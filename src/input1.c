@@ -260,9 +260,6 @@ void adjustdata(Project *pr)
         parser->Unitsflag = US;
     }
 
-    // Revise pressure units depending on flow units
-    if (parser->Unitsflag != SI) parser->Pressflag = PSI;
-    else if (parser->Pressflag == PSI) parser->Pressflag = METERS;
     
     // Store value of viscosity & diffusivity
     ucf = 1.0;
@@ -414,14 +411,20 @@ void initunits(Project *pr)
            hcf,    // head conversion factor
            pcf,    // pressure conversion factor
            wcf;    // energy conversion factor
+    if (parser->Pressflag == METERS)   strcpy(rpt->Field[PRESSURE].Units, u_METERS);
+    else if (parser->Pressflag == KPA) strcpy(rpt->Field[PRESSURE].Units, u_KPA);
+    else                               strcpy(rpt->Field[PRESSURE].Units, u_PSI);
+
+    if (parser->Pressflag == METERS) pcf = MperFT * hyd->SpGrav;
+    else if (parser->Pressflag == KPA) pcf = KPAperPSI * PSIperFT * hyd->SpGrav;
+    else pcf = PSIperFT * hyd->SpGrav;
+
 
     if (parser->Unitsflag == SI)  // SI units
     {
         strcpy(rpt->Field[DEMAND].Units, RptFlowUnitsTxt[parser->Flowflag]);
         strcpy(rpt->Field[ELEV].Units, u_METERS);
         strcpy(rpt->Field[HEAD].Units, u_METERS);
-        if (parser->Pressflag == METERS) strcpy(rpt->Field[PRESSURE].Units, u_METERS);
-        else                             strcpy(rpt->Field[PRESSURE].Units, u_KPA);
         strcpy(rpt->Field[LENGTH].Units, u_METERS);
         strcpy(rpt->Field[DIAM].Units, u_MMETERS);
         strcpy(rpt->Field[FLOW].Units, RptFlowUnitsTxt[parser->Flowflag]);
@@ -438,8 +441,6 @@ void initunits(Project *pr)
         if (parser->Flowflag == CMD) qcf = CMDperCFS;
 
         hcf = MperFT;
-        if (parser->Pressflag == METERS) pcf = MperFT * hyd->SpGrav;
-        else pcf = KPAperPSI * PSIperFT * hyd->SpGrav;
         wcf = KWperHP;
     }
     else  // US units
@@ -463,7 +464,6 @@ void initunits(Project *pr)
         if (parser->Flowflag == IMGD) qcf = IMGDperCFS;
         if (parser->Flowflag == AFD)  qcf = AFDperCFS;
         hcf = 1.0;
-        pcf = PSIperFT * hyd->SpGrav;
         wcf = 1.0;
     }
 
