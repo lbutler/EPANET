@@ -45,7 +45,7 @@ static void writeenergy(Project *);
 static int  writeresults(Project *);
 static int  disconnected(Project *);
 static void marknodes(Project *, int, int *, char *);
-static void getclosedlink(Project *, int, char *);
+static void getclosedlink(Project *, int, char *, int);
 static void writelimits(Project *, int, int);
 static int  checklimits(Report *, double *, int, int);
 static char *fillstr(char *, char, int);
