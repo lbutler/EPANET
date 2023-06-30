@@ -1384,7 +1384,7 @@ void getclosedlink(Project *pr, int i, char *marked, int *limit)
             writeline(pr, pr->Msg);
             return;
         }
-        else getclosedlink(pr, j, marked, &limit);
+        else getclosedlink(pr, j, marked, limit);
     }
 }
 
