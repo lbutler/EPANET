@@ -1222,6 +1222,8 @@ int disconnected(Project *pr)
     char *marked;
     Snode *node;
 
+    int limit = 0;
+
     // Allocate memory for node list & marked list
     nodelist = (int *)calloc(net->Nnodes + 1, sizeof(int));
     marked = (char *)calloc(net->Nnodes + 1, sizeof(char));
@@ -1287,7 +1289,7 @@ int disconnected(Project *pr)
                     clocktime(rpt->Atime, time->Htime));
             writeline(pr, pr->Msg);
         }
-        getclosedlink(pr, j, marked, 1000);
+        getclosedlink(pr, j, marked, &limit);
     }
 
     // Free allocated memory
@@ -1350,7 +1352,7 @@ void marknodes(Project *pr, int m, int *nodelist, char *marked)
     }
 }
 
-void getclosedlink(Project *pr, int i, char *marked, int limit)
+void getclosedlink(Project *pr, int i, char *marked, int *limit)
 /*
 **----------------------------------------------------------------
 **   Input:   i = junction index
@@ -1362,7 +1364,10 @@ void getclosedlink(Project *pr, int i, char *marked, int limit)
 {
     Network *net = &pr->network;
 
-    printf("This is a number: %d\n", limit);
+    
+
+    printf("This is a number: %d\n", (*limit));
+    (*limit)++;
 
     int j, k;
     Padjlist alink;
@@ -1379,7 +1384,7 @@ void getclosedlink(Project *pr, int i, char *marked, int limit)
             writeline(pr, pr->Msg);
             return;
         }
-        else getclosedlink(pr, j, marked, limit--);
+        else getclosedlink(pr, j, marked, &limit);
     }
 }
 
