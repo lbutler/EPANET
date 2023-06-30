@@ -1362,6 +1362,8 @@ void getclosedlink(Project *pr, int i, char *marked, int limit)
 {
     Network *net = &pr->network;
 
+    printf("This is a number: %d\n", limit);
+
     int j, k;
     Padjlist alink;
 
