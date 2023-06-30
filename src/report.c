@@ -1287,7 +1287,7 @@ int disconnected(Project *pr)
                     clocktime(rpt->Atime, time->Htime));
             writeline(pr, pr->Msg);
         }
-        getclosedlink(pr, j, marked);
+        getclosedlink(pr, j, marked, 1000);
     }
 
     // Free allocated memory
@@ -1350,7 +1350,7 @@ void marknodes(Project *pr, int m, int *nodelist, char *marked)
     }
 }
 
-void getclosedlink(Project *pr, int i, char *marked)
+void getclosedlink(Project *pr, int i, char *marked, int limit)
 /*
 **----------------------------------------------------------------
 **   Input:   i = junction index
@@ -1377,7 +1377,7 @@ void getclosedlink(Project *pr, int i, char *marked)
             writeline(pr, pr->Msg);
             return;
         }
-        else getclosedlink(pr, j, marked);
+        else getclosedlink(pr, j, marked, limit--);
     }
 }
 
