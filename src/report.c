@@ -1365,20 +1365,41 @@ void getclosedlink(Project *pr, int i, char *marked)
     int j, k;
     Padjlist alink;
 
+    // Create a stack to keep track of nodes
+    int stackSize = net->Njuncs;
+    int *stack = (int *)malloc(stackSize * sizeof(int));
+    int top = -1;
+
     marked[i] = 2;
-    for (alink = net->Adjlist[i]; alink != NULL; alink = alink->next)
-    {
-        k = alink->link;
-        j = alink->node;
-        if (marked[j] == 2) continue;
-        if (marked[j] == 1)
-        {
-            sprintf(pr->Msg, WARN03c, net->Link[k].ID);
-            writeline(pr, pr->Msg);
-            return;
+    stack[++top] = i;
+
+    while (top >= 0) {
+        i = stack[top--];
+        alink = net->Adjlist[i];
+
+        while (alink != NULL) {
+            k = alink->link;
+            j = alink->node;
+
+            if (marked[j] == 2) {
+                alink = alink->next;
+                continue;
+            }
+            
+            if (marked[j] == 1) {
+                sprintf(pr->Msg, WARN03c, net->Link[k].ID);
+                writeline(pr, pr->Msg);
+                free(stack);
+                return;
+            }
+
+            marked[j] = 2;
+            stack[++top] = j;
+            alink = alink->next;
         }
-        else getclosedlink(pr, j, marked);
     }
+
+    free(stack);
 }
 
 void writelimits(Project *pr, int j1, int j2)
