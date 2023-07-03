@@ -1368,24 +1368,28 @@ void getclosedlink(Project *pr, int i, char *marked)
     // Create a stack to keep track of nodes
     int stackSize = net->Njuncs;
     int *stack = (int *)malloc(stackSize * sizeof(int));
-    int top = -1;
+    int top = 0;
 
+    // Mark the current junction as examined and push onto stack
     marked[i] = 2;
-    stack[++top] = i;
+    stack[top] = i;
 
     while (top >= 0) {
         i = stack[top--];
         alink = net->Adjlist[i];
-
+        
+        // Iterate through each link adjacent to the current node
         while (alink != NULL) {
             k = alink->link;
             j = alink->node;
 
+            // Skip nodes that have already been examined
             if (marked[j] == 2) {
                 alink = alink->next;
                 continue;
             }
-            
+
+            // If a closed link is found, return and display a warning message
             if (marked[j] == 1) {
                 sprintf(pr->Msg, WARN03c, net->Link[k].ID);
                 writeline(pr, pr->Msg);
@@ -1393,6 +1397,7 @@ void getclosedlink(Project *pr, int i, char *marked)
                 return;
             }
 
+            // Mark the node as examined and push it onto the stack
             marked[j] = 2;
             stack[++top] = j;
             alink = alink->next;
