@@ -3,13 +3,13 @@
 /*
  ******************************************************************************
  Project:      OWA EPANET
- Version:      2.2
+ Version:      2.3
  Module:       epanet2_enums.h
  Description:  enumerations of symbolic constants used by the API functions
  Authors:      see AUTHORS
  Copyright:    see AUTHORS
  License:      see LICENSE
- Last Updated: 04/28/2023
+ Last Updated: 07/17/2023
  ******************************************************************************
 */
 
@@ -64,7 +64,8 @@ typedef enum {
   EN_MAXVOLUME    = 25, //!< Tank maximum volume (read only)
   EN_CANOVERFLOW  = 26, //!< Tank can overflow (= 1) or not (= 0)
   EN_DEMANDDEFICIT = 27,//!< Amount that full demand is reduced under PDA (read only)
-  EN_NODE_INCONTROL = 28  //!< Is present in any simple or rule-based control (= 1) or not (= 0)
+  EN_NODE_INCONTROL = 28, //!< Is present in any simple or rule-based control (= 1) or not (= 0)
+  EN_EMITTERFLOW    = 29  //!< Current emitter flow (read only)
 } EN_NodeProperty;
 
 /// Link properties
@@ -351,7 +352,8 @@ typedef enum {
   EN_CONCENLIMIT    = 22, //!< Limiting concentration for growth reactions
   EN_DEMANDPATTERN  = 23, //!< Name of default demand pattern
   EN_EMITBACKFLOW   = 24, //!< 1 if emitters can backflow, 0 if not
-  EN_PRESS_UNITS    = 25  //!< Pressure units (see @ref EN_PressUnits)
+  EN_PRESS_UNITS    = 25, //!< Pressure units (see @ref EN_PressUnits)
+  EN_STATUS_REPORT  = 26  //!< Type of status report to produce (see @ref EN_StatusReport)
 } EN_Option;
 
 /// Simple control types
@@ -445,7 +447,8 @@ typedef enum {
 /// Status reporting levels
 /**
 These choices specify the level of status reporting written to a project's report
-file during a hydraulic analysis. The level is set using the @ref EN_setstatusreport function.
+file during a hydraulic analysis. The level is set using the @ref EN_setstatusreport
+or the @ref EN_setoption functions.
 */
 typedef enum {
   EN_NO_REPORT = 0,     //!< No status reporting
@@ -501,5 +504,8 @@ typedef enum {
 #define EN_MISSING    -1.E10  //!< Missing value indicator
 #define EN_SET_CLOSED -1.E10  //!< Link set closed indicator
 #define EN_SET_OPEN    1.E10  //!< Link set open indicator
+
+#define EN_FALSE 0  // boolean false
+#define EN_TRUE 1   // boolean true
 
 #endif //EPANET2_ENUMS_H

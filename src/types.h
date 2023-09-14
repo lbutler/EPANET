@@ -1,13 +1,13 @@
 /*
  ******************************************************************************
  Project:      OWA EPANET
- Version:      2.2
+ Version:      2.3
  Module:       types.h
  Description:  symbolic constants and data types used throughout EPANET
  Authors:      see AUTHORS
  Copyright:    see AUTHORS
  License:      see LICENSE
- Last Updated: 04/29/2023
+ Last Updated: 07/17/2023
  ******************************************************************************
 */
 
@@ -31,7 +31,7 @@ typedef  int          INT4;
    Various constants
 ----------------------------------------------
 */
-#define   CODEVERSION        20200
+#define   CODEVERSION        20300
 #define   MAGICNUMBER        516114521
 #define   ENGINE_VERSION     201   // Used for binary hydraulics file
 #define   EOFMARK            0x1A  // Use 0x04 for UNIX systems
@@ -474,6 +474,7 @@ typedef struct             // Control Statement
     double      Setting;   // new link setting
     StatusType  Status;    // new link status
     ControlType Type;      // control type
+    int         isEnabled; // control enabled?
 } Scontrol;
 
 typedef struct             // Field Object of Report Table
@@ -525,6 +526,7 @@ typedef struct                 // Control Rule Structure
 {
     char     label[MAXID+1];   // rule label
     double   priority;         // priority level
+    int      isEnabled;        // is the rule enabled?
     Spremise *Premises;        // list of premises
     Saction  *ThenActions;     // list of THEN actions
     Saction  *ElseActions;     // list of ELSE actions

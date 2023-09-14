@@ -4,7 +4,7 @@
 'Declarations of functions in the EPANET PROGRAMMERs TOOLKIT
 '(EPANET2.DLL) for use with VB.Net.
 
-'Last updated on 05/13/2023
+'Last updated on 07/18/2023
 
 Imports System.Runtime.InteropServices
 Imports System.Text
@@ -41,6 +41,7 @@ Public Const EN_MAXVOLUME = 25
 Public Const EN_CANOVERFLOW = 26
 Public Const EN_DEMANDDEFICIT = 27
 Public Const EN_NODE_INCONTROL = 28
+Public Const EN_EMITTERFLOW = 29
 
 Public Const EN_DIAMETER = 0      ' Link parameters
 Public Const EN_LENGTH = 1
@@ -182,6 +183,7 @@ Public Const EN_CONCENLIMIT = 22
 Public Const EN_DEMANDPATTERN = 23
 Public Const EN_EMITBACKFLOW = 24
 Public Const EN_PRESS_UNITS = 25
+Public Const EN_STATUS_REPORT = 26
 
 Public Const EN_LOWLEVEL = 0      ' Control types
 Public Const EN_HILEVEL = 1

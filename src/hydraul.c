@@ -7,7 +7,7 @@
  Authors:      see AUTHORS
  Copyright:    see AUTHORS
  License:      see LICENSE
- Last Updated: 08/13/2022
+ Last Updated: 08/02/2023
  ******************************************************************************
 */
 
@@ -557,6 +557,10 @@ int  controls(Project *pr)
     {
         // Make sure that link is defined
         control = &net->Control[i];
+        if (!control->isEnabled)
+        {
+            continue;
+        }
         reset = 0;
         if ( (k = control->Link) <= 0) continue;
         link = &net->Link[k];
@@ -718,7 +722,7 @@ int  controltimestep(Project *pr, long *tstep)
     Network *net = &pr->network;
     Hydraul *hyd = &pr->hydraul;
 
-    int    i, j, k, n, controlIndex;
+    int    i, j, k, n, controlIndex = 0;
     double h, q, v;
     long   t, t1, t2;
     Slink  *link;
@@ -729,7 +733,10 @@ int  controltimestep(Project *pr, long *tstep)
     {
         t = 0;
         control = &net->Control[i];
-
+        if (!control->isEnabled)
+        {
+            continue;
+        }
         // Control depends on a tank level
         if ( (n = control->Node) > 0)
         {

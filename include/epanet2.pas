@@ -3,7 +3,7 @@ unit epanet2;
 { Declarations of imported procedures from the EPANET PROGRAMMERs TOOLKIT }
 { (EPANET2.DLL) }
 
-{Last updated on 05/13/2023}
+{Last updated on 09/11/2023}
 
 interface
 
@@ -12,9 +12,9 @@ const
 { These are codes used by the DLL functions }
  EN_MAXID = 31;        { Max. # characters in ID name }
  EN_MAXMSG = 255;      { Max. # characters in strings }
- EN_MISSING = -1.E10;
- EN_SET_CLOSED = -1.E10;
- EN_SET_OPEN = 1.E10;
+ EN_MISSING = -1.0E10;
+ EN_SET_CLOSED = -1.0E10;
+ EN_SET_OPEN = 1.0E10;
 
  EN_ELEVATION  = 0;    { Node parameters }
  EN_BASEDEMAND = 1;
@@ -45,6 +45,7 @@ const
  EN_CANOVERFLOW = 26;
  EN_DEMANDDEFICIT = 27;
  EN_NODE_INCONTROL = 28;
+ EN_EMITTERFLOW = 29;
 
  EN_DIAMETER    = 0;    { Link parameters }
  EN_LENGTH      = 1;
@@ -162,6 +163,10 @@ const
  EN_CMD        = 9;
  EN_CMS        = 10;
 
+ EN_PSI        = 0;   { Pressure units types }
+ EN_KPA        = 1;
+ EN_METERS     = 2;
+
  EN_DDA        = 0;   { Demand model types }
  EN_PDA        = 1;  
  
@@ -190,6 +195,8 @@ const
  EN_CONCENLIMIT  = 22;
  EN_DEMANDPATTERN = 23;
  EN_EMITBACKFLOW  = 24;
+ EN_PRESS_UNITS   = 25;
+ EN_STATUS_REPORT = 26;
 
  EN_LOWLEVEL   = 0;   { Control types }
  EN_HILEVEL    = 1;
@@ -264,8 +271,8 @@ const
  EN_R_IS_CLOSED = 2;
  EN_R_IS_ACTIVE = 3;
 
-{$ifdef WINDOWS}
- EpanetLib = 'epanet2.dll';
+{$ifdef MSWINDOWS}
+ EpanetLib = 'epanet2.dll'; 
 {$else}
  EpanetLib = 'libepanet2.so';
 {$endif}

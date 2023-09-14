@@ -1,13 +1,13 @@
 /*
  ******************************************************************************
  Project:      OWA EPANET
- Version:      2.2
+ Version:      2.3
  Module:       epanet.c
  Description:  implementation of EPANET's API functions
  Authors:      see AUTHORS
  Copyright:    see AUTHORS
  License:      see LICENSE
- Last Updated: 04/29/2023
+ Last Updated: 07/17/2023
  ******************************************************************************
 */
 
@@ -1211,6 +1211,9 @@ int DLLEXPORT EN_getoption(EN_Project p, int option, double *value)
     case EN_PRESS_UNITS:
         v = (double)p->parser.Pressflag;
         break;
+    case EN_STATUS_REPORT:
+        v = (double)( p->report.Statflag);
+        break;        
     default:
         return 251;
     }
@@ -1400,6 +1403,12 @@ int DLLEXPORT EN_setoption(EN_Project p, int option, double value)
         hcf =  Ucf[HEAD] / hfactor;
         qcf =  Ucf[FLOW] / qfactor;
         updateruleunits(p, dcf, pcf, hcf, qcf);
+        break;
+        
+    case EN_STATUS_REPORT:
+        i = ROUND(value);
+        if (i < EN_NO_REPORT || i > EN_FULL_REPORT) return 213;
+        p->report.Statflag = i;
         break;
 
     default:
@@ -2365,6 +2374,10 @@ int DLLEXPORT EN_getnodevalue(EN_Project p, int index, int property, double *val
         v = (double)incontrols(p, NODE, index);
         break;
 
+    case EN_EMITTERFLOW:
+        v = hyd->EmitterFlow[index] * Ucf[FLOW];
+        break;
+        
     default:
         return 251;
     }
@@ -5246,6 +5259,42 @@ int DLLEXPORT EN_setcontrol(EN_Project p, int index, int type, int linkIndex,
     return 0;
 }
 
+
+int  DLLEXPORT EN_getcontrolenabled(EN_Project p, int index, int *enabled)
+{
+    Network *net = &p->network;
+    Scontrol *control;
+    
+    // Check for valid arguments
+    if (!p->Openflag) 
+        return 102;
+    if (index <= 0 || index > net->Ncontrols) 
+        return 241;
+
+    control = &net->Control[index];
+    *enabled = control->isEnabled;
+    return 0;
+}
+
+
+int  DLLEXPORT EN_setcontrolenabled(EN_Project p, int index, int enabled)
+{
+    Network *net = &p->network;
+    Scontrol *control;
+    
+    // Check for valid arguments
+    if (enabled != TRUE && enabled != FALSE)
+        return 202; // illegal numeric value
+    if (!p->Openflag) 
+        return 102;
+    if (index <= 0 || index > net->Ncontrols) 
+        return 241;
+
+    control = &net->Control[index];
+    control->isEnabled = enabled;
+    return 0;
+}
+
 /********************************************************************
 
     Rule-Based Controls Functions
@@ -5668,3 +5717,41 @@ int DLLEXPORT EN_setrulepriority(EN_Project p, int index, double priority)
     p->network.Rule[index].priority = priority;
     return 0;
 }
+
+
+int  DLLEXPORT EN_getruleenabled(EN_Project p, int index, int *enabled)
+{
+    Network *net = &p->network;
+    Srule *rule;
+    
+    // Check for valid arguments
+    if (!p->Openflag) 
+        return 102;
+    if (index <= 0 || index > net->Nrules) 
+        return 241;
+
+    rule = &net->Rule[index];
+    *enabled = rule->isEnabled;
+    return 0;
+}
+
+
+int  DLLEXPORT EN_setruleenabled(EN_Project p, int index, int enabled)
+{
+    Network *net = &p->network;
+    Srule *rule;
+    
+    // Check for valid arguments
+    if (enabled != TRUE && enabled != FALSE)
+        return 202; // illegal numeric value
+    if (!p->Openflag) 
+        return 102;
+    if (index <= 0 || index > net->Nrules) 
+        return 241;
+
+    rule = &net->Rule[index];
+    rule->isEnabled = enabled;
+    return 0;
+}
+
+

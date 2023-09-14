@@ -7,7 +7,7 @@ Description:  parses network data from a line of an EPANET input file
 Authors:      see AUTHORS
 Copyright:    see AUTHORS
 License:      see LICENSE
-Last Updated: 02/05/2023
+Last Updated: 09/11/2023
 ******************************************************************************
 */
 
@@ -550,7 +550,7 @@ int valvedata(Project *pr)
         if (c == 0) return setError(parser, 7, 206);
         losscurve = c;
         net->Curve[c].Type = VALVE_CURVE;
-        if (setting > 1.0) setting = 1.0;
+        if (setting > 100.0) setting = 100.0;
     }        
 
     // Check for illegal connections
@@ -943,6 +943,7 @@ int controldata(Project *pr)
     control->Time = (long)(3600.0 * time);
     if (ctltype == TIMEOFDAY) control->Time %= SECperDAY;
     control->Grade = level;
+    control->isEnabled = TRUE;
     return 0;
 }
 
@@ -1842,10 +1843,7 @@ int optionchoice(Project *pr, int n)
         }
         if (qual->Qualflag == TRACE)
         {
-            // Copy Trace Node ID to parser->Tok[0] for error reporting
-            strcpy(parser->Tok[0], "");
             if (n < 2) return 201;
-            strcpy(parser->Tok[0], parser->Tok[2]);
             qual->TraceNode = findnode(net, parser->Tok[2]);
             if (qual->TraceNode == 0) return setError(parser, 2, 212);
             strncpy(qual->ChemName, u_PERCENT, MAXID);
