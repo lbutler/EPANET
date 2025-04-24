@@ -24,7 +24,7 @@ def result_compare(path_test, path_ref, comp_args):
     test_reader = er.output_generator(path_test)
     ref_reader = er.output_generator(path_ref)
     
-    for test, ref in it.izip(test_reader, ref_reader):
+    for test, ref in zip(test_reader, ref_reader):
         total += 1
         if total%100000 == 0:
             print(total)

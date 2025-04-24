@@ -64,7 +64,7 @@ def epanet_allclose_compare(path_test, path_ref, rtol, atol):
         AssertionError()
         ...
     '''
-    for (test, ref) in it.izip(ordr.output_generator(path_test), 
+    for (test, ref) in zip(ordr.output_generator(path_test), 
                                ordr.output_generator(path_ref)):
         
         if len(test[0]) != len(ref[0]):
@@ -74,6 +74,8 @@ def epanet_allclose_compare(path_test, path_ref, rtol, atol):
         if np.array_equal(test[0], ref[0]):
             continue
         else:
+            print('test[0] = ', test[0])
+            print('ref[0] = ', ref[0])
             np.testing.assert_allclose(test[0], ref[0], rtol, atol)
 
     return True
@@ -108,7 +110,7 @@ def epanet_mincdd_compare(path_test, path_ref, rtol, atol):
     '''
     min_cdd = 100.0
 
-    for (test, ref) in it.izip(ordr.output_generator(path_test), 
+    for (test, ref) in zip(ordr.output_generator(path_test), 
                                ordr.output_generator(path_ref)):
 
         if len(test[0]) != len(ref[0]):
@@ -199,7 +201,7 @@ def epanet_report_compare(path_test, path_ref, rtol, atol):
     FOOTER = 2
     with open(path_test ,'r') as ftest, open(path_ref, 'r') as fref:
         
-        for (test_line, ref_line) in it.izip(hdf.parse(ftest, HEADER, FOOTER)[1], 
+        for (test_line, ref_line) in zip(hdf.parse(ftest, HEADER, FOOTER)[1], 
                                              hdf.parse(fref, HEADER, FOOTER)[1]): 
         
             if test_line != ref_line: 

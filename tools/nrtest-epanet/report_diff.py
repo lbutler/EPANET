@@ -20,7 +20,7 @@ import nrtest_epanet.output_reader as ordr
 
 
 def _binary_diff(path_test, path_ref, min_cdd):
-    for (test, ref) in it.izip(ordr.output_generator(path_test), 
+    for (test, ref) in zip(ordr.output_generator(path_test), 
                                ordr.output_generator(path_ref)):
         
         if len(test[0]) != len(ref[0]):

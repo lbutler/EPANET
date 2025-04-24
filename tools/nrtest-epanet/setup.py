@@ -38,8 +38,7 @@ setup(
     install_requires=[
         'header_detail_footer>=2.3',
         'nrtest>=0.2.0',
-        'numpy>=1.7.0',
-        'epanet_output'
+        'numpy>=1.7.0'
     ],
     keywords='nrtest_epanet'  
 )

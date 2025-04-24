@@ -1,0 +1,30 @@
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Docker files (if storing image outputs locally)
+docker-output/
+
+# Python virtual environments
+venv/
+*.pyc
+__pycache__/
+
+# Build artifacts (adjust CMake build dir if different)
+build/
+**/build/
+*.o
+*.a
+*.so
+*.dll
+*.exe
+
+# IDE files
+.vscode/
+.idea/
+
+# Test output (if generated locally)
+nrtests/
+*.out
+*.rpt
