@@ -42,6 +42,7 @@ set(toolkit_test_srcs
      test_valve.cpp
      test_units.cpp
      test_leakage.cpp
+     test_rules_variables_expressions.cpp
 )
 
 add_executable(test_toolkit ${toolkit_test_srcs})
