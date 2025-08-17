@@ -520,6 +520,11 @@ typedef struct s_Premise       // Rule Premise Clause
     int      relop;            // relational operator (=, >, <, etc.)
     int      status;           // variable's status (OPEN, CLOSED)
     double   value;            // variable's value
+    int      exprIndex;        // index into Expressions array; -1 if not an expression LHS
+    int      rhsIsVar;         // 1 if RHS refers to a variable, 0 if it is a literal
+    int      rhsObject;        // RHS object type when rhsIsVar = 1
+    int      rhsIndex;         // RHS object index when rhsIsVar = 1
+    int      rhsVariable;      // RHS variable enum when rhsIsVar = 1
     struct   s_Premise *next;  // next premise clause
 } Spremise;
 
@@ -613,7 +618,9 @@ typedef struct {
     ErrTok,                // Index of error-producing token
     Unitsflag,             // Unit system flag
     Flowflag,              // Flow units flag
-    Pressflag;             // Pressure units flag
+    Pressflag,             // Pressure units flag
+    VarCount,              // Named variable count in [RULES]
+    ExprCount;             // Expression count in [RULES]
 
   Spattern *PrevPat;       // Previous pattern processed
   Scurve   *PrevCurve;     // Previous curve processed
@@ -712,8 +719,36 @@ typedef struct {
     Spremise    *LastPremise;    // Previous premise clause
     Saction     *LastThenAction; // Previous THEN action
     Saction     *LastElseAction; // Previous ELSE action
-
+    int         CurrentVar;      // cursor while parsing named variables
+    int         CurrentExpr;     // cursor while parsing expressions
+    
 } Rules;
+
+// Named variables and expressions definitions for rules
+
+#define MAXVARNAME 32
+
+// Forward declaration of MathExpr (from mathexpr.h)
+struct ExprNode; typedef struct ExprNode MathExpr;
+
+typedef struct {
+    char name[MAXVARNAME+1];
+    int  object;    // r_NODE, r_LINK, r_SYSTEM
+    int  index;     // object index
+    int  variable;  // Varwords enum
+} NamedVar;
+
+typedef struct {
+    char name[MAXVARNAME+1];
+    MathExpr* expr;
+} NamedExpr;
+
+// Attach storage to Network to simplify lifetime management with project
+// (kept localized within rule subsystem)
+typedef struct RulesStorage {
+    NamedVar*  NamedVars;      // array length VarCount
+    NamedExpr* Expressions;    // array length ExprCount
+} RulesStorage;
 
 // Sparse Matrix Wrapper
 typedef struct {
@@ -906,6 +941,9 @@ typedef struct Project {
   Rules      rules;              // Rule-based controls wrapper
   Hydraul    hydraul;            // Hydraulics solver wrapper
   Quality    quality;            // Water quality solver wrapper
+
+  // Storage for named variables and expressions
+  RulesStorage rulesStorage;
 
   double Ucf[MAXVAR];            // Unit conversion factors
 

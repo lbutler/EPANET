@@ -62,6 +62,8 @@ int netsize(Project *pr)
     parser->MaxControls = 0;
     parser->MaxRules = 0;
     parser->MaxCurves = 0;
+    parser->VarCount = 0;
+    parser->ExprCount = 0;
     sect = -1;
 
 

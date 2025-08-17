@@ -199,6 +199,8 @@
 #define   w_ELSE        "ELSE"
 #define   w_PRIORITY    "PRIO"
 #define   w_DISABLED    "DISABLED"
+#define   w_VARIABLE    "VARIABLE"
+#define   w_EXPRESSION  "EXPRESSION"
 
 // ------ Input File Section Names ------------------------
 
