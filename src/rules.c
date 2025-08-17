@@ -297,6 +297,30 @@ int ruledata(Project *pr)
     // Find the key word that begins the rule statement
     err = 0;
     key = findmatch(Tok[0], Ruleword);
+
+    // If not a keyword, check if it's a variable action (when in THEN/ELSE state)
+    if (key == -1 && (rules->RuleState == r_THEN || rules->RuleState == r_ELSE))
+    {
+        // Check if this looks like a variable action: <VariableName> = <value>
+        if (parser->Ntokens == 3 && match(Tok[1], "="))
+        {
+            // Check if the first token is a valid variable name
+            int varIndex = getNamedVarIndex(pr, Tok[0]);
+            if (varIndex >= 0)
+            {
+                NamedVar *nv = &NAMED_VARS(pr)[varIndex];
+                // Validate that the variable references an assignable property
+                if (nv->object == r_LINK && (nv->variable == r_STATUS || nv->variable == r_SETTING))
+                {
+                    err = newaction(pr);
+                    return err;
+                }
+            }
+        }
+        err = 201; // Unrecognized keyword
+        return err;
+    }
+
     switch (key)
     {
     case -1:
@@ -1587,7 +1611,9 @@ int newaction(Project *pr)
 //----------------------------------------------------------
 //   Adds new action to current rule.
 //   Format is:
-//      THEN/ELSE/AND LINK <id> <variable> IS <value>
+//      THEN/ELSE/AND LINK <id> <variable> = <value>
+//      OR
+//      THEN/ELSE/AND <VariableName> = <value>
 //----------------------------------------------------------
 {
     Network *net = &pr->network;
@@ -1599,10 +1625,126 @@ int newaction(Project *pr)
     Saction *a;
     char **Tok = parser->Tok;
 
-    // Check for correct number of tokens
-    if (parser->Ntokens != 6)
+    // Check for correct number of tokens (either 6 for LINK format or 3 for variable format or 4 for AND variable format)
+    if (parser->Ntokens != 6 && parser->Ntokens != 3 && parser->Ntokens != 4)
         return 201;
 
+    // Handle variable format: <VariableName> = <value> or AND <VariableName> = <value>
+    if (parser->Ntokens == 3 || parser->Ntokens == 4)
+    {
+        // Determine the variable name and value tokens
+        char *varName, *value;
+        if (parser->Ntokens == 3)
+        {
+            // Format: <VariableName> = <value>
+            varName = Tok[0];
+            value = Tok[2];
+        }
+        else
+        {
+            // Format: AND <VariableName> = <value>
+            varName = Tok[1];
+            value = Tok[3];
+        }
+
+        // Check for '=' at the right position
+        if (!match((parser->Ntokens == 3) ? Tok[1] : Tok[2], "="))
+            return 201;
+
+        // Look up the variable name
+        int varIndex = getNamedVarIndex(pr, varName);
+        if (varIndex < 0)
+            return 201; // Variable not found
+
+        NamedVar *nv = &NAMED_VARS(pr)[varIndex];
+
+        // Validate that the variable references an assignable property
+        if (nv->object != r_LINK)
+            return 201; // Only LINK properties can be assigned
+
+        if (nv->variable != r_STATUS && nv->variable != r_SETTING)
+            return 201; // Only STATUS and SETTING can be assigned
+
+        // Get the link index
+        j = nv->index;
+        if (j == 0)
+            return 204; // Link not found
+
+        // Cannot control a CV
+        if (net->Link[j].Type == CVPIPE)
+            return 207;
+
+        // Find value for status or setting
+        s = -1;
+        x = MISSING;
+        if ((k = findmatch(value, Value)) > IS_NUMBER)
+        {
+            s = k;
+            // Validate that status words are only used for STATUS targets
+            if (nv->variable != r_STATUS)
+                return 201; // Status words only valid for STATUS targets
+        }
+        else
+        {
+            if (!getfloat(value, &x))
+                return 202;
+            if (x < 0.0)
+                return 202;
+
+            // Validate that numeric values are only used for SETTING targets
+            if (nv->variable != r_SETTING)
+                return 201; // Numeric values only valid for SETTING targets
+        }
+
+        // Cannot change setting for a GPV
+        if (x != MISSING && net->Link[j].Type == GPV)
+            return 202;
+
+        // Set status for pipe in case setting was specified
+        if (x != MISSING && net->Link[j].Type == PIPE)
+        {
+            if (x == 0.0)
+                s = IS_CLOSED;
+            else
+                s = IS_OPEN;
+            x = MISSING;
+        }
+
+        // Create a new action structure
+        a = (Saction *)malloc(sizeof(Saction));
+        if (a == NULL)
+            return 101;
+        a->link = j;
+        a->status = s;
+        a->setting = x;
+
+        // Add action to current rule's action list
+        if (rules->RuleState == r_THEN)
+        {
+            a->next = NULL;
+            if (rules->LastThenAction == NULL)
+            {
+                net->Rule[net->Nrules].ThenActions = a;
+            }
+            else
+                rules->LastThenAction->next = a;
+            rules->LastThenAction = a;
+        }
+        else
+        {
+            a->next = NULL;
+            if (rules->LastElseAction == NULL)
+            {
+                net->Rule[net->Nrules].ElseActions = a;
+            }
+            else
+                rules->LastElseAction->next = a;
+            rules->LastElseAction = a;
+        }
+        return 0;
+    }
+
+    // Handle legacy LINK format: LINK <id> <variable> = <value>
     // Check that link exists
     j = findlink(net, Tok[2]);
     if (j == 0)

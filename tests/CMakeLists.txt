@@ -44,6 +44,7 @@ set(toolkit_test_srcs
      test_leakage.cpp
      test_rules_variables_expressions.cpp
      test_rules_variables_in_comparisons.cpp
+     test_rules_variable_actions.cpp
 )
 
 add_executable(test_toolkit ${toolkit_test_srcs})
