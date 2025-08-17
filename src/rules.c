@@ -25,78 +25,99 @@
 #define snprintf _snprintf
 #endif
 
-enum Rulewords {
-  r_RULE,
-  r_IF,
-  r_AND,
-  r_OR,
-  r_THEN,
-  r_ELSE,
-  r_PRIORITY,
-  r_DISABLED,
-  r_VARIABLE,
-  r_EXPRESSION,
-  r_ERROR
+enum Rulewords
+{
+    r_RULE,
+    r_IF,
+    r_AND,
+    r_OR,
+    r_THEN,
+    r_ELSE,
+    r_PRIORITY,
+    r_DISABLED,
+    r_VARIABLE,
+    r_EXPRESSION,
+    r_ERROR
 };
-char *Ruleword[] = {w_RULE, w_IF,   w_AND,      w_OR,
+char *Ruleword[] = {w_RULE, w_IF, w_AND, w_OR,
                     w_THEN, w_ELSE, w_PRIORITY, w_DISABLED, w_VARIABLE, w_EXPRESSION, NULL};
 
-enum Varwords {
-  r_DEMAND,
-  r_HEAD,
-  r_GRADE,
-  r_LEVEL,
-  r_PRESSURE,
-  r_FLOW,
-  r_STATUS,
-  r_SETTING,
-  r_POWER,
-  r_TIME,
-  r_CLOCKTIME,
-  r_FILLTIME,
-  r_DRAINTIME
+enum Varwords
+{
+    r_DEMAND,
+    r_HEAD,
+    r_GRADE,
+    r_LEVEL,
+    r_PRESSURE,
+    r_FLOW,
+    r_STATUS,
+    r_SETTING,
+    r_POWER,
+    r_TIME,
+    r_CLOCKTIME,
+    r_FILLTIME,
+    r_DRAINTIME
 };
-char *Varword[] = {w_DEMAND,    w_HEAD,     w_GRADE,     w_LEVEL, w_PRESSURE,
-                   w_FLOW,      w_STATUS,   w_SETTING,   w_POWER, w_TIME,
+char *Varword[] = {w_DEMAND, w_HEAD, w_GRADE, w_LEVEL, w_PRESSURE,
+                   w_FLOW, w_STATUS, w_SETTING, w_POWER, w_TIME,
                    w_CLOCKTIME, w_FILLTIME, w_DRAINTIME, NULL};
 
-enum Objects {
-  r_JUNC,
-  r_RESERV,
-  r_TANK,
-  r_PIPE,
-  r_PUMP,
-  r_VALVE,
-  r_NODE,
-  r_LINK,
-  r_SYSTEM
+enum Objects
+{
+    r_JUNC,
+    r_RESERV,
+    r_TANK,
+    r_PIPE,
+    r_PUMP,
+    r_VALVE,
+    r_NODE,
+    r_LINK,
+    r_SYSTEM
 };
-char *Object[] = {w_JUNC,  w_RESERV, w_TANK, w_PIPE,   w_PUMP,
-                  w_VALVE, w_NODE,   w_LINK, w_SYSTEM, NULL};
+char *Object[] = {w_JUNC, w_RESERV, w_TANK, w_PIPE, w_PUMP,
+                  w_VALVE, w_NODE, w_LINK, w_SYSTEM, NULL};
 
 // NOTE: place "<=" & ">=" before "<" & ">" so that findmatch() works correctly.
-enum Operators { EQ, NE, LE, GE, LT, GT, IS, NOT, BELOW, ABOVE };
-char *Operator[] = {"=",  "<>",  "<=",    ">=",    "<", ">",
+enum Operators
+{
+    EQ,
+    NE,
+    LE,
+    GE,
+    LT,
+    GT,
+    IS,
+    NOT,
+    BELOW,
+    ABOVE
+};
+char *Operator[] = {"=", "<>", "<=", ">=", "<", ">",
                     w_IS, w_NOT, w_BELOW, w_ABOVE, NULL};
 
-enum Values { IS_NUMBER, IS_OPEN, IS_CLOSED, IS_ACTIVE };
+enum Values
+{
+    IS_NUMBER,
+    IS_OPEN,
+    IS_CLOSED,
+    IS_ACTIVE
+};
 char *Value[] = {"XXXX", w_OPEN, w_CLOSED, w_ACTIVE, NULL};
 
 // Local functions
 static void newrule(Project *);
-static int  newpremise(Project *, int);
-static int  newaction(Project *);
-static int  newpriority(Project *);
+static int newpremise(Project *, int);
+static int newaction(Project *);
+static int newpriority(Project *);
 
-static int  evalpremises(Project *, int);
-static int  checkpremise(Project *, Spremise *);
-static int  checktime(Project *, Spremise *);
-static int  checkstatus(Project *, Spremise *);
-static int  checkvalue(Project *, Spremise *);
+static int evalpremises(Project *, int);
+static int checkpremise(Project *, Spremise *);
+static int checktime(Project *, Spremise *);
+static int checkstatus(Project *, Spremise *);
+static int checkvalue(Project *, Spremise *);
 
-static int  onactionlist(Project *, int, Saction *);
+static int onactionlist(Project *, int, Saction *);
 static void updateactionlist(Project *, int, Saction *);
-static int  takeactions(Project *);
+static int takeactions(Project *);
 static void clearactionlist(Rules *);
 static void clearrule(Project *, int);
 
@@ -106,29 +127,31 @@ static void getobjtxt(int, int, char *);
 static void gettimetxt(double, char *);
 
 // Helper accessors for named variables/expressions storage
-#define NAMED_VARS(pr)      ((pr)->rulesStorage.NamedVars)
-#define EXPRESSIONS(pr)     ((pr)->rulesStorage.Expressions)
+#define NAMED_VARS(pr) ((pr)->rulesStorage.NamedVars)
+#define EXPRESSIONS(pr) ((pr)->rulesStorage.Expressions)
 
 // Forward static helpers
-static int getNamedVarIndex(Project* pr, const char* name);
-static int getExprIndex(Project* pr, const char* name);
-static double getVariableValue(Project* pr, int object, int index, int variable);
+static int getNamedVarIndex(Project *pr, const char *name);
+static int getExprIndex(Project *pr, const char *name);
+static double getVariableValue(Project *pr, int object, int index, int variable);
 
 // Static context for mathexpr callbacks
-static Project* g_exprProject = NULL;
-static int expr_getVarIndex(char* name)
+static Project *g_exprProject = NULL;
+static int expr_getVarIndex(char *name)
 {
-    if (!g_exprProject) return -1;
+    if (!g_exprProject)
+        return -1;
     return getNamedVarIndex(g_exprProject, name);
 }
 static double expr_getVarValue(int idx)
 {
-    if (!g_exprProject) return 0.0;
-    if (idx < 0 || idx >= g_exprProject->parser.VarCount) return 0.0;
-    NamedVar* nv = &NAMED_VARS(g_exprProject)[idx];
+    if (!g_exprProject)
+        return 0.0;
+    if (idx < 0 || idx >= g_exprProject->parser.VarCount)
+        return 0.0;
+    NamedVar *nv = &NAMED_VARS(g_exprProject)[idx];
     return getVariableValue(g_exprProject, nv->object, nv->index, nv->variable);
 }
-
 
 void initrules(Project *pr)
 //--------------------------------------------------------------
@@ -152,9 +175,12 @@ void addrule(Parser *parser, char *tok)
 //    Updates rule count if RULE keyword found in line of input.
 //--------------------------------------------------------------
 {
-    if (match(tok, w_RULE)) parser->MaxRules++;
-    else if (match(tok, w_VARIABLE)) parser->VarCount++;
-    else if (match(tok, w_EXPRESSION)) parser->ExprCount++;
+    if (match(tok, w_RULE))
+        parser->MaxRules++;
+    else if (match(tok, w_VARIABLE))
+        parser->VarCount++;
+    else if (match(tok, w_EXPRESSION))
+        parser->ExprCount++;
 }
 
 void deleterule(Project *pr, int index)
@@ -195,18 +221,21 @@ int allocrules(Project *pr)
     int n = pr->parser.MaxRules + 1;
 
     net->Rule = (Srule *)calloc(n, sizeof(Srule));
-    if (net->Rule == NULL) return 101;
+    if (net->Rule == NULL)
+        return 101;
     // allocate named variables and expressions arrays if any were counted
     if (pr->parser.VarCount > 0)
     {
-        pr->rulesStorage.NamedVars = (NamedVar*)calloc(pr->parser.VarCount, sizeof(NamedVar));
-        if (pr->rulesStorage.NamedVars == NULL) return 101;
+        pr->rulesStorage.NamedVars = (NamedVar *)calloc(pr->parser.VarCount, sizeof(NamedVar));
+        if (pr->rulesStorage.NamedVars == NULL)
+            return 101;
         pr->rules.CurrentVar = -1;
     }
     if (pr->parser.ExprCount > 0)
     {
-        pr->rulesStorage.Expressions = (NamedExpr*)calloc(pr->parser.ExprCount, sizeof(NamedExpr));
-        if (pr->rulesStorage.Expressions == NULL) return 101;
+        pr->rulesStorage.Expressions = (NamedExpr *)calloc(pr->parser.ExprCount, sizeof(NamedExpr));
+        if (pr->rulesStorage.Expressions == NULL)
+            return 101;
         pr->rules.CurrentExpr = -1;
     }
     return 0;
@@ -223,7 +252,8 @@ void freerules(Project *pr)
     if (pr->network.Rule == NULL)
         return;
 
-    for (i = 1; i <= pr->network.Nrules; i++) clearrule(pr, i);
+    for (i = 1; i <= pr->network.Nrules; i++)
+        clearrule(pr, i);
     free(pr->network.Rule);
     pr->network.Rule = NULL;
 
@@ -253,197 +283,273 @@ int ruledata(Project *pr)
 //--------------------------------------------------------------
 {
     Network *net = &pr->network;
-    Parser  *parser = &pr->parser;
-    Rules   *rules = &pr->rules;
+    Parser *parser = &pr->parser;
+    Rules *rules = &pr->rules;
 
-    int key,      // Keyword code
+    int key, // Keyword code
         err;
-    char **Tok = parser->Tok;  // Tokenized line of a rule statement
+    char **Tok = parser->Tok; // Tokenized line of a rule statement
 
     // Exit if current rule has an error
-    if (rules->RuleState == r_ERROR) return 0;
+    if (rules->RuleState == r_ERROR)
+        return 0;
 
     // Find the key word that begins the rule statement
     err = 0;
     key = findmatch(Tok[0], Ruleword);
     switch (key)
     {
-        case -1:
-          err = 201;   // Unrecognized keyword
-          break;
+    case -1:
+        err = 201; // Unrecognized keyword
+        break;
 
-        case r_VARIABLE:
-          // VARIABLE name = {SYSTEM Var | OBJECT id Var}
-          if (parser->Ntokens < 5) { err = 201; break; }
-          // Reject names that collide with Varword or rule words
-          if (findmatch(Tok[1], Varword) >= 0) { err = 201; break; }
-          // Expect '=' at Tok[2]
-          if (!match(Tok[2], "=")) { err = 201; break; }
-          {
-              int obj = findmatch(Tok[3], Object);
-              int index = 0;
-              int var = -1;
-              if (obj == r_SYSTEM)
-              {
-                  if (parser->Ntokens < 5) { err = 201; break; }
-                  var = findmatch(Tok[4], Varword);
-                  if (var != r_TIME && var != r_CLOCKTIME && var != r_DEMAND)
-                  { err = 201; break; }
-              }
-              else
-              {
-                  // OBJECT ID VAR
-                  if (parser->Ntokens < 6) { err = 201; break; }
-                  int kind;
-                  switch (obj)
-                  {
-                    case r_NODE:
-                    case r_JUNC:
-                    case r_RESERV:
-                    case r_TANK: kind = r_NODE; break;
-                    case r_LINK:
-                    case r_PIPE:
-                    case r_PUMP:
-                    case r_VALVE: kind = r_LINK; break;
-                    default: err = 201; kind = -1; break;
-                  }
-                  if (err) break;
-                  if (kind == r_NODE)
-                  {
-                      index = findnode(net, Tok[4]);
-                      if (index == 0) { err = 203; break; }
-                      var = findmatch(Tok[5], Varword);
-                      if (var!=r_DEMAND && var!=r_HEAD && var!=r_GRADE && var!=r_LEVEL && var!=r_PRESSURE && var!=r_FILLTIME && var!=r_DRAINTIME)
-                      { err = 201; break; }
-                      obj = r_NODE;
-                  }
-                  else
-                  {
-                      index = findlink(net, Tok[4]);
-                      if (index == 0) { err = 204; break; }
-                      var = findmatch(Tok[5], Varword);
-                      if (var!=r_FLOW && var!=r_STATUS && var!=r_SETTING && var!=r_POWER)
-                      { err = 201; break; }
-                      obj = r_LINK;
-                  }
-              }
-              if (!err)
-              {
-                  rules->CurrentVar++;
-                  if (rules->CurrentVar >= pr->parser.VarCount) { err = 201; break; }
-                  NamedVar *nv = &NAMED_VARS(pr)[rules->CurrentVar];
-                  strncpy(nv->name, Tok[1], MAXVARNAME);
-                  nv->object = obj; nv->index = index; nv->variable = var;
-              }
-          }
-          break;
-
-        case r_EXPRESSION:
-          // EXPRESSION name = <expr tokens...>
-          if (parser->Ntokens < 4) { err = 201; break; }
-          if (!match(Tok[2], "=")) { err = 201; break; }
-          {
-              char exprbuf[MAXLINE+1] = {0};
-              int pos = 0; int k;
-              for (k = 3; k < parser->Ntokens; k++)
-              {
-                  int add = (int)strlen(Tok[k]);
-                  if (pos + add + 1 >= MAXLINE) break;
-                  if (k > 3) exprbuf[pos++] = ' ';
-                  strncpy(&exprbuf[pos], Tok[k], MAXLINE-pos-1); pos += add;
-              }
-              exprbuf[pos] = '\0';
-              // compile expression with callback
-              g_exprProject = pr;
-              MathExpr* expr = mathexpr_create(exprbuf, expr_getVarIndex);
-              if (expr == NULL) { err = 201; break; }
-              rules->CurrentExpr++;
-              if (rules->CurrentExpr >= pr->parser.ExprCount) { err = 201; break; }
-              NamedExpr *ne = &EXPRESSIONS(pr)[rules->CurrentExpr];
-              strncpy(ne->name, Tok[1], MAXVARNAME);
-              ne->expr = expr;
-          }
-          break;
-
-        case r_RULE:
-          // Missing the rule label
-          if (parser->Ntokens != 2)
-          {
-              err = 201;
-              break;
-          }
-          net->Nrules++;
-          newrule(pr);
-          rules->RuleState = r_RULE;
-          rules->Errcode = 0;
-          break;
-
-        case r_IF:
-          if (rules->RuleState != r_RULE)
-          {
-              err = 221;   // Mis-placed IF clause
-              break;
-          }
-          rules->RuleState = r_IF;
-          err = newpremise(pr, r_AND);
-          break;
-
-        case r_AND:
-          if (rules->RuleState == r_IF) err = newpremise(pr, r_AND);
-          else if (rules->RuleState == r_THEN || rules->RuleState == r_ELSE)
-          {
-              err = newaction(pr);
-          }
-          else err = 221;
-          break;
-
-        case r_OR:
-          if (rules->RuleState == r_IF) err = newpremise(pr, r_OR);
-          else err = 221;
-          break;
-
-        case r_THEN:
-          if (rules->RuleState != r_IF)
-          {
-              err = 221;   // Mis-placed THEN clause
-              break;
-          }
-          rules->RuleState = r_THEN;
-          err = newaction(pr);
-          break;
-
-        case r_ELSE:
-          if (rules->RuleState != r_THEN)
-          {
-            err = 221;   // Mis-placed ELSE clause
+    case r_VARIABLE:
+        // VARIABLE name = {SYSTEM Var | OBJECT id Var}
+        if (parser->Ntokens < 5)
+        {
+            err = 201;
             break;
-          }
-          rules->RuleState = r_ELSE;
-          err = newaction(pr);
-          break;
+        }
+        // Reject names that collide with Varword or rule words
+        if (findmatch(Tok[1], Varword) >= 0)
+        {
+            err = 201;
+            break;
+        }
+        // Expect '=' at Tok[2]
+        if (!match(Tok[2], "="))
+        {
+            err = 201;
+            break;
+        }
+        {
+            int obj = findmatch(Tok[3], Object);
+            int index = 0;
+            int var = -1;
+            if (obj == r_SYSTEM)
+            {
+                if (parser->Ntokens < 5)
+                {
+                    err = 201;
+                    break;
+                }
+                var = findmatch(Tok[4], Varword);
+                if (var != r_TIME && var != r_CLOCKTIME && var != r_DEMAND)
+                {
+                    err = 201;
+                    break;
+                }
+            }
+            else
+            {
+                // OBJECT ID VAR
+                if (parser->Ntokens < 6)
+                {
+                    err = 201;
+                    break;
+                }
+                int kind;
+                switch (obj)
+                {
+                case r_NODE:
+                case r_JUNC:
+                case r_RESERV:
+                case r_TANK:
+                    kind = r_NODE;
+                    break;
+                case r_LINK:
+                case r_PIPE:
+                case r_PUMP:
+                case r_VALVE:
+                    kind = r_LINK;
+                    break;
+                default:
+                    err = 201;
+                    kind = -1;
+                    break;
+                }
+                if (err)
+                    break;
+                if (kind == r_NODE)
+                {
+                    index = findnode(net, Tok[4]);
+                    if (index == 0)
+                    {
+                        err = 203;
+                        break;
+                    }
+                    var = findmatch(Tok[5], Varword);
+                    if (var != r_DEMAND && var != r_HEAD && var != r_GRADE && var != r_LEVEL && var != r_PRESSURE && var != r_FILLTIME && var != r_DRAINTIME)
+                    {
+                        err = 201;
+                        break;
+                    }
+                    obj = r_NODE;
+                }
+                else
+                {
+                    index = findlink(net, Tok[4]);
+                    if (index == 0)
+                    {
+                        err = 204;
+                        break;
+                    }
+                    var = findmatch(Tok[5], Varword);
+                    if (var != r_FLOW && var != r_STATUS && var != r_SETTING && var != r_POWER)
+                    {
+                        err = 201;
+                        break;
+                    }
+                    obj = r_LINK;
+                }
+            }
+            if (!err)
+            {
+                rules->CurrentVar++;
+                if (rules->CurrentVar >= pr->parser.VarCount)
+                {
+                    err = 201;
+                    break;
+                }
+                NamedVar *nv = &NAMED_VARS(pr)[rules->CurrentVar];
+                strncpy(nv->name, Tok[1], MAXVARNAME);
+                nv->object = obj;
+                nv->index = index;
+                nv->variable = var;
+            }
+        }
+        break;
 
-        case r_PRIORITY:
-          if (rules->RuleState != r_THEN && rules->RuleState != r_ELSE)
-          {
-              err = 221;
-              break;
-          }
-          rules->RuleState = r_PRIORITY;
-          err = newpriority(pr);
-          break;
+    case r_EXPRESSION:
+        // EXPRESSION name = <expr tokens...>
+        if (parser->Ntokens < 4)
+        {
+            err = 201;
+            break;
+        }
+        if (!match(Tok[2], "="))
+        {
+            err = 201;
+            break;
+        }
+        {
+            char exprbuf[MAXLINE + 1] = {0};
+            int pos = 0;
+            int k;
+            for (k = 3; k < parser->Ntokens; k++)
+            {
+                int add = (int)strlen(Tok[k]);
+                if (pos + add + 1 >= MAXLINE)
+                    break;
+                if (k > 3)
+                    exprbuf[pos++] = ' ';
+                strncpy(&exprbuf[pos], Tok[k], MAXLINE - pos - 1);
+                pos += add;
+            }
+            exprbuf[pos] = '\0';
+            // compile expression with callback
+            g_exprProject = pr;
+            MathExpr *expr = mathexpr_create(exprbuf, expr_getVarIndex);
+            if (expr == NULL)
+            {
+                err = 201;
+                break;
+            }
+            rules->CurrentExpr++;
+            if (rules->CurrentExpr >= pr->parser.ExprCount)
+            {
+                err = 201;
+                break;
+            }
+            NamedExpr *ne = &EXPRESSIONS(pr)[rules->CurrentExpr];
+            strncpy(ne->name, Tok[1], MAXVARNAME);
+            ne->expr = expr;
+        }
+        break;
 
-        case r_DISABLED:
-          if (rules->RuleState != r_THEN && rules->RuleState != r_ELSE &&
-              rules->RuleState != r_PRIORITY)
-          {
-              err = 221; 
-              break;
-          }
-          net->Rule[net->Nrules].isEnabled = FALSE;
-          break;
+    case r_RULE:
+        // Missing the rule label
+        if (parser->Ntokens != 2)
+        {
+            err = 201;
+            break;
+        }
+        net->Nrules++;
+        newrule(pr);
+        rules->RuleState = r_RULE;
+        rules->Errcode = 0;
+        break;
 
-        default:
-          err = 201;
+    case r_IF:
+        if (rules->RuleState != r_RULE)
+        {
+            err = 221; // Mis-placed IF clause
+            break;
+        }
+        rules->RuleState = r_IF;
+        err = newpremise(pr, r_AND);
+        break;
+
+    case r_AND:
+        if (rules->RuleState == r_IF)
+            err = newpremise(pr, r_AND);
+        else if (rules->RuleState == r_THEN || rules->RuleState == r_ELSE)
+        {
+            err = newaction(pr);
+        }
+        else
+            err = 221;
+        break;
+
+    case r_OR:
+        if (rules->RuleState == r_IF)
+            err = newpremise(pr, r_OR);
+        else
+            err = 221;
+        break;
+
+    case r_THEN:
+        if (rules->RuleState != r_IF)
+        {
+            err = 221; // Mis-placed THEN clause
+            break;
+        }
+        rules->RuleState = r_THEN;
+        err = newaction(pr);
+        break;
+
+    case r_ELSE:
+        if (rules->RuleState != r_THEN)
+        {
+            err = 221; // Mis-placed ELSE clause
+            break;
+        }
+        rules->RuleState = r_ELSE;
+        err = newaction(pr);
+        break;
+
+    case r_PRIORITY:
+        if (rules->RuleState != r_THEN && rules->RuleState != r_ELSE)
+        {
+            err = 221;
+            break;
+        }
+        rules->RuleState = r_PRIORITY;
+        err = newpriority(pr);
+        break;
+
+    case r_DISABLED:
+        if (rules->RuleState != r_THEN && rules->RuleState != r_ELSE &&
+            rules->RuleState != r_PRIORITY)
+        {
+            err = 221;
+            break;
+        }
+        net->Rule[net->Nrules].isEnabled = FALSE;
+        break;
+
+    default:
+        err = 201;
     }
 
     // Set RuleState to r_ERROR if errors found
@@ -456,43 +562,47 @@ int ruledata(Project *pr)
     return err;
 }
 
-static int getNamedVarIndex(Project* pr, const char* name)
+static int getNamedVarIndex(Project *pr, const char *name)
 {
     int i;
     for (i = 0; i < pr->parser.VarCount; i++)
     {
-        if (match(name, NAMED_VARS(pr)[i].name)) return i;
+        if (match(name, NAMED_VARS(pr)[i].name))
+            return i;
     }
     return -1;
 }
 
-static int getExprIndex(Project* pr, const char* name)
+static int getExprIndex(Project *pr, const char *name)
 {
     int i;
     for (i = 0; i < pr->parser.ExprCount; i++)
     {
-        if (match(name, EXPRESSIONS(pr)[i].name)) return i;
+        if (match(name, EXPRESSIONS(pr)[i].name))
+            return i;
     }
     return -1;
 }
 
-static double getVariableValue(Project* pr, int object, int index, int variable)
+static double getVariableValue(Project *pr, int object, int index, int variable)
 {
     Network *net = &pr->network;
     Hydraul *hyd = &pr->hydraul;
-    int     i = index;
-    double  x = 0.0;
+    int i = index;
+    double x = 0.0;
     double *Ucf = pr->Ucf;
     double *NodeDemand = hyd->NodeDemand;
     double *LinkFlow = hyd->LinkFlow;
     double *LinkSetting = hyd->LinkSetting;
-    Snode  *Node = net->Node;
-    Slink  *Link = net->Link;
+    Snode *Node = net->Node;
+    Slink *Link = net->Link;
     int Njuncs = net->Njuncs;
     if (variable == r_DEMAND)
     {
-        if (object == r_SYSTEM) x = hyd->Dsystem * Ucf[DEMAND];
-        else x = NodeDemand[i] * Ucf[DEMAND];
+        if (object == r_SYSTEM)
+            x = hyd->Dsystem * Ucf[DEMAND];
+        else
+            x = NodeDemand[i] * Ucf[DEMAND];
     }
     else if (variable == r_HEAD || variable == r_GRADE)
     {
@@ -512,35 +622,43 @@ static double getVariableValue(Project* pr, int object, int index, int variable)
     }
     else if (variable == r_SETTING)
     {
-        if (LinkSetting[i] == MISSING) return 0.0;
+        if (LinkSetting[i] == MISSING)
+            return 0.0;
         x = LinkSetting[i];
         switch (Link[i].Type)
         {
-          case PRV:
-          case PSV:
-          case PBV:
+        case PRV:
+        case PSV:
+        case PBV:
             x = x * Ucf[PRESSURE];
             break;
-          case FCV:
+        case FCV:
             x = x * Ucf[FLOW];
             break;
-          default: break;
+        default:
+            break;
         }
     }
     else if (variable == r_FILLTIME)
     {
-        if (i <= Njuncs) return 0.0;
+        if (i <= Njuncs)
+            return 0.0;
         int j = i - Njuncs;
-        if (net->Tank[j].A == 0.0) return 0.0;
-        if (NodeDemand[i] <= TINY) return 0.0;
+        if (net->Tank[j].A == 0.0)
+            return 0.0;
+        if (NodeDemand[i] <= TINY)
+            return 0.0;
         x = (net->Tank[j].Vmax - net->Tank[j].V) / NodeDemand[i];
     }
     else if (variable == r_DRAINTIME)
     {
-        if (i <= Njuncs) return 0.0;
+        if (i <= Njuncs)
+            return 0.0;
         int j = i - Njuncs;
-        if (net->Tank[j].A == 0.0) return 0.0;
-        if (NodeDemand[i] >= -TINY) return 0.0;
+        if (net->Tank[j].A == 0.0)
+            return 0.0;
+        if (NodeDemand[i] >= -TINY)
+            return 0.0;
         x = (net->Tank[j].Vmin - net->Tank[j].V) / NodeDemand[i];
     }
     else if (variable == r_TIME || variable == r_CLOCKTIME)
@@ -557,8 +675,8 @@ void ruleerrmsg(Project *pr)
 //-----------------------------------------------------------
 {
     Network *net = &pr->network;
-    Parser  *parser = &pr->parser;
-    Rules   *rules = &pr->rules;
+    Parser *parser = &pr->parser;
+    Rules *rules = &pr->rules;
 
     int i;
     char label[MAXMSG + 1];
@@ -568,13 +686,26 @@ void ruleerrmsg(Project *pr)
     // Get text of error message
     switch (rules->Errcode)
     {
-    case 201: strcpy(msg, R_ERR201); break;
-    case 202: strcpy(msg, R_ERR202); break;
-    case 203: strcpy(msg, R_ERR203); break;
-    case 204: strcpy(msg, R_ERR204); break;
-    case 207: strcpy(msg, R_ERR207); break;
-    case 221: strcpy(msg, R_ERR221); break;
-    default: return;
+    case 201:
+        strcpy(msg, R_ERR201);
+        break;
+    case 202:
+        strcpy(msg, R_ERR202);
+        break;
+    case 203:
+        strcpy(msg, R_ERR203);
+        break;
+    case 204:
+        strcpy(msg, R_ERR204);
+        break;
+    case 207:
+        strcpy(msg, R_ERR207);
+        break;
+    case 221:
+        strcpy(msg, R_ERR221);
+        break;
+    default:
+        return;
     }
 
     // Get label of rule being parsed
@@ -584,7 +715,8 @@ void ruleerrmsg(Project *pr)
         strncat(label, " ", MAXMSG);
         strncat(label, net->Rule[net->Nrules].label, MAXMSG);
     }
-    else strncpy(label, t_RULES_SECT, MAXMSG);
+    else
+        strncpy(label, t_RULES_SECT, MAXMSG);
 
     // Write rule label and error message to status report
     snprintf(pr->Msg, MAXMSG, "%s", msg);
@@ -620,7 +752,8 @@ void adjustrules(Project *pr, int objtype, int index)
         p = net->Rule[i].Premises;
         while (p != NULL && !delete)
         {
-            if (objtype == p->object && p->index == index) delete = TRUE;
+            if (objtype == p->object && p->index == index)
+                delete = TRUE;
             p = p->next;
         }
         if (objtype == r_LINK)
@@ -628,17 +761,20 @@ void adjustrules(Project *pr, int objtype, int index)
             a = net->Rule[i].ThenActions;
             while (a != NULL && !delete)
             {
-                if (a->link == index) delete = TRUE;
+                if (a->link == index)
+                    delete = TRUE;
                 a = a->next;
             }
             a = net->Rule[i].ElseActions;
             while (a != NULL && !delete)
             {
-                if (a->link == index) delete = TRUE;
+                if (a->link == index)
+                    delete = TRUE;
                 a = a->next;
             }
         }
-        if (delete) deleterule(pr, i);
+        if (delete)
+            deleterule(pr, i);
     }
 
     // Adjust all higher object indices to reflect deletion of object index
@@ -647,7 +783,8 @@ void adjustrules(Project *pr, int objtype, int index)
         p = net->Rule[i].Premises;
         while (p != NULL)
         {
-            if (objtype == p->object && p->index > index) p->index--;
+            if (objtype == p->object && p->index > index)
+                p->index--;
             p = p->next;
         }
         if (objtype == r_LINK)
@@ -655,13 +792,15 @@ void adjustrules(Project *pr, int objtype, int index)
             a = net->Rule[i].ThenActions;
             while (a != NULL)
             {
-                if (a->link > index) a->link--;
+                if (a->link > index)
+                    a->link--;
                 a = a->next;
             }
             a = net->Rule[i].ElseActions;
             while (a != NULL)
             {
-                if (a->link > index) a->link--;
+                if (a->link > index)
+                    a->link--;
                 a = a->next;
             }
         }
@@ -703,7 +842,8 @@ Spremise *getpremise(Spremise *premises, int i)
     while (p != NULL)
     {
         count++;
-        if (count == i) break;
+        if (count == i)
+            break;
         p = p->next;
     }
     return p;
@@ -721,7 +861,8 @@ Saction *getaction(Saction *actions, int i)
     while (a != NULL)
     {
         count++;
-        if (count == i) break;
+        if (count == i)
+            break;
         a = a->next;
     }
     return a;
@@ -732,12 +873,12 @@ int writerule(Project *pr, FILE *f, int ruleIndex)
 //  Write a rule to an INP file.
 //-----------------------------------------------------------------------------
 {
-    Network  *net = &pr->network;
+    Network *net = &pr->network;
 
-    Srule      *rule = &net->Rule[ruleIndex];
-    Spremise   *p;
-    Saction    *a;
-    
+    Srule *rule = &net->Rule[ruleIndex];
+    Spremise *p;
+    Saction *a;
+
     // Write each premise clause to the file
     p = rule->Premises;
     fprintf(f, "\nIF   ");
@@ -745,31 +886,37 @@ int writerule(Project *pr, FILE *f, int ruleIndex)
     {
         writepremise(p, f, net);
         p = p->next;
-        if (p) fprintf(f, "\n%-5s", Ruleword[p->logop]);
+        if (p)
+            fprintf(f, "\n%-5s", Ruleword[p->logop]);
     }
 
     // Write each THEN action clause to the file
     a = rule->ThenActions;
-    if (a) fprintf(f, "\nTHEN ");
+    if (a)
+        fprintf(f, "\nTHEN ");
     while (a != NULL)
     {
         writeaction(a, f, net);
         a = a->next;
-        if (a) fprintf(f, "\nAND  ");
+        if (a)
+            fprintf(f, "\nAND  ");
     }
 
     // Write each ELSE action clause to the file
     a = rule->ElseActions;
-    if (a) fprintf(f, "\nELSE ");
+    if (a)
+        fprintf(f, "\nELSE ");
     while (a != NULL)
     {
         writeaction(a, f, net);
         a = a->next;
-        if (a) fprintf(f, "\nAND  ");
+        if (a)
+            fprintf(f, "\nAND  ");
     }
 
     // Write the rule's priority to the file
-    if (rule->priority > 0) fprintf(f, "\nPRIORITY %f", rule->priority);
+    if (rule->priority > 0)
+        fprintf(f, "\nPRIORITY %f", rule->priority);
     return 0;
 }
 
@@ -779,13 +926,13 @@ int checkrules(Project *pr, long dt)
 //-----------------------------------------------------
 {
     Network *net = &pr->network;
-    Times   *time = &pr->times;
-    Rules   *rules = &pr->rules;
+    Times *time = &pr->times;
+    Rules *rules = &pr->rules;
 
     int i;
-    int actionCount = 0;    // Number of actions actually taken
+    int actionCount = 0; // Number of actions actually taken
 
-                            // Start of rule evaluation time interval
+    // Start of rule evaluation time interval
     rules->Time1 = time->Htime - dt + 1;
 
     // Iterate through each rule
@@ -814,7 +961,8 @@ int checkrules(Project *pr, long dt)
     }
 
     // Execute actions then clear action list
-    if (rules->ActionList != NULL) actionCount = takeactions(pr);
+    if (rules->ActionList != NULL)
+        actionCount = takeactions(pr);
     clearactionlist(rules);
     return actionCount;
 }
@@ -825,13 +973,13 @@ void updateruleunits(Project *pr, double dcf, double pcf, double hcf, double qcf
 //-----------------------------------------------------------
 {
     Network *net = &pr->network;
-    Slink  *Link = net->Link;
+    Slink *Link = net->Link;
 
     int i, k;
     double x;
     Spremise *p;
     Saction *a;
-    
+
     for (i = 1; i <= net->Nrules; i++)
     {
         p = net->Rule[i].Premises;
@@ -877,10 +1025,9 @@ void updateruleunits(Project *pr, double dcf, double pcf, double hcf, double qcf
                     break;
                 }
                 break;
-            
+
             default:
                 break;
-
             }
             p = p->next;
         }
@@ -938,7 +1085,6 @@ void updateruleunits(Project *pr, double dcf, double pcf, double hcf, double qcf
     }
 }
 
-
 void newrule(Project *pr)
 //----------------------------------------------------------
 //    Adds a new rule to the project
@@ -970,8 +1116,8 @@ int newpremise(Project *pr, int logop)
 //---------------------------------------------------------------------
 {
     Network *net = &pr->network;
-    Parser  *parser = &pr->parser;
-    Rules   *rules = &pr->rules;
+    Parser *parser = &pr->parser;
+    Rules *rules = &pr->rules;
 
     int i, j, k, m, r, s, v;
     double x;
@@ -981,17 +1127,40 @@ int newpremise(Project *pr, int logop)
     // Handle expression or named variable LHS
     int exprIdx = getExprIndex(pr, Tok[1]);
     int namedVarIdx = -1;
-    if (exprIdx < 0) namedVarIdx = getNamedVarIndex(pr, Tok[1]);
+    if (exprIdx < 0)
+        namedVarIdx = getNamedVarIndex(pr, Tok[1]);
     if (exprIdx >= 0)
     {
         // format: <ExprName> <relop> <rhs>
-        if (parser->Ntokens < 4) return 201;
+        if (parser->Ntokens < 4)
+            return 201;
         m = 2;
         k = findmatch(Tok[m], Operator);
-        if (k < 0) return 201;
-        switch (k) { case IS: r=EQ; break; case NOT: r=NE; break; case BELOW: r=LT; break; case ABOVE: r=GT; break; default: r=k; }
+        if (k < 0)
+            return 201;
+        switch (k)
+        {
+        case IS:
+            r = EQ;
+            break;
+        case NOT:
+            r = NE;
+            break;
+        case BELOW:
+            r = LT;
+            break;
+        case ABOVE:
+            r = GT;
+            break;
+        default:
+            r = k;
+        }
         // parse RHS: could be named var, object triple, or number
-        s = 0; x = MISSING; i = 0; j = 0; v = -1;
+        s = 0;
+        x = MISSING;
+        i = 0;
+        j = 0;
+        v = -1;
         // try named var
         int rhsNamedIdx = getNamedVarIndex(pr, Tok[3]);
         if (rhsNamedIdx >= 0)
@@ -1007,53 +1176,111 @@ int newpremise(Project *pr, int logop)
             {
                 if (obj == r_SYSTEM)
                 {
-                    if (parser->Ntokens < 5) return 201;
-                    i = r_SYSTEM; j = 0;
+                    if (parser->Ntokens < 5)
+                        return 201;
+                    i = r_SYSTEM;
+                    j = 0;
                     v = findmatch(Tok[4], Varword);
-                    if (v < 0) return 201;
+                    if (v < 0)
+                        return 201;
                 }
                 else
                 {
-                    if (parser->Ntokens < 6) return 201;
+                    if (parser->Ntokens < 6)
+                        return 201;
                     int kind;
                     switch (obj)
                     {
-                      case r_NODE: case r_JUNC: case r_RESERV: case r_TANK: kind=r_NODE; break;
-                      case r_LINK: case r_PIPE: case r_PUMP: case r_VALVE: kind=r_LINK; break;
-                      default: return 201;
+                    case r_NODE:
+                    case r_JUNC:
+                    case r_RESERV:
+                    case r_TANK:
+                        kind = r_NODE;
+                        break;
+                    case r_LINK:
+                    case r_PIPE:
+                    case r_PUMP:
+                    case r_VALVE:
+                        kind = r_LINK;
+                        break;
+                    default:
+                        return 201;
                     }
                     if (kind == r_NODE)
                     {
-                        j = findnode(net, Tok[4]); if (j==0) return 203; i = r_NODE;
-                        v = findmatch(Tok[5], Varword); if (v<0) return 201;
+                        j = findnode(net, Tok[4]);
+                        if (j == 0)
+                            return 203;
+                        i = r_NODE;
+                        v = findmatch(Tok[5], Varword);
+                        if (v < 0)
+                            return 201;
                     }
                     else
                     {
-                        j = findlink(net, Tok[4]); if (j==0) return 204; i = r_LINK;
-                        v = findmatch(Tok[5], Varword); if (v<0) return 201;
+                        j = findlink(net, Tok[4]);
+                        if (j == 0)
+                            return 204;
+                        i = r_LINK;
+                        v = findmatch(Tok[5], Varword);
+                        if (v < 0)
+                            return 201;
                     }
                 }
             }
             else
             {
-                if (!getfloat(Tok[3], &x)) return 202;
+                if (!getfloat(Tok[3], &x))
+                    return 202;
             }
         }
-        p = (Spremise *)malloc(sizeof(Spremise)); if (!p) return 101;
-        p->object = r_SYSTEM; p->index = 0; p->variable = r_TIME; // placeholder; time path will be bypassed by exprIndex
-        p->exprIndex = exprIdx; p->relop = r; p->logop = logop;
-        p->status = 0; p->value = x;
-        if (v >= 0) { p->rhsIsVar = 1; p->rhsObject = i; p->rhsIndex = j; p->rhsVariable = v; }
-        else { p->rhsIsVar = 0; p->rhsObject = 0; p->rhsIndex = 0; p->rhsVariable = 0; }
+        p = (Spremise *)malloc(sizeof(Spremise));
+        if (!p)
+            return 101;
+        p->object = r_SYSTEM;
+        p->index = 0;
+        p->variable = r_TIME; // placeholder; time path will be bypassed by exprIndex
+        p->exprIndex = exprIdx;
+        p->relop = r;
+        p->logop = logop;
+        p->status = 0;
+        p->value = x;
+        if (v >= 0)
+        {
+            p->rhsIsVar = 1;
+            p->rhsObject = i;
+            p->rhsIndex = j;
+            p->rhsVariable = v;
+        }
+        else
+        {
+            p->rhsIsVar = 0;
+            p->rhsObject = 0;
+            p->rhsIndex = 0;
+            p->rhsVariable = 0;
+        }
         p->next = NULL;
-        if (rules->LastPremise == NULL) net->Rule[net->Nrules].Premises = p;
-        else rules->LastPremise->next = p;
+        if (rules->LastPremise == NULL)
+            net->Rule[net->Nrules].Premises = p;
+        else
+            rules->LastPremise->next = p;
         rules->LastPremise = p;
         return 0;
     }
 
     // Check for correct number of tokens for legacy formats and named variable LHS
-    if (parser->Ntokens != 5 && parser->Ntokens != 6) return 201;
+    // Named variable LHS: IF VarName < value (4 tokens) or IF VarName < OBJECT ID VAR (6 tokens)
+    // Legacy formats: IF OBJECT ID VAR OP VALUE (5 tokens) or IF SYSTEM VAR OP VALUE (5 tokens)
+    if (namedVarIdx >= 0)
+    {
+        if (parser->Ntokens != 4 && parser->Ntokens != 6)
+            return 201;
+    }
+    else
+    {
+        if (parser->Ntokens != 5 && parser->Ntokens != 6)
+            return 201;
+    }
 
     // Find network object & id if present
     i = -1;
@@ -1065,32 +1292,36 @@ int newpremise(Project *pr, int logop)
         v = NAMED_VARS(pr)[namedVarIdx].variable;
         m = 2; // operator position
     }
-    else i = findmatch(Tok[1], Object);
+    else
+        i = findmatch(Tok[1], Object);
     if (i == r_SYSTEM)
     {
         j = 0;
         v = findmatch(Tok[2], Varword);
-        if (v != r_DEMAND && v != r_TIME && v != r_CLOCKTIME) return 201;
+        if (v != r_DEMAND && v != r_TIME && v != r_CLOCKTIME)
+            return 201;
     }
     else
     {
-        if (namedVarIdx < 0) v = findmatch(Tok[3], Varword);
-        if (v < 0) return (201);
+        if (namedVarIdx < 0)
+            v = findmatch(Tok[3], Varword);
+        if (v < 0)
+            return (201);
         switch (i)
         {
-          case r_NODE:
-          case r_JUNC:
-          case r_RESERV:
-          case r_TANK:
+        case r_NODE:
+        case r_JUNC:
+        case r_RESERV:
+        case r_TANK:
             k = r_NODE;
             break;
-          case r_LINK:
-          case r_PIPE:
-          case r_PUMP:
-          case r_VALVE:
+        case r_LINK:
+        case r_PIPE:
+        case r_PUMP:
+        case r_VALVE:
             k = r_LINK;
             break;
-          default:
+        default:
             return 201;
         }
         i = k;
@@ -1101,58 +1332,67 @@ int newpremise(Project *pr, int logop)
         else if (i == r_NODE)
         {
             j = findnode(net, Tok[2]);
-            if (j == 0) return 203;
+            if (j == 0)
+                return 203;
             switch (v)
             {
-              case r_DEMAND:
-              case r_HEAD:
-              case r_GRADE:
-              case r_LEVEL:
-              case r_PRESSURE:
+            case r_DEMAND:
+            case r_HEAD:
+            case r_GRADE:
+            case r_LEVEL:
+            case r_PRESSURE:
                 break;
-              case r_FILLTIME:
-              case r_DRAINTIME:
-                if (j <= net->Njuncs) return 201;
-                 break;
-              default:
+            case r_FILLTIME:
+            case r_DRAINTIME:
+                if (j <= net->Njuncs)
+                    return 201;
+                break;
+            default:
                 return 201;
             }
         }
         else
         {
             j = findlink(net, Tok[2]);
-            if (j == 0) return 204;
+            if (j == 0)
+                return 204;
             switch (v)
             {
-              case r_FLOW:
-              case r_STATUS:
-              case r_SETTING:
+            case r_FLOW:
+            case r_STATUS:
+            case r_SETTING:
                 break;
-              default:
+            default:
                 return 201;
             }
         }
     }
 
     // Parse relational operator (r) and check for synonyms
-    if (namedVarIdx >= 0) m = 2; else if (i == r_SYSTEM) m = 3; else m = 4;
+    if (namedVarIdx >= 0)
+        m = 2;
+    else if (i == r_SYSTEM)
+        m = 3;
+    else
+        m = 4;
     k = findmatch(Tok[m], Operator);
-    if (k < 0) return 201;
+    if (k < 0)
+        return 201;
     switch (k)
     {
-      case IS:
+    case IS:
         r = EQ;
         break;
-      case NOT:
+    case NOT:
         r = NE;
         break;
-      case BELOW:
+    case BELOW:
         r = LT;
         break;
-      case ABOVE:
+    case ABOVE:
         r = GT;
         break;
-      default:
+    default:
         r = k;
     }
 
@@ -1161,37 +1401,90 @@ int newpremise(Project *pr, int logop)
     x = MISSING;
     if (v == r_TIME || v == r_CLOCKTIME)
     {
-        if (parser->Ntokens == 6) x = hour(Tok[4], Tok[5]) * 3600.;
-        else                      x = hour(Tok[4], "") * 3600.;
-        if (x < 0.0) return 202;
+        if (parser->Ntokens == 6)
+            x = hour(Tok[4], Tok[5]) * 3600.;
+        else
+            x = hour(Tok[4], "") * 3600.;
+        if (x < 0.0)
+            return 202;
     }
     else if (namedVarIdx >= 0)
     {
-        // RHS could be named var or object triple or number
-        int rhsNamedIdx = getNamedVarIndex(pr, Tok[3]);
-        if (rhsNamedIdx >= 0)
+        // RHS could be named var, object triple, or number
+        // Check if RHS is an object triple first (6 tokens: IF VarName < OBJECT ID VAR)
+        if (parser->Ntokens == 6)
         {
-            // store RHS variable fields in premise
-            s = 0; x = MISSING;
+            int obj = findmatch(Tok[3], Object);
+            if (obj >= 0)
+            {
+                // RHS is an object triple
+                s = 0;
+                x = MISSING;
+            }
+            else
+            {
+                // Check if RHS is a named variable
+                int rhsNamedIdx = getNamedVarIndex(pr, Tok[3]);
+                if (rhsNamedIdx >= 0)
+                {
+                    // store RHS variable fields in premise
+                    s = 0;
+                    x = MISSING;
+                }
+                else
+                {
+                    // RHS is a number
+                    if ((k = findmatch(Tok[3], Value)) > IS_NUMBER)
+                        s = k;
+                    else
+                    {
+                        if (!getfloat(Tok[3], &x))
+                            return 202;
+                        if (v == r_FILLTIME || v == r_DRAINTIME)
+                            x = x * 3600.0;
+                    }
+                }
+            }
         }
-        else if ((k = findmatch(Tok[parser->Ntokens - 1], Value)) > IS_NUMBER) s = k;
         else
         {
-            if (!getfloat(Tok[parser->Ntokens - 1], &x)) return 202;
-            if (v == r_FILLTIME || v == r_DRAINTIME) x = x * 3600.0;
+            // RHS is a named variable or number (4 tokens: IF VarName < value)
+            int rhsNamedIdx = getNamedVarIndex(pr, Tok[3]);
+            if (rhsNamedIdx >= 0)
+            {
+                // store RHS variable fields in premise
+                s = 0;
+                x = MISSING;
+            }
+            else
+            {
+                // RHS is a number
+                if ((k = findmatch(Tok[3], Value)) > IS_NUMBER)
+                    s = k;
+                else
+                {
+                    if (!getfloat(Tok[3], &x))
+                        return 202;
+                    if (v == r_FILLTIME || v == r_DRAINTIME)
+                        x = x * 3600.0;
+                }
+            }
         }
     }
-    else if ((k = findmatch(Tok[parser->Ntokens - 1], Value)) > IS_NUMBER) s = k;
+    else if ((k = findmatch(Tok[parser->Ntokens - 1], Value)) > IS_NUMBER)
+        s = k;
     else
     {
         if (!getfloat(Tok[parser->Ntokens - 1], &x))
-        return (202);
-        if (v == r_FILLTIME || v == r_DRAINTIME) x = x * 3600.0;
+            return (202);
+        if (v == r_FILLTIME || v == r_DRAINTIME)
+            x = x * 3600.0;
     }
 
     // Create new premise structure
     p = (Spremise *)malloc(sizeof(Spremise));
-    if (p == NULL) return 101;
+    if (p == NULL)
+        return 101;
     p->object = i;
     p->index = j;
     p->variable = v;
@@ -1200,7 +1493,10 @@ int newpremise(Project *pr, int logop)
     p->status = s;
     p->value = x;
     p->exprIndex = -1;
-    p->rhsIsVar = 0; p->rhsObject = 0; p->rhsIndex = 0; p->rhsVariable = 0;
+    p->rhsIsVar = 0;
+    p->rhsObject = 0;
+    p->rhsIndex = 0;
+    p->rhsVariable = 0;
     if (namedVarIdx >= 0)
     {
         // set RHS variable if applicable
@@ -1212,12 +1508,77 @@ int newpremise(Project *pr, int logop)
             p->rhsIndex = NAMED_VARS(pr)[rhsNamedIdx].index;
             p->rhsVariable = NAMED_VARS(pr)[rhsNamedIdx].variable;
         }
+        else if (parser->Ntokens == 6)
+        {
+            // Check if RHS is an object triple
+            int obj = findmatch(Tok[3], Object);
+            if (obj >= 0)
+            {
+                // Parse object triple RHS
+                int rhsObj, rhsIndex, rhsVar;
+                if (obj == r_SYSTEM)
+                {
+                    rhsObj = r_SYSTEM;
+                    rhsIndex = 0;
+                    rhsVar = findmatch(Tok[4], Varword);
+                    if (rhsVar < 0)
+                        return 201;
+                }
+                else
+                {
+                    int kind;
+                    switch (obj)
+                    {
+                    case r_NODE:
+                    case r_JUNC:
+                    case r_RESERV:
+                    case r_TANK:
+                        kind = r_NODE;
+                        break;
+                    case r_LINK:
+                    case r_PIPE:
+                    case r_PUMP:
+                    case r_VALVE:
+                        kind = r_LINK;
+                        break;
+                    default:
+                        return 201;
+                    }
+                    if (kind == r_NODE)
+                    {
+                        rhsIndex = findnode(net, Tok[4]);
+                        if (rhsIndex == 0)
+                            return 203;
+                        rhsObj = r_NODE;
+                        rhsVar = findmatch(Tok[5], Varword);
+                        if (rhsVar < 0)
+                            return 201;
+                    }
+                    else
+                    {
+                        rhsIndex = findlink(net, Tok[4]);
+                        if (rhsIndex == 0)
+                            return 204;
+                        rhsObj = r_LINK;
+                        rhsVar = findmatch(Tok[5], Varword);
+                        if (rhsVar < 0)
+                            return 201;
+                    }
+                }
+                p->rhsIsVar = 1;
+                p->rhsObject = rhsObj;
+                p->rhsIndex = rhsIndex;
+                p->rhsVariable = rhsVar;
+            }
+        }
     }
 
     // Add premise to current rule's premise list
     p->next = NULL;
-    if (rules->LastPremise == NULL) net->Rule[net->Nrules].Premises = p;
-    else rules->LastPremise->next = p;
+    if (rules->LastPremise == NULL)
+        net->Rule[net->Nrules].Premises = p;
+    else
+        rules->LastPremise->next = p;
     rules->LastPremise = p;
     return 0;
 }
@@ -1230,8 +1591,8 @@ int newaction(Project *pr)
 //----------------------------------------------------------
 {
     Network *net = &pr->network;
-    Parser  *parser = &pr->parser;
-    Rules   *rules = &pr->rules;
+    Parser *parser = &pr->parser;
+    Rules *rules = &pr->rules;
 
     int j, k, s;
     double x;
@@ -1239,39 +1600,49 @@ int newaction(Project *pr)
     char **Tok = parser->Tok;
 
     // Check for correct number of tokens
-    if (parser->Ntokens != 6) return 201;
+    if (parser->Ntokens != 6)
+        return 201;
 
     // Check that link exists
     j = findlink(net, Tok[2]);
-    if (j == 0) return 204;
+    if (j == 0)
+        return 204;
 
     // Cannot control a CV
-    if (net->Link[j].Type == CVPIPE) return 207;
+    if (net->Link[j].Type == CVPIPE)
+        return 207;
 
     // Find value for status or setting
     s = -1;
     x = MISSING;
-    if ((k = findmatch(Tok[5], Value)) > IS_NUMBER) s = k;
+    if ((k = findmatch(Tok[5], Value)) > IS_NUMBER)
+        s = k;
     else
     {
-        if (!getfloat(Tok[5], &x)) return 202;
-        if (x < 0.0) return 202;
+        if (!getfloat(Tok[5], &x))
+            return 202;
+        if (x < 0.0)
+            return 202;
     }
 
     // Cannot change setting for a GPV
-    if (x != MISSING && net->Link[j].Type == GPV) return 202;
+    if (x != MISSING && net->Link[j].Type == GPV)
+        return 202;
 
     // Set status for pipe in case setting was specified
     if (x != MISSING && net->Link[j].Type == PIPE)
     {
-        if (x == 0.0) s = IS_CLOSED;
-        else          s = IS_OPEN;
+        if (x == 0.0)
+            s = IS_CLOSED;
+        else
+            s = IS_OPEN;
         x = MISSING;
     }
 
     // Create a new action structure
     a = (Saction *)malloc(sizeof(Saction));
-    if (a == NULL) return 101;
+    if (a == NULL)
+        return 101;
     a->link = j;
     a->status = s;
     a->setting = x;
@@ -1284,7 +1655,8 @@ int newaction(Project *pr)
         {
             net->Rule[net->Nrules].ThenActions = a;
         }
-        else rules->LastThenAction->next = a;
+        else
+            rules->LastThenAction->next = a;
         rules->LastThenAction = a;
     }
     else
@@ -1294,7 +1666,8 @@ int newaction(Project *pr)
         {
             net->Rule[net->Nrules].ElseActions = a;
         }
-        else rules->LastElseAction->next = a;
+        else
+            rules->LastElseAction->next = a;
         rules->LastElseAction = a;
     }
     return 0;
@@ -1310,7 +1683,8 @@ int newpriority(Project *pr)
     double x;
     char **Tok = pr->parser.Tok;
 
-    if (!getfloat(Tok[1], &x)) return 202;
+    if (!getfloat(Tok[1], &x))
+        return 202;
     net->Rule[net->Nrules].priority = x;
     return 0;
 }
@@ -1331,11 +1705,13 @@ int evalpremises(Project *pr, int i)
     {
         if (p->logop == r_OR)
         {
-            if (result == FALSE) result = checkpremise(pr, p);
+            if (result == FALSE)
+                result = checkpremise(pr, p);
         }
         else
         {
-            if (result == FALSE) return (FALSE);
+            if (result == FALSE)
+                return (FALSE);
             result = checkpremise(pr, p);
         }
         p = p->next;
@@ -1348,11 +1724,15 @@ int checkpremise(Project *pr, Spremise *p)
 //    Checks if a particular premise is true
 //----------------------------------------------------------
 {
-    if (p->exprIndex >= 0) return (checkvalue(pr,p));
+    if (p->exprIndex >= 0)
+        return (checkvalue(pr, p));
     if (p->variable == r_TIME ||
-        p->variable == r_CLOCKTIME) return (checktime(pr,p));
-    else if (p->status > IS_NUMBER) return (checkstatus(pr,p));
-    else return (checkvalue(pr,p));
+        p->variable == r_CLOCKTIME)
+        return (checktime(pr, p));
+    else if (p->status > IS_NUMBER)
+        return (checkstatus(pr, p));
+    else
+        return (checkvalue(pr, p));
 }
 
 int checktime(Project *pr, Spremise *p)
@@ -1377,42 +1757,49 @@ int checktime(Project *pr, Spremise *p)
         t1 = (rules->Time1 + time->Tstart) % SECperDAY;
         t2 = (time->Htime + time->Tstart) % SECperDAY;
     }
-    else return (0);
+    else
+        return (0);
 
     // Test premise's time
     x = (long)(p->value);
     switch (p->relop)
     {
-      // For inequality, test against current time
-      case LT:
-        if (t2 >= x) return (0);
+    // For inequality, test against current time
+    case LT:
+        if (t2 >= x)
+            return (0);
         break;
-      case LE:
-        if (t2 > x) return (0);
+    case LE:
+        if (t2 > x)
+            return (0);
         break;
-      case GT:
-        if (t2 <= x) return (0);
+    case GT:
+        if (t2 <= x)
+            return (0);
         break;
-      case GE:
-        if (t2 < x) return (0);
-      break;
+    case GE:
+        if (t2 < x)
+            return (0);
+        break;
 
-      // For equality, test if within interval
-      case EQ:
-      case NE:
+    // For equality, test if within interval
+    case EQ:
+    case NE:
         flag = FALSE;
         if (t2 < t1) // E.g., 11:00 am to 1:00 am
         {
             if (x >= t1 || x <= t2)
-            flag = TRUE;
+                flag = TRUE;
         }
         else
         {
             if (x >= t1 && x <= t2)
-            flag = TRUE;
+                flag = TRUE;
         }
-        if (p->relop == EQ && flag == FALSE) return (0);
-        if (p->relop == NE && flag == TRUE)  return (0);
+        if (p->relop == EQ && flag == FALSE)
+            return (0);
+        if (p->relop == NE && flag == TRUE)
+            return (0);
         break;
     }
 
@@ -1432,15 +1819,20 @@ int checkstatus(Project *pr, Spremise *p)
 
     switch (p->status)
     {
-      case IS_OPEN:
-      case IS_CLOSED:
-      case IS_ACTIVE:
+    case IS_OPEN:
+    case IS_CLOSED:
+    case IS_ACTIVE:
         i = hyd->LinkStatus[p->index];
-        if      (i <= CLOSED) j = IS_CLOSED;
-        else if (i == ACTIVE) j = IS_ACTIVE;
-        else                  j = IS_OPEN;
-        if (j == p->status && p->relop == EQ) return 1;
-        if (j != p->status && p->relop == NE) return 1;
+        if (i <= CLOSED)
+            j = IS_CLOSED;
+        else if (i == ACTIVE)
+            j = IS_ACTIVE;
+        else
+            j = IS_OPEN;
+        if (j == p->status && p->relop == EQ)
+            return 1;
+        if (j != p->status && p->relop == NE)
+            return 1;
     }
     return 0;
 }
@@ -1454,17 +1846,17 @@ int checkvalue(Project *pr, Spremise *p)
     Network *net = &pr->network;
     Hydraul *hyd = &pr->hydraul;
 
-    int     i, j, v;
-    double  x,            // A variable's value (LHS)
-            tol = 1.e-3;  // Equality tolerance
-    int    Njuncs = net->Njuncs;
+    int i, j, v;
+    double x,        // A variable's value (LHS)
+        tol = 1.e-3; // Equality tolerance
+    int Njuncs = net->Njuncs;
     double *Ucf = pr->Ucf;
     double *NodeDemand = hyd->NodeDemand;
     double *LinkFlow = hyd->LinkFlow;
     double *LinkSetting = hyd->LinkSetting;
-    Snode  *Node = net->Node;
-    Slink  *Link = net->Link;
-    Stank  *Tank = net->Tank;
+    Snode *Node = net->Node;
+    Slink *Link = net->Link;
+    Stank *Tank = net->Tank;
 
     // LHS value: expression or direct variable
     if (p->exprIndex >= 0)
@@ -1479,83 +1871,110 @@ int checkvalue(Project *pr, Spremise *p)
         v = p->variable;
         switch (v)
         {
-          case r_DEMAND:
-            if (p->object == r_SYSTEM) x = hyd->Dsystem * Ucf[DEMAND];
-            else                       x = NodeDemand[i] * Ucf[DEMAND];
+        case r_DEMAND:
+            if (p->object == r_SYSTEM)
+                x = hyd->Dsystem * Ucf[DEMAND];
+            else
+                x = NodeDemand[i] * Ucf[DEMAND];
             break;
- 
-          case r_HEAD:
-          case r_GRADE:
+
+        case r_HEAD:
+        case r_GRADE:
             x = hyd->NodeHead[i] * Ucf[HEAD];
             break;
- 
-          case r_PRESSURE:
+
+        case r_PRESSURE:
             x = (hyd->NodeHead[i] - Node[i].El) * Ucf[PRESSURE];
             break;
- 
-          case r_LEVEL:
+
+        case r_LEVEL:
             x = (hyd->NodeHead[i] - Node[i].El) * Ucf[HEAD];
             break;
- 
-          case r_FLOW:
+
+        case r_FLOW:
             x = ABS(LinkFlow[i]) * Ucf[FLOW];
             break;
- 
-          case r_SETTING:
-            if (LinkSetting[i] == MISSING) return 0;
+
+        case r_SETTING:
+            if (LinkSetting[i] == MISSING)
+                return 0;
             x = LinkSetting[i];
             switch (Link[i].Type)
             {
-              case PRV:
-              case PSV:
-              case PBV:
+            case PRV:
+            case PSV:
+            case PBV:
                 x = x * Ucf[PRESSURE];
                 break;
-              case FCV:
+            case FCV:
                 x = x * Ucf[FLOW];
                 break;
-              default:
+            default:
                 break;
             }
             break;
- 
-          case r_FILLTIME:
-            if (i <= Njuncs) return 0;
+
+        case r_FILLTIME:
+            if (i <= Njuncs)
+                return 0;
             j = i - Njuncs;
-            if (Tank[j].A == 0.0) return 0;
-            if (NodeDemand[i] <= TINY) return 0;
+            if (Tank[j].A == 0.0)
+                return 0;
+            if (NodeDemand[i] <= TINY)
+                return 0;
             x = (Tank[j].Vmax - Tank[j].V) / NodeDemand[i];
             break;
- 
-          case r_DRAINTIME:
-            if (i <= Njuncs) return 0;
+
+        case r_DRAINTIME:
+            if (i <= Njuncs)
+                return 0;
             j = i - Njuncs;
-            if (Tank[j].A == 0.0) return 0;
-            if (NodeDemand[i] >= -TINY) return 0;
+            if (Tank[j].A == 0.0)
+                return 0;
+            if (NodeDemand[i] >= -TINY)
+                return 0;
             x = (Tank[j].Vmin - Tank[j].V) / NodeDemand[i];
             break;
- 
-          default:
+
+        default:
             return 0;
         }
     }
- 
+
     // RHS value: another variable or literal
     double rhs = p->value;
     if (p->rhsIsVar)
     {
         rhs = getVariableValue(pr, p->rhsObject, p->rhsIndex, p->rhsVariable);
     }
- 
+
     // Compare value x against the premise
     switch (p->relop)
     {
-      case EQ: if (ABS(x - rhs) > tol) return 0; break;
-      case NE: if (ABS(x - rhs) < tol) return 0; break;
-      case LT: if (x > rhs + tol) return 0;      break;
-      case LE: if (x > rhs - tol) return 0;      break;
-      case GT: if (x < rhs - tol) return 0;      break;
-      case GE: if (x < rhs + tol) return 0;      break;
+    case EQ:
+        if (ABS(x - rhs) > tol)
+            return 0;
+        break;
+    case NE:
+        if (ABS(x - rhs) < tol)
+            return 0;
+        break;
+    case LT:
+        if (x > rhs + tol)
+            return 0;
+        break;
+    case LE:
+        if (x > rhs - tol)
+            return 0;
+        break;
+    case GT:
+        if (x < rhs - tol)
+            return 0;
+        break;
+    case GE:
+        if (x < rhs + tol)
+            return 0;
+        break;
     }
     return 1;
 }
@@ -1636,8 +2055,8 @@ int takeactions(Project *pr)
 {
     Network *net = &pr->network;
     Hydraul *hyd = &pr->hydraul;
-    Report  *rpt = &pr->report;
-    Rules   *rules = &pr->rules;
+    Report *rpt = &pr->report;
+    Rules *rules = &pr->rules;
 
     char flag;
     int k, s, n;
@@ -1675,15 +2094,15 @@ int takeactions(Project *pr)
         {
             switch (net->Link[k].Type)
             {
-              case PRV:
-              case PSV:
-              case PBV:
+            case PRV:
+            case PSV:
+            case PBV:
                 x = x / pr->Ucf[PRESSURE];
                 break;
-              case FCV:
+            case FCV:
                 x = x / pr->Ucf[FLOW];
                 break;
-              default:
+            default:
                 break;
             }
             if (ABS(x - v) > tol)
@@ -1761,7 +2180,6 @@ void clearrule(Project *pr, int i)
     }
 }
 
-
 void writepremise(Spremise *p, FILE *f, Network *net)
 //-----------------------------------------------------------------------------
 //  Write a rule's premise clause to an INP file.
@@ -1770,7 +2188,7 @@ void writepremise(Spremise *p, FILE *f, Network *net)
     char s_obj[20];
     char s_id[MAXID + 1];
     char s_value[20];
-    int  subtype;
+    int subtype;
 
     // Get the type name & ID of object referred to in the premise
     if (p->object == r_NODE)
@@ -1792,7 +2210,8 @@ void writepremise(Spremise *p, FILE *f, Network *net)
     }
 
     // If premise has no value field, use its status field as a value
-    if (p->value == MISSING) strcpy(s_value, Value[p->status]);
+    if (p->value == MISSING)
+        strcpy(s_value, Value[p->status]);
 
     // Otherwise get text of premise's value field
     else
@@ -1806,7 +2225,8 @@ void writepremise(Spremise *p, FILE *f, Network *net)
         case r_TIME:
             gettimetxt(p->value, s_value);
             break;
-        default: sprintf(s_value, "%.4f", p->value);
+        default:
+            sprintf(s_value, "%.4f", p->value);
         }
     }
 
@@ -1851,10 +2271,17 @@ void getobjtxt(int objtype, int subtype, char *objtxt)
     {
         switch (subtype)
         {
-            case JUNCTION:  strcpy(objtxt, "JUNCTION"); break;
-            case RESERVOIR: strcpy(objtxt, "RESERVOIR"); break;
-            case TANK:      strcpy(objtxt, "TANK"); break;
-            default:        strcpy(objtxt, "NODE");
+        case JUNCTION:
+            strcpy(objtxt, "JUNCTION");
+            break;
+        case RESERVOIR:
+            strcpy(objtxt, "RESERVOIR");
+            break;
+        case TANK:
+            strcpy(objtxt, "TANK");
+            break;
+        default:
+            strcpy(objtxt, "NODE");
         }
     }
     else if (objtype == r_LINK)
@@ -1862,12 +2289,18 @@ void getobjtxt(int objtype, int subtype, char *objtxt)
         switch (subtype)
         {
         case CVPIPE:
-        case PIPE:  strcpy(objtxt, "PIPE"); break;
-        case PUMP:  strcpy(objtxt, "PUMP"); break;
-        default:    strcpy(objtxt, "VALVE");
+        case PIPE:
+            strcpy(objtxt, "PIPE");
+            break;
+        case PUMP:
+            strcpy(objtxt, "PUMP");
+            break;
+        default:
+            strcpy(objtxt, "VALVE");
         }
     }
-    else strcpy(objtxt, "SYSTEM");
+    else
+        strcpy(objtxt, "SYSTEM");
 }
 
 void gettimetxt(double secs, char *timetxt)
@@ -1877,7 +2310,8 @@ void gettimetxt(double secs, char *timetxt)
 {
     int hours = 0, minutes = 0, seconds = 0;
     hours = (int)secs / 3600;
-    if (hours > 24 * 7) sprintf(timetxt, "%.4f", secs / 3600.0);
+    if (hours > 24 * 7)
+        sprintf(timetxt, "%.4f", secs / 3600.0);
     else
     {
         minutes = (int)((secs - 3600 * hours) / 60);
