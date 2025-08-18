@@ -1677,6 +1677,8 @@ int newaction(Project *pr)
         // Find value for status or setting
         s = -1;
         x = MISSING;
+        int settingExprIndex = -1;
+
         if ((k = findmatch(value, Value)) > IS_NUMBER)
         {
             s = k;
@@ -1686,14 +1688,27 @@ int newaction(Project *pr)
         }
         else
         {
-            if (!getfloat(value, &x))
-                return 202;
-            if (x < 0.0)
-                return 202;
+            // Check if the value is an expression name
+            int exprIndex = getExprIndex(pr, value);
+            if (exprIndex >= 0)
+            {
+                // It's an expression - validate that expressions are only used for SETTING targets
+                if (nv->variable != r_SETTING)
+                    return 201; // Expressions only valid for SETTING targets
+                settingExprIndex = exprIndex;
+            }
+            else
+            {
+                // It's a numeric value
+                if (!getfloat(value, &x))
+                    return 202;
+                if (x < 0.0)
+                    return 202;
 
-            // Validate that numeric values are only used for SETTING targets
-            if (nv->variable != r_SETTING)
-                return 201; // Numeric values only valid for SETTING targets
+                // Validate that numeric values are only used for SETTING targets
+                if (nv->variable != r_SETTING)
+                    return 201; // Numeric values only valid for SETTING targets
+            }
         }
 
         // Cannot change setting for a GPV
@@ -1717,6 +1732,7 @@ int newaction(Project *pr)
         a->link = j;
         a->status = s;
         a->setting = x;
+        a->settingExprIndex = settingExprIndex;
 
         // Add action to current rule's action list
         if (rules->RuleState == r_THEN)
@@ -1757,14 +1773,26 @@ int newaction(Project *pr)
     // Find value for status or setting
     s = -1;
     x = MISSING;
+    int settingExprIndex = -1;
     if ((k = findmatch(Tok[5], Value)) > IS_NUMBER)
         s = k;
     else
     {
-        if (!getfloat(Tok[5], &x))
-            return 202;
-        if (x < 0.0)
-            return 202;
+        // Check if the value is an expression name
+        int exprIndex = getExprIndex(pr, Tok[5]);
+        if (exprIndex >= 0)
+        {
+            // It's an expression - only valid for SETTING
+            settingExprIndex = exprIndex;
+        }
+        else
+        {
+            // It's a numeric value
+            if (!getfloat(Tok[5], &x))
+                return 202;
+            if (x < 0.0)
+                return 202;
+        }
     }
 
     // Cannot change setting for a GPV
@@ -1788,6 +1816,7 @@ int newaction(Project *pr)
     a->link = j;
     a->status = s;
     a->setting = x;
+    a->settingExprIndex = settingExprIndex;
 
     // Add action to current rule's action list
     if (rules->RuleState == r_THEN)
@@ -2232,8 +2261,15 @@ int takeactions(Project *pr)
         }
 
         // Change link's setting
-        else if (x != MISSING)
+        else if (x != MISSING || a->settingExprIndex >= 0)
         {
+            // Evaluate expression if present
+            if (a->settingExprIndex >= 0)
+            {
+                g_exprProject = pr;
+                x = mathexpr_eval(EXPRESSIONS(pr)[a->settingExprIndex].expr, expr_getVarValue);
+            }
+
             switch (net->Link[k].Type)
             {
             case PRV:
