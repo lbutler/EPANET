@@ -45,6 +45,7 @@ set(toolkit_test_srcs
      test_rules_variables_expressions.cpp
      test_rules_variables_in_comparisons.cpp
      test_rules_variable_actions.cpp
+     test_expressions_as_settings.cpp
 )
 
 add_executable(test_toolkit ${toolkit_test_srcs})

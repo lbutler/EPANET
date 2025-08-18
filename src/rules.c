@@ -1783,6 +1783,10 @@ int newaction(Project *pr)
         if (exprIndex >= 0)
         {
             // It's an expression - only valid for SETTING
+            // Check if this is a SETTING action
+            int varType = findmatch(Tok[3], Varword);
+            if (varType != r_SETTING)
+                return 201; // Expressions only valid for SETTING targets
             settingExprIndex = exprIndex;
         }
         else
