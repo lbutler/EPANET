@@ -82,11 +82,32 @@ int main(int argc, char *argv[])
     printf("  Velocity threshold: %.1f ft/s\n", pr->fireflow->VelocityThreshold);
     printf("  Convergence tolerance: %.3f cfs\n\n", pr->fireflow->Tolerance);
     
+    // Open hydraulics solver
+    errcode = EN_openH(ph);
+    if (errcode) {
+        printf("Error opening hydraulics: %d\n", errcode);
+        EN_close(ph);
+        EN_deleteproject(ph);
+        return errcode;
+    }
+    
+    // Initialize hydraulics
+    errcode = EN_initH(ph, EN_NOSAVE);
+    if (errcode) {
+        printf("Error initializing hydraulics: %d\n", errcode);
+        EN_close(ph);
+        EN_deleteproject(ph);
+        return errcode;
+    }
+    
     // Run static analysis first (no fire flow)
     printf("Running static analysis (no fire flow)...\n");
-    errcode = EN_solveH(ph);
+    
+    // Run hydraulic analysis
+    long t;
+    errcode = EN_runH(ph, &t);
     if (errcode) {
-        printf("Error in hydraulic solution: %d\n", errcode);
+        printf("Error running hydraulics: %d\n", errcode);
         EN_close(ph);
         EN_deleteproject(ph);
         return errcode;

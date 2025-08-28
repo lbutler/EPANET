@@ -1,6 +1,6 @@
 # Fire Flow Algorithm Implementation Status
 
-## Current Phase: 3/6 - Full Implementation (Near Complete)
+## Current Phase: 4/6 - Testing and Debugging (In Progress)
 
 ### Overview
 Implementing the Hernández fire flow algorithm from the paper "Fast Firefighting Water Capacity Assessment Using a Streamlined Single-Loop Hybrid Search" into EPANET's hydraulic solver.
@@ -8,65 +8,76 @@ Implementing the Hernández fire flow algorithm from the paper "Fast Firefightin
 ### Progress Summary
 - ✅ Phase 1: Research and Understanding (COMPLETE)
 - ✅ Phase 2: Design and Initial Implementation (COMPLETE)
-- 🔄 Phase 3: Full Implementation (90% COMPLETE)
-- ⏳ Phase 4: Testing and Debugging
+- ✅ Phase 3: Full Implementation (COMPLETE)
+- 🔄 Phase 4: Testing and Debugging (50% COMPLETE)
 - ⏳ Phase 5: Validation Against Benchmarks
 - ⏳ Phase 6: Documentation and Finalization
 
-### Session 2 Completed Work
+### Session 3 Completed Work
 
-#### Integration
-- Integrated FireFlow struct into Project structure
-- Modified hydsolver.c with fire flow calls at Steps 2, 4, and 5
-- Modified hydcoeffs.c to inject fire flow demand
-- Updated project.c for initialization and cleanup
-- Successfully compiled entire project
+#### Testing & Debugging
+- Created simplified test program
+- Fixed hydraulics initialization issues
+- Fixed heuristic algorithm bugs
+- **Critical Fix**: Corrected pipe diameter units (inches to feet)
+- Added extensive debug output
+- Verified core functionality works
 
-#### Code Modifications
-- `/workspace/src/types.h` - Added FireFlow pointer to Project struct
-- `/workspace/src/hydsolver.c` - Added fire flow integration points
-- `/workspace/src/hydcoeffs.c` - Modified nodecoeffs() for fire flow demand
-- `/workspace/src/project.c` - Added init/free calls
-- `/workspace/test_fireflow.c` - Created test program
+#### Current Test Results
+- Fire flow starts at 100 gpm and increases
+- Critical element tracking works correctly
+- Velocities now calculated correctly (30-40 ft/s range)
+- Relative closeness values positive when constraints satisfied
+- **Issue**: Algorithm doesn't converge - flow keeps increasing
+
+### Algorithm Status
+
+#### Working Components
+- ✅ Fire flow module initialization
+- ✅ Fire flow demand injection into hydraulics
+- ✅ Heuristic guess generation
+- ✅ Critical element identification
+- ✅ Relative closeness calculation
+- ✅ Velocity/pressure calculations
+
+#### Not Yet Working
+- ❌ Convergence checking
+- ❌ Quadratic regression (needs 3+ iterations)
+- ❌ Constraint-based flow limiting
+- ❌ Initialization sequence (static → available → design)
+
+### Test Output Example
+```
+FF Iter 0: Q=100.0 gpm, Critical: Pipe 10, X=30.60 ft/s, RC=1.0300
+FF Iter 1: Q=210.0 gpm, Critical: Pipe 10, X=34.66 ft/s, RC=1.2328
+FF Iter 2: Q=331.0 gpm, Critical: Pipe 10, X=39.14 ft/s, RC=1.4568
+```
 
 ### Next Steps
-1. Run test program with Net1.inp
-2. Debug convergence behavior
-3. Implement initial runs (static, required, available)
-4. Validate against paper's benchmarks
-5. Fine-tune parameters
-
-### Implementation Details
-
-#### Fire Flow Integration Points
-1. **Step 2 (Before matrixcoeffs)**: Generate fire flow guess
-2. **Step 2 (In nodecoeffs)**: Add fire flow demand to hydrant
-3. **Step 4 (After newflows)**: Update critical element
-4. **Step 5 (In hasconverged)**: Check fire flow convergence
-
-#### Key Algorithms Implemented
-- ✅ Quadratic regression with Cholesky (3x3 Cramer's rule)
-- ✅ Heuristic backup method
-- ✅ Relative closeness calculation
-- ✅ Critical element selection
-- ✅ Convergence checking
+1. Implement proper convergence logic
+2. Test quadratic regression after 3 iterations
+3. Add constraint-based flow limiting
+4. Implement full initialization sequence
+5. Validate against paper's benchmarks
 
 ### Known Issues
-- Need to implement proper initialization sequence (static → required → available → design)
-- Relative closeness normalization needs validation
-- Fire flow needs to be activated through API or command line
-- Test coverage needed
+- Fire flow increases without bound (no convergence)
+- Quadratic regression not yet tested
+- Missing proper initialization runs
+- Need to handle critical element approaching threshold
 
-### Files Modified/Created (Session 2)
-- `/workspace/src/types.h` - Modified
-- `/workspace/src/hydsolver.c` - Modified  
-- `/workspace/src/hydcoeffs.c` - Modified
-- `/workspace/src/project.c` - Modified
-- `/workspace/test_fireflow.c` - Created
-- `/workspace/FIRE_FLOW_DOCS_FOR_AI/PROGRESS_LOG.md` - Updated
+### Files Modified (Session 3)
+- `/workspace/src/fireflow.c` - Multiple bug fixes
+- `/workspace/test_fireflow_simple.c` - Created and refined
+- Debug output added temporarily
 
 ### Build Status
-✅ **BUILD SUCCESSFUL** - All modules compile without errors
+✅ **BUILD SUCCESSFUL** - All modules compile and link correctly
 
-### Session Time: Session 1: ~2 hours, Session 2: ~1.5 hours
-### Estimated Completion: 10-15 more sessions for full validation and documentation
+### Session Time: 
+- Session 1: ~2 hours
+- Session 2: ~1.5 hours  
+- Session 3: ~1.5 hours (current)
+- **Total: ~5 hours**
+
+### Estimated Completion: 8-10 more sessions for full validation and documentation

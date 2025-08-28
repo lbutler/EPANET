@@ -306,26 +306,40 @@ void generateFireFlowGuess(Project *pr)
     // Use heuristic method if needed
     if (pr->fireflow->HistoryCount < 3 || pr->fireflow->UseHeuristic) {
         if (pr->fireflow->Iteration == 0) {
-            // First iteration: use a fraction of available flow
-            newQ = pr->fireflow->AvailableFlow * 0.5;
+            // First iteration: start with a small flow
+            // If available flow is not yet computed, use a reasonable default
+            if (pr->fireflow->AvailableFlow > 0) {
+                newQ = pr->fireflow->AvailableFlow * 0.5;
+            } else {
+                // Start with 100 gpm as initial guess
+                newQ = 100.0 / 448.831;  // Convert gpm to cfs
+            }
         } else {
             // Heuristic update
-            double currentDirection = (pr->fireflow->Qcurrent > pr->fireflow->LastQ) ? 1.0 : -1.0;
-            double multiplier;
-            
-            if (pr->fireflow->LastDirection == 0.0) {
-                // First direction
-                multiplier = pr->fireflow->HeuristicMultUp;
-            } else if (currentDirection == pr->fireflow->LastDirection) {
-                // Same direction
-                multiplier = pr->fireflow->HeuristicMultUp;
+            if (pr->fireflow->LastDeltaQ == 0.0) {
+                // No previous change, make an initial step
+                // Increase flow by 10% or 50 gpm, whichever is larger
+                double increment = fmax(pr->fireflow->Qcurrent * 0.1, 50.0 / 448.831);
+                newQ = pr->fireflow->Qcurrent + increment;
             } else {
-                // Direction changed
-                multiplier = pr->fireflow->HeuristicMultDown;
+                // Use direction-based heuristic
+                double currentDirection = (pr->fireflow->Qcurrent > pr->fireflow->LastQ) ? 1.0 : -1.0;
+                double multiplier;
+                
+                if (pr->fireflow->LastDirection == 0.0) {
+                    // First direction
+                    multiplier = pr->fireflow->HeuristicMultUp;
+                } else if (currentDirection == pr->fireflow->LastDirection) {
+                    // Same direction
+                    multiplier = pr->fireflow->HeuristicMultUp;
+                } else {
+                    // Direction changed
+                    multiplier = pr->fireflow->HeuristicMultDown;
+                }
+                
+                newQ = pr->fireflow->Qcurrent + multiplier * pr->fireflow->LastDeltaQ;
+                pr->fireflow->LastDirection = currentDirection;
             }
-            
-            newQ = pr->fireflow->Qcurrent + multiplier * pr->fireflow->LastDeltaQ;
-            pr->fireflow->LastDirection = currentDirection;
         }
     }
     
@@ -361,7 +375,9 @@ double computeRelativeCloseness(Project *pr, int element, int isPipe)
     if (isPipe) {
         // Velocity constraint for pipes
         double q = fabs(hyd->LinkFlow[element]);
-        double area = 0.7854 * net->Link[element].Diam * net->Link[element].Diam;
+        // Convert diameter from inches to feet for area calculation
+        double diam_ft = net->Link[element].Diam / 12.0;
+        double area = 0.7854 * diam_ft * diam_ft;  // Area in sq ft
         x = q / area;  // Velocity in ft/s
         xThreshold = pr->fireflow->VelocityThreshold;
         
@@ -436,8 +452,8 @@ void updateCriticalElement(Project *pr)
     if (isCriticalPipe) {
         Hydraul *hyd = &pr->hydraul;
         double q = fabs(hyd->LinkFlow[criticalElement]);
-        double area = 0.7854 * net->Link[criticalElement].Diam * 
-                      net->Link[criticalElement].Diam;
+        double diam_ft = net->Link[criticalElement].Diam / 12.0;
+        double area = 0.7854 * diam_ft * diam_ft;
         pr->fireflow->Xcritical = q / area;  // Velocity
     } else {
         Hydraul *hyd = &pr->hydraul;
@@ -491,7 +507,17 @@ void fireFlowBeforeMatrixCoeffs(Project *pr)
     // Generate new fire flow guess
     generateFireFlowGuess(pr);
     
-    // The actual demand will be added in a modified demandcoeffs() function
+    // Debug output (temporary)
+    if (pr->fireflow->Iteration < 10) {
+        printf("    FF Iter %d: Q=%.3f cfs (%.1f gpm), LastQ=%.3f, DeltaQ=%.3f\n", 
+               pr->fireflow->Iteration, 
+               pr->fireflow->Qcurrent,
+               pr->fireflow->Qcurrent * 448.831,
+               pr->fireflow->LastQ,
+               pr->fireflow->LastDeltaQ);
+    }
+    
+    // The actual demand will be added in nodecoeffs() function
 }
 
 void fireFlowAfterNewFlows(Project *pr)
@@ -507,6 +533,17 @@ void fireFlowAfterNewFlows(Project *pr)
     
     // Update critical element and relative closeness
     updateCriticalElement(pr);
+    
+    // Debug output (temporary)
+    if (pr->fireflow->Iteration < 10) {
+        printf("      Critical: %s %d, X=%.2f, RC=%.4f\n",
+               pr->fireflow->IsCriticalPipe ? "Pipe" : "Node",
+               pr->fireflow->CriticalElement,
+               pr->fireflow->Xcritical,
+               pr->fireflow->IsCriticalPipe ? 
+                   pr->fireflow->RelCloseness[pr->network.Njuncs + pr->fireflow->CriticalElement] :
+                   pr->fireflow->RelCloseness[pr->fireflow->CriticalElement]);
+    }
     
     // Update history with current values
     updateFireFlowHistory(pr, pr->fireflow->Qcurrent, pr->fireflow->Xcritical);
