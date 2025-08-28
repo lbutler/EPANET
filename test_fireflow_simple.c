@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
         
         // Override thresholds for this small-pipe network
         pr->fireflow->PressureThreshold = 20.0 * 2.31;  // 20 psi
-        pr->fireflow->VelocityThreshold = 50.0;  // 50 ft/s (more reasonable for small pipes)
+        pr->fireflow->VelocityThreshold = 3.0;  // 3 ft/s (will actually constrain flow)
         
         printf("  Enabled: %d\n", pr->fireflow->Enabled);
         printf("  Active: %d\n", pr->fireflow->Active);

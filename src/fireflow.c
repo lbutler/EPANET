@@ -356,8 +356,16 @@ void generateFireFlowGuess(Project *pr)
                 
                 // If constraint violated, force reduction
                 if (rcCritical < 0.0) {
-                    multiplier = -0.5;  // Back off by 50%
-                    printf("      Constraint violated (RC=%.4f), backing off\n", rcCritical);
+                    // Use smaller steps when close to constraint
+                    if (rcCritical > -0.1) {
+                        multiplier = -0.1;  // Small adjustment near boundary
+                    } else {
+                        multiplier = -0.5;  // Larger back off when far from constraint
+                    }
+                    if (pr->fireflow->Iteration < 15) {
+                        printf("      Constraint violated (RC=%.4f), backing off with multiplier %.2f\n", 
+                               rcCritical, multiplier);
+                    }
                 } else if (pr->fireflow->LastDirection == 0.0) {
                     // First direction
                     multiplier = pr->fireflow->HeuristicMultUp;
@@ -407,11 +415,17 @@ double computeRelativeCloseness(Project *pr, int element, int isPipe)
     if (isPipe) {
         // Velocity constraint for pipes
         double q = fabs(hyd->LinkFlow[element]);
-        // Convert diameter from inches to feet for area calculation
-        double diam_ft = net->Link[element].Diam / 12.0;
+        // Diameter is already in feet internally
+        double diam_ft = net->Link[element].Diam;
         double area = 0.7854 * diam_ft * diam_ft;  // Area in sq ft
         x = q / area;  // Velocity in ft/s
         xThreshold = pr->fireflow->VelocityThreshold;
+        
+        // Debug output for first few iterations
+        if (pr->fireflow && pr->fireflow->Iteration < 3 && element == pr->fireflow->CriticalElement) {
+            printf("        Pipe %s: D=%.2f ft (%.1f\"), Q=%.4f cfs, A=%.4f ft², V=%.2f ft/s\n",
+                   net->Link[element].ID, diam_ft, diam_ft * 12.0, q, area, x);
+        }
         
         // Use a fixed range for velocity (e.g., 0 to 2*threshold)
         range = 2.0 * xThreshold;
@@ -491,7 +505,7 @@ void updateCriticalElement(Project *pr)
     if (isCriticalPipe) {
         Hydraul *hyd = &pr->hydraul;
         double q = fabs(hyd->LinkFlow[criticalElement]);
-        double diam_ft = net->Link[criticalElement].Diam / 12.0;
+        double diam_ft = net->Link[criticalElement].Diam;  // Already in feet
         double area = 0.7854 * diam_ft * diam_ft;
         pr->fireflow->Xcritical = q / area;  // Velocity
     } else {
@@ -534,10 +548,12 @@ int checkFireFlowConvergence(Project *pr)
     
     // Check convergence criteria:
     // 1. Flow change is small (absolute or relative)
-    // 2. Critical element is close to threshold (0 <= RC <= 0.01)
+    // 2. Critical element is close to threshold (-0.05 <= RC <= 0.05)
     if ((deltaQ < pr->fireflow->Tolerance || relativeChange < 0.01) && 
-        rcCritical >= -0.001 && rcCritical <= 0.01) {
+        rcCritical >= -0.05 && rcCritical <= 0.05) {
         pr->fireflow->Converged = 1;
+        printf("      CONVERGED: Q=%.3f cfs (%.1f gpm), RC=%.4f\n",
+               pr->fireflow->Qcurrent, pr->fireflow->Qcurrent * 448.831, rcCritical);
         return 1;
     }
     
