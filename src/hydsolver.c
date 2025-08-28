@@ -20,6 +20,7 @@
 #include "types.h"
 #include "funcs.h"
 #include "text.h"
+#include "fireflow.h"
 
 // Hydraulic balance error for network being analyzed
 typedef struct {
@@ -119,6 +120,12 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
         // Solution for H is returned in F from call to linsolve().
 
         headlosscoeffs(pr);
+        
+        // Fire flow Step 2 modification: Generate fire flow guess before matrix coeffs
+        if (isFireFlowActive(pr)) {
+            fireFlowBeforeMatrixCoeffs(pr);
+        }
+        
         matrixcoeffs(pr);
         errcode = linsolve(sm, net->Njuncs);
 
@@ -138,6 +145,11 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
         }
         newerr = newflows(pr, &hydbal);             // Update flows
         *relerr = newerr;
+        
+        // Fire flow Step 4 modification: Update critical element after flows computed
+        if (isFireFlowActive(pr)) {
+            fireFlowAfterNewFlows(pr);
+        }
 
         // Write convergence error to status report if called for
         if (rpt->Statflag == FULL)
@@ -685,7 +697,11 @@ int  hasconverged(Project *pr, double *relerr, Hydbalance *hbal)
     if (hyd->HasLeakage && !leakagehasconverged(pr)) return 0;
         
     // Check for pressure driven analysis convergence
-    if (hyd->DemandModel == PDA) return pdaconverged(pr);
+    if (hyd->DemandModel == PDA && !pdaconverged(pr)) return 0;
+    
+    // Fire flow Step 5 modification: Check fire flow convergence
+    if (isFireFlowActive(pr) && !fireFlowCheckConvergence(pr)) return 0;
+    
     return 1;
 }
 
