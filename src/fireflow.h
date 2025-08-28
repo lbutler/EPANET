@@ -12,7 +12,7 @@
 #define FIREFLOW_H
 
 // Fire flow analysis state structure
-typedef struct {
+typedef struct FireFlow {
     // Control flags
     int    Active;              // Fire flow analysis active flag
     int    Enabled;             // Fire flow feature enabled flag

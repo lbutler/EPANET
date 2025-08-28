@@ -23,6 +23,7 @@
 
 #include "types.h"
 #include "funcs.h"
+#include "fireflow.h"
 
 int openproject(Project *pr, const char *inpFile, const char *rptFile,
                       const char *outFile, int allowerrors)
@@ -68,6 +69,9 @@ int openproject(Project *pr, const char *inpFile, const char *rptFile,
 
     // Read input data
     ERRCODE(getdata(pr));
+    
+    // Initialize fire flow analysis module
+    initFireFlow(pr);
 
     // Close input file
     if (pr->parser.InFile != NULL)
@@ -359,6 +363,8 @@ void initpointers(Project *pr)
     pr->hydraul.smatrix.LNZ = NULL;
 
     pr->report.reportCallback = NULL;
+    
+    pr->fireflow = NULL;
 
     initrules(pr);
 }
@@ -546,6 +552,9 @@ void freedata(Project *pr)
 
     // Free memory for rule base (see RULES.C)
     freerules(pr);
+    
+    // Free memory for fire flow analysis
+    freeFireFlow(pr);
 
     // Free hash table memory
     if (pr->network.NodeHashTable != NULL)

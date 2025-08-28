@@ -895,6 +895,9 @@ typedef struct {
 
 } Network;
 
+// Forward declaration for FireFlow
+typedef struct FireFlow FireFlow;
+
 // Overall Project Wrapper
 typedef struct Project {
 
@@ -906,6 +909,7 @@ typedef struct Project {
   Rules      rules;              // Rule-based controls wrapper
   Hydraul    hydraul;            // Hydraulics solver wrapper
   Quality    quality;            // Water quality solver wrapper
+  FireFlow   *fireflow;          // Fire flow analysis wrapper
 
   double Ucf[MAXVAR];            // Unit conversion factors
 

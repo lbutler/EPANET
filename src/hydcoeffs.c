@@ -18,6 +18,7 @@
 
 #include "types.h"
 #include "funcs.h"
+#include "fireflow.h"
 
 // Constants used for computing Darcy-Weisbach friction factor
 const double A1 = 3.14159265358979323850e+03;   // 1000*PI
@@ -400,6 +401,12 @@ void  nodecoeffs(Project *pr)
     for (i = 1; i <= net->Njuncs; i++)
     {
         hyd->Xflow[i] -= hyd->DemandFlow[i];
+        
+        // Fire flow modification: Add fire flow demand to hydrant node
+        if (isFireFlowActive(pr) && pr->fireflow->HydrantNode == i) {
+            hyd->Xflow[i] -= pr->fireflow->Qcurrent;
+        }
+        
         sm->F[sm->Row[i]] += hyd->Xflow[i];
     }
 }

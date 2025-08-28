@@ -17,9 +17,6 @@
 #include "funcs.h"
 #include "fireflow.h"
 
-// Module-level fire flow state (to be added to Project struct later)
-static FireFlow* gFireFlow = NULL;
-
 void initFireFlow(Project *pr)
 /*
 **--------------------------------------------------------------
@@ -32,40 +29,40 @@ void initFireFlow(Project *pr)
     Network *net = &pr->network;
     
     // Allocate fire flow structure
-    if (gFireFlow == NULL) {
-        gFireFlow = (FireFlow*)calloc(1, sizeof(FireFlow));
+    if (pr->fireflow == NULL) {
+        pr->fireflow = (FireFlow*)calloc(1, sizeof(FireFlow));
     }
     
-    if (gFireFlow == NULL) return;
+    if (pr->fireflow == NULL) return;
     
     // Initialize fields
-    gFireFlow->Enabled = 0;  // Disabled by default
-    gFireFlow->Active = 0;
-    gFireFlow->HydrantNode = 0;
-    gFireFlow->CriticalElement = 0;
-    gFireFlow->IsCriticalPipe = 0;
-    gFireFlow->HistoryCount = 0;
-    gFireFlow->Iteration = 0;
-    gFireFlow->Converged = 0;
-    gFireFlow->UseHeuristic = 0;
+    pr->fireflow->Enabled = 0;  // Disabled by default
+    pr->fireflow->Active = 0;
+    pr->fireflow->HydrantNode = 0;
+    pr->fireflow->CriticalElement = 0;
+    pr->fireflow->IsCriticalPipe = 0;
+    pr->fireflow->HistoryCount = 0;
+    pr->fireflow->Iteration = 0;
+    pr->fireflow->Converged = 0;
+    pr->fireflow->UseHeuristic = 0;
     
     // Set default parameters
-    gFireFlow->Tolerance = 0.01;  // 0.01 cfs convergence tolerance
-    gFireFlow->PressureThreshold = 20.0 * 2.31;  // 20 psi converted to feet
-    gFireFlow->VelocityThreshold = 10.0;  // 10 ft/s default
-    gFireFlow->HeuristicMultUp = 1.1;
-    gFireFlow->HeuristicMultDown = -0.4;
+    pr->fireflow->Tolerance = 0.01;  // 0.01 cfs convergence tolerance
+    pr->fireflow->PressureThreshold = 20.0 * 2.31;  // 20 psi converted to feet
+    pr->fireflow->VelocityThreshold = 10.0;  // 10 ft/s default
+    pr->fireflow->HeuristicMultUp = 1.1;
+    pr->fireflow->HeuristicMultDown = -0.4;
     
     // Allocate relative closeness array
     // Size = Njuncs (for pressure) + Nlinks (for velocity)
     int totalElements = net->Njuncs + net->Nlinks;
-    gFireFlow->RelClosenessSize = totalElements;
-    gFireFlow->RelCloseness = (double*)calloc(totalElements + 1, sizeof(double));
+    pr->fireflow->RelClosenessSize = totalElements;
+    pr->fireflow->RelCloseness = (double*)calloc(totalElements + 1, sizeof(double));
     
     // Initialize history arrays
     for (int i = 0; i < 3; i++) {
-        gFireFlow->Q[i] = 0.0;
-        gFireFlow->X[i] = 0.0;
+        pr->fireflow->Q[i] = 0.0;
+        pr->fireflow->X[i] = 0.0;
     }
 }
 
@@ -78,13 +75,13 @@ void freeFireFlow(Project *pr)
 **--------------------------------------------------------------
 */
 {
-    if (gFireFlow != NULL) {
-        if (gFireFlow->RelCloseness != NULL) {
-            free(gFireFlow->RelCloseness);
-            gFireFlow->RelCloseness = NULL;
+    if (pr->fireflow != NULL) {
+        if (pr->fireflow->RelCloseness != NULL) {
+            free(pr->fireflow->RelCloseness);
+            pr->fireflow->RelCloseness = NULL;
         }
-        free(gFireFlow);
-        gFireFlow = NULL;
+        free(pr->fireflow);
+        pr->fireflow = NULL;
     }
 }
 
@@ -97,23 +94,23 @@ void resetFireFlow(Project *pr)
 **--------------------------------------------------------------
 */
 {
-    if (gFireFlow == NULL) return;
+    if (pr->fireflow == NULL) return;
     
-    gFireFlow->Active = 0;
-    gFireFlow->CriticalElement = 0;
-    gFireFlow->IsCriticalPipe = 0;
-    gFireFlow->HistoryCount = 0;
-    gFireFlow->Iteration = 0;
-    gFireFlow->Converged = 0;
-    gFireFlow->UseHeuristic = 0;
-    gFireFlow->Qcurrent = 0.0;
-    gFireFlow->LastQ = 0.0;
-    gFireFlow->LastDirection = 0.0;
-    gFireFlow->LastDeltaQ = 0.0;
+    pr->fireflow->Active = 0;
+    pr->fireflow->CriticalElement = 0;
+    pr->fireflow->IsCriticalPipe = 0;
+    pr->fireflow->HistoryCount = 0;
+    pr->fireflow->Iteration = 0;
+    pr->fireflow->Converged = 0;
+    pr->fireflow->UseHeuristic = 0;
+    pr->fireflow->Qcurrent = 0.0;
+    pr->fireflow->LastQ = 0.0;
+    pr->fireflow->LastDirection = 0.0;
+    pr->fireflow->LastDeltaQ = 0.0;
     
     for (int i = 0; i < 3; i++) {
-        gFireFlow->Q[i] = 0.0;
-        gFireFlow->X[i] = 0.0;
+        pr->fireflow->Q[i] = 0.0;
+        pr->fireflow->X[i] = 0.0;
     }
 }
 
@@ -126,7 +123,7 @@ int isFireFlowActive(Project *pr)
 **--------------------------------------------------------------
 */
 {
-    return (gFireFlow != NULL && gFireFlow->Active);
+    return (pr->fireflow != NULL && pr->fireflow->Active);
 }
 
 void setFireFlowHydrant(Project *pr, int nodeIndex)
@@ -139,10 +136,10 @@ void setFireFlowHydrant(Project *pr, int nodeIndex)
 **--------------------------------------------------------------
 */
 {
-    if (gFireFlow == NULL) return;
+    if (pr->fireflow == NULL) return;
     
-    gFireFlow->HydrantNode = nodeIndex;
-    gFireFlow->Active = (nodeIndex > 0);
+    pr->fireflow->HydrantNode = nodeIndex;
+    pr->fireflow->Active = (nodeIndex > 0);
 }
 
 void solve3x3System(double A[3][3], double b[3], double x[3])
@@ -249,20 +246,20 @@ void updateFireFlowHistory(Project *pr, double Q, double X)
 **--------------------------------------------------------------
 */
 {
-    if (gFireFlow == NULL) return;
+    if (pr->fireflow == NULL) return;
     
     // Shift history
-    gFireFlow->Q[2] = gFireFlow->Q[1];
-    gFireFlow->Q[1] = gFireFlow->Q[0];
-    gFireFlow->Q[0] = Q;
+    pr->fireflow->Q[2] = pr->fireflow->Q[1];
+    pr->fireflow->Q[1] = pr->fireflow->Q[0];
+    pr->fireflow->Q[0] = Q;
     
-    gFireFlow->X[2] = gFireFlow->X[1];
-    gFireFlow->X[1] = gFireFlow->X[0];
-    gFireFlow->X[0] = X;
+    pr->fireflow->X[2] = pr->fireflow->X[1];
+    pr->fireflow->X[1] = pr->fireflow->X[0];
+    pr->fireflow->X[0] = X;
     
     // Update history count
-    if (gFireFlow->HistoryCount < 3) {
-        gFireFlow->HistoryCount++;
+    if (pr->fireflow->HistoryCount < 3) {
+        pr->fireflow->HistoryCount++;
     }
 }
 
@@ -276,22 +273,22 @@ void generateFireFlowGuess(Project *pr)
 **--------------------------------------------------------------
 */
 {
-    if (gFireFlow == NULL || !gFireFlow->Active) return;
+    if (pr->fireflow == NULL || !pr->fireflow->Active) return;
     
     double newQ = 0.0;
     
     // Check if we have enough history for regression
-    if (gFireFlow->HistoryCount >= 3 && !gFireFlow->UseHeuristic) {
+    if (pr->fireflow->HistoryCount >= 3 && !pr->fireflow->UseHeuristic) {
         // Try physically-based quadratic regression
         double coeffs[3];
-        computeQuadraticRegression(gFireFlow->X, gFireFlow->Q, coeffs);
+        computeQuadraticRegression(pr->fireflow->X, pr->fireflow->Q, coeffs);
         
         // Determine threshold based on critical element type
         double xThreshold;
-        if (gFireFlow->IsCriticalPipe) {
-            xThreshold = gFireFlow->VelocityThreshold;
+        if (pr->fireflow->IsCriticalPipe) {
+            xThreshold = pr->fireflow->VelocityThreshold;
         } else {
-            xThreshold = gFireFlow->PressureThreshold;
+            xThreshold = pr->fireflow->PressureThreshold;
         }
         
         // Evaluate quadratic at threshold
@@ -300,46 +297,46 @@ void generateFireFlowGuess(Project *pr)
                coeffs[2];
         
         // Check if the guess is reasonable
-        if (newQ < 0.0 || newQ > gFireFlow->AvailableFlow * 2.0) {
+        if (newQ < 0.0 || newQ > pr->fireflow->AvailableFlow * 2.0) {
             // Unreasonable guess, switch to heuristic
-            gFireFlow->UseHeuristic = 1;
+            pr->fireflow->UseHeuristic = 1;
         }
     }
     
     // Use heuristic method if needed
-    if (gFireFlow->HistoryCount < 3 || gFireFlow->UseHeuristic) {
-        if (gFireFlow->Iteration == 0) {
+    if (pr->fireflow->HistoryCount < 3 || pr->fireflow->UseHeuristic) {
+        if (pr->fireflow->Iteration == 0) {
             // First iteration: use a fraction of available flow
-            newQ = gFireFlow->AvailableFlow * 0.5;
+            newQ = pr->fireflow->AvailableFlow * 0.5;
         } else {
             // Heuristic update
-            double currentDirection = (gFireFlow->Qcurrent > gFireFlow->LastQ) ? 1.0 : -1.0;
+            double currentDirection = (pr->fireflow->Qcurrent > pr->fireflow->LastQ) ? 1.0 : -1.0;
             double multiplier;
             
-            if (gFireFlow->LastDirection == 0.0) {
+            if (pr->fireflow->LastDirection == 0.0) {
                 // First direction
-                multiplier = gFireFlow->HeuristicMultUp;
-            } else if (currentDirection == gFireFlow->LastDirection) {
+                multiplier = pr->fireflow->HeuristicMultUp;
+            } else if (currentDirection == pr->fireflow->LastDirection) {
                 // Same direction
-                multiplier = gFireFlow->HeuristicMultUp;
+                multiplier = pr->fireflow->HeuristicMultUp;
             } else {
                 // Direction changed
-                multiplier = gFireFlow->HeuristicMultDown;
+                multiplier = pr->fireflow->HeuristicMultDown;
             }
             
-            newQ = gFireFlow->Qcurrent + multiplier * gFireFlow->LastDeltaQ;
-            gFireFlow->LastDirection = currentDirection;
+            newQ = pr->fireflow->Qcurrent + multiplier * pr->fireflow->LastDeltaQ;
+            pr->fireflow->LastDirection = currentDirection;
         }
     }
     
     // Store the new guess
-    gFireFlow->LastQ = gFireFlow->Qcurrent;
-    gFireFlow->LastDeltaQ = newQ - gFireFlow->Qcurrent;
-    gFireFlow->Qcurrent = newQ;
+    pr->fireflow->LastQ = pr->fireflow->Qcurrent;
+    pr->fireflow->LastDeltaQ = newQ - pr->fireflow->Qcurrent;
+    pr->fireflow->Qcurrent = newQ;
     
     // Ensure non-negative flow
-    if (gFireFlow->Qcurrent < 0.0) {
-        gFireFlow->Qcurrent = 0.0;
+    if (pr->fireflow->Qcurrent < 0.0) {
+        pr->fireflow->Qcurrent = 0.0;
     }
 }
 
@@ -357,7 +354,7 @@ double computeRelativeCloseness(Project *pr, int element, int isPipe)
     Network *net = &pr->network;
     Hydraul *hyd = &pr->hydraul;
     
-    if (gFireFlow == NULL) return 1.0;  // No violation
+    if (pr->fireflow == NULL) return 1.0;  // No violation
     
     double x, xThreshold, range;
     
@@ -366,17 +363,17 @@ double computeRelativeCloseness(Project *pr, int element, int isPipe)
         double q = fabs(hyd->LinkFlow[element]);
         double area = 0.7854 * net->Link[element].Diam * net->Link[element].Diam;
         x = q / area;  // Velocity in ft/s
-        xThreshold = gFireFlow->VelocityThreshold;
+        xThreshold = pr->fireflow->VelocityThreshold;
         
         // Use a fixed range for velocity (e.g., 0 to 2*threshold)
         range = 2.0 * xThreshold;
     } else {
         // Pressure constraint for junctions
         x = hyd->NodeHead[element] - net->Node[element].El;  // Pressure in ft
-        xThreshold = gFireFlow->PressureThreshold;
+        xThreshold = pr->fireflow->PressureThreshold;
         
         // Use range from available flow analysis
-        range = gFireFlow->AvailablePressure - gFireFlow->StaticPressure;
+        range = pr->fireflow->AvailablePressure - pr->fireflow->StaticPressure;
         if (range <= 0.0) range = xThreshold;  // Fallback
     }
     
@@ -398,7 +395,7 @@ void updateCriticalElement(Project *pr)
 {
     Network *net = &pr->network;
     
-    if (gFireFlow == NULL || !gFireFlow->Active) return;
+    if (pr->fireflow == NULL || !pr->fireflow->Active) return;
     
     double minCloseness = 1e10;
     int criticalElement = 0;
@@ -407,7 +404,7 @@ void updateCriticalElement(Project *pr)
     // Check all junctions for pressure constraints
     for (int i = 1; i <= net->Njuncs; i++) {
         double rc = computeRelativeCloseness(pr, i, 0);
-        gFireFlow->RelCloseness[i] = rc;
+        pr->fireflow->RelCloseness[i] = rc;
         
         if (rc < minCloseness) {
             minCloseness = rc;
@@ -422,7 +419,7 @@ void updateCriticalElement(Project *pr)
         if (net->Link[k].Type != PIPE && net->Link[k].Type != CVPIPE) continue;
         
         double rc = computeRelativeCloseness(pr, k, 1);
-        gFireFlow->RelCloseness[net->Njuncs + k] = rc;
+        pr->fireflow->RelCloseness[net->Njuncs + k] = rc;
         
         if (rc < minCloseness) {
             minCloseness = rc;
@@ -432,8 +429,8 @@ void updateCriticalElement(Project *pr)
     }
     
     // Update critical element
-    gFireFlow->CriticalElement = criticalElement;
-    gFireFlow->IsCriticalPipe = isCriticalPipe;
+    pr->fireflow->CriticalElement = criticalElement;
+    pr->fireflow->IsCriticalPipe = isCriticalPipe;
     
     // Get critical variable value for history
     if (isCriticalPipe) {
@@ -441,10 +438,10 @@ void updateCriticalElement(Project *pr)
         double q = fabs(hyd->LinkFlow[criticalElement]);
         double area = 0.7854 * net->Link[criticalElement].Diam * 
                       net->Link[criticalElement].Diam;
-        gFireFlow->Xcritical = q / area;  // Velocity
+        pr->fireflow->Xcritical = q / area;  // Velocity
     } else {
         Hydraul *hyd = &pr->hydraul;
-        gFireFlow->Xcritical = hyd->NodeHead[criticalElement] - 
+        pr->fireflow->Xcritical = hyd->NodeHead[criticalElement] - 
                                net->Node[criticalElement].El;  // Pressure
     }
 }
@@ -458,23 +455,23 @@ int checkFireFlowConvergence(Project *pr)
 **--------------------------------------------------------------
 */
 {
-    if (gFireFlow == NULL || !gFireFlow->Active) return 1;
+    if (pr->fireflow == NULL || !pr->fireflow->Active) return 1;
     
     // Check flow change convergence
-    double deltaQ = fabs(gFireFlow->Qcurrent - gFireFlow->LastQ);
-    if (deltaQ > gFireFlow->Tolerance) return 0;
+    double deltaQ = fabs(pr->fireflow->Qcurrent - pr->fireflow->LastQ);
+    if (deltaQ > pr->fireflow->Tolerance) return 0;
     
     // Check constraint satisfaction
-    double rcCritical = gFireFlow->RelCloseness[gFireFlow->CriticalElement];
-    if (gFireFlow->IsCriticalPipe) {
-        rcCritical = gFireFlow->RelCloseness[pr->network.Njuncs + 
-                                              gFireFlow->CriticalElement];
+    double rcCritical = pr->fireflow->RelCloseness[pr->fireflow->CriticalElement];
+    if (pr->fireflow->IsCriticalPipe) {
+        rcCritical = pr->fireflow->RelCloseness[pr->network.Njuncs + 
+                                              pr->fireflow->CriticalElement];
     }
     
     if (rcCritical < 0.0) return 0;  // Constraint violated
     
     // Both criteria met
-    gFireFlow->Converged = 1;
+    pr->fireflow->Converged = 1;
     return 1;
 }
 
@@ -489,7 +486,7 @@ void fireFlowBeforeMatrixCoeffs(Project *pr)
 **--------------------------------------------------------------
 */
 {
-    if (gFireFlow == NULL || !gFireFlow->Active) return;
+    if (pr->fireflow == NULL || !pr->fireflow->Active) return;
     
     // Generate new fire flow guess
     generateFireFlowGuess(pr);
@@ -506,16 +503,16 @@ void fireFlowAfterNewFlows(Project *pr)
 **--------------------------------------------------------------
 */
 {
-    if (gFireFlow == NULL || !gFireFlow->Active) return;
+    if (pr->fireflow == NULL || !pr->fireflow->Active) return;
     
     // Update critical element and relative closeness
     updateCriticalElement(pr);
     
     // Update history with current values
-    updateFireFlowHistory(pr, gFireFlow->Qcurrent, gFireFlow->Xcritical);
+    updateFireFlowHistory(pr, pr->fireflow->Qcurrent, pr->fireflow->Xcritical);
     
     // Increment iteration counter
-    gFireFlow->Iteration++;
+    pr->fireflow->Iteration++;
 }
 
 int fireFlowCheckConvergence(Project *pr)
