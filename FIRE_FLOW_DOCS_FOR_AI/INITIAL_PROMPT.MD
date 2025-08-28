@@ -2,6 +2,8 @@
 
 You are an AI agent tasked with implementing the Hernández fire flow algorithm into EPANET's source code. This is a complex, multi-session project requiring systematic research, implementation, and validation.
 
+All documentation can be found in ./FIRE_FLOW_DOCS_FOR_AI/
+
 ## Your Role and Responsibilities
 
 You are working independently through this implementation. You must:
@@ -18,8 +20,8 @@ You're implementing the "Fast Firefighting Water Capacity Assessment Using a Str
 
 ## Key Reference Materials
 
-- Hernández paper (provided) - your primary specification
-- EPANET source code (you have access) - your implementation target
+- Hernández paper (Hernández fire flow algorithm.md) - your primary specification
+- EPANET source code (you have access ./src/) - your implementation target
 - IMPLEMENTATION_PLAN.md - your detailed roadmap
 - Table 1 from paper - your validation benchmarks (Small network targets: Pressure MAE 0.00141 psi, RMAE 0.0070%)
 
@@ -74,6 +76,7 @@ You'll need to make decisions about:
 - Test incrementally and validate frequently
 - Don't hesitate to experiment when specifications are unclear
 - Keep comprehensive notes for future sessions
+- Commit code and work towards the goal
 
 Start by reading the Hernández paper thoroughly, then begin analyzing EPANET's hydsolver.c to understand the current GGA implementation. Document everything you learn.
 
