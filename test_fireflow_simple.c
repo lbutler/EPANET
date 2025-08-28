@@ -61,9 +61,15 @@ int main(int argc, char *argv[])
         printf("ERROR: Fire flow module not initialized!\n");
     } else {
         printf("SUCCESS: Fire flow module initialized\n");
+        
+        // Override thresholds for this small-pipe network
+        pr->fireflow->PressureThreshold = 20.0 * 2.31;  // 20 psi
+        pr->fireflow->VelocityThreshold = 50.0;  // 50 ft/s (more reasonable for small pipes)
+        
         printf("  Enabled: %d\n", pr->fireflow->Enabled);
         printf("  Active: %d\n", pr->fireflow->Active);
-        printf("  Pressure threshold: %.1f ft\n", pr->fireflow->PressureThreshold);
+        printf("  Pressure threshold: %.1f ft (%.1f psi)\n", 
+               pr->fireflow->PressureThreshold, pr->fireflow->PressureThreshold/2.31);
         printf("  Velocity threshold: %.1f ft/s\n", pr->fireflow->VelocityThreshold);
         printf("  Tolerance: %.3f cfs\n", pr->fireflow->Tolerance);
     }

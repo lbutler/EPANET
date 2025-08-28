@@ -283,12 +283,20 @@ void generateFireFlowGuess(Project *pr)
         double coeffs[3];
         computeQuadraticRegression(pr->fireflow->X, pr->fireflow->Q, coeffs);
         
-        // Determine threshold based on critical element type
-        double xThreshold;
+        // Debug: print the regression data
+        printf("      Quadratic data: (X,Q) = (%.2f,%.3f), (%.2f,%.3f), (%.2f,%.3f)\n",
+               pr->fireflow->X[0], pr->fireflow->Q[0],
+               pr->fireflow->X[1], pr->fireflow->Q[1],
+               pr->fireflow->X[2], pr->fireflow->Q[2]);
+        printf("      Coeffs: c1=%.6f, c2=%.6f, c3=%.6f\n", coeffs[0], coeffs[1], coeffs[2]);
+        
+        // Use the appropriate threshold for the critical element
+        // The threshold should match what the critical variable X represents
+        double xThreshold = pr->fireflow->PressureThreshold;  // Default to pressure
+        
+        // If we have a consistent critical element type, use its threshold
         if (pr->fireflow->IsCriticalPipe) {
             xThreshold = pr->fireflow->VelocityThreshold;
-        } else {
-            xThreshold = pr->fireflow->PressureThreshold;
         }
         
         // Evaluate quadratic at threshold
@@ -297,9 +305,18 @@ void generateFireFlowGuess(Project *pr)
                coeffs[2];
         
         // Check if the guess is reasonable
-        if (newQ < 0.0 || newQ > pr->fireflow->AvailableFlow * 2.0) {
+        double maxReasonableFlow = pr->fireflow->Qcurrent * 3.0;  // Allow up to 3x current
+        if (pr->fireflow->AvailableFlow > 0) {
+            maxReasonableFlow = pr->fireflow->AvailableFlow * 2.0;
+        }
+        
+        if (newQ < 0.0 || newQ > maxReasonableFlow) {
             // Unreasonable guess, switch to heuristic
             pr->fireflow->UseHeuristic = 1;
+            printf("      Quadratic gave unreasonable Q=%.3f, switching to heuristic\n", newQ);
+        } else {
+            printf("      Using quadratic regression: Q=%.3f cfs (%.1f gpm)\n", 
+                   newQ, newQ * 448.831);
         }
     }
     
@@ -322,11 +339,26 @@ void generateFireFlowGuess(Project *pr)
                 double increment = fmax(pr->fireflow->Qcurrent * 0.1, 50.0 / 448.831);
                 newQ = pr->fireflow->Qcurrent + increment;
             } else {
+                // Check if we need to back off due to constraint violation
+                double rcCritical = 0.0;
+                if (pr->fireflow->CriticalElement > 0) {
+                    if (pr->fireflow->IsCriticalPipe) {
+                        rcCritical = pr->fireflow->RelCloseness[pr->network.Njuncs + 
+                                                              pr->fireflow->CriticalElement];
+                    } else {
+                        rcCritical = pr->fireflow->RelCloseness[pr->fireflow->CriticalElement];
+                    }
+                }
+                
                 // Use direction-based heuristic
                 double currentDirection = (pr->fireflow->Qcurrent > pr->fireflow->LastQ) ? 1.0 : -1.0;
                 double multiplier;
                 
-                if (pr->fireflow->LastDirection == 0.0) {
+                // If constraint violated, force reduction
+                if (rcCritical < 0.0) {
+                    multiplier = -0.5;  // Back off by 50%
+                    printf("      Constraint violated (RC=%.4f), backing off\n", rcCritical);
+                } else if (pr->fireflow->LastDirection == 0.0) {
                     // First direction
                     multiplier = pr->fireflow->HeuristicMultUp;
                 } else if (currentDirection == pr->fireflow->LastDirection) {
@@ -395,7 +427,14 @@ double computeRelativeCloseness(Project *pr, int element, int isPipe)
     
     // Calculate relative closeness
     // Positive means constraint satisfied, negative means violated
-    double relCloseness = (x - xThreshold) / range;
+    double relCloseness;
+    if (isPipe) {
+        // For velocity (maximum constraint), violation when x > threshold
+        relCloseness = (xThreshold - x) / range;
+    } else {
+        // For pressure (minimum constraint), violation when x < threshold
+        relCloseness = (x - xThreshold) / range;
+    }
     
     return relCloseness;
 }
@@ -473,22 +512,43 @@ int checkFireFlowConvergence(Project *pr)
 {
     if (pr->fireflow == NULL || !pr->fireflow->Active) return 1;
     
+    // Don't check convergence until we have some iterations
+    if (pr->fireflow->Iteration < 2) return 0;
+    
     // Check flow change convergence
     double deltaQ = fabs(pr->fireflow->Qcurrent - pr->fireflow->LastQ);
-    if (deltaQ > pr->fireflow->Tolerance) return 0;
+    double relativeChange = deltaQ / (pr->fireflow->Qcurrent + 0.001);  // Avoid div by 0
     
-    // Check constraint satisfaction
+    // Get critical element's relative closeness
     double rcCritical = pr->fireflow->RelCloseness[pr->fireflow->CriticalElement];
     if (pr->fireflow->IsCriticalPipe) {
         rcCritical = pr->fireflow->RelCloseness[pr->network.Njuncs + 
                                               pr->fireflow->CriticalElement];
     }
     
-    if (rcCritical < 0.0) return 0;  // Constraint violated
+    // Debug output
+    if (pr->fireflow->Iteration < 15) {
+        printf("      Convergence check: deltaQ=%.4f, relChange=%.4f, RC=%.4f\n",
+               deltaQ, relativeChange, rcCritical);
+    }
     
-    // Both criteria met
-    pr->fireflow->Converged = 1;
-    return 1;
+    // Check convergence criteria:
+    // 1. Flow change is small (absolute or relative)
+    // 2. Critical element is close to threshold (0 <= RC <= 0.01)
+    if ((deltaQ < pr->fireflow->Tolerance || relativeChange < 0.01) && 
+        rcCritical >= -0.001 && rcCritical <= 0.01) {
+        pr->fireflow->Converged = 1;
+        return 1;
+    }
+    
+    // If constraint is violated, reduce flow
+    if (rcCritical < 0.0) {
+        // We've exceeded the constraint, need to back off
+        // This will be handled in the guess generation
+        pr->fireflow->UseHeuristic = 1;  // Switch to heuristic to back off
+    }
+    
+    return 0;
 }
 
 // Integration functions to be called from hydsolver.c
@@ -536,8 +596,15 @@ void fireFlowAfterNewFlows(Project *pr)
     
     // Debug output (temporary)
     if (pr->fireflow->Iteration < 10) {
-        printf("      Critical: %s %d, X=%.2f, RC=%.4f\n",
+        char elemID[256];
+        if (pr->fireflow->IsCriticalPipe) {
+            strcpy(elemID, pr->network.Link[pr->fireflow->CriticalElement].ID);
+        } else {
+            strcpy(elemID, pr->network.Node[pr->fireflow->CriticalElement].ID);
+        }
+        printf("      Critical: %s %s (idx %d), X=%.2f, RC=%.4f\n",
                pr->fireflow->IsCriticalPipe ? "Pipe" : "Node",
+               elemID,
                pr->fireflow->CriticalElement,
                pr->fireflow->Xcritical,
                pr->fireflow->IsCriticalPipe ? 
