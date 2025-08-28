@@ -80,7 +80,7 @@ ENDIF (MSVC)
 
 # configure file groups
 file(GLOB EPANET_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c src/util/*.c)
-file(GLOB EPANET_LIB_ALL RELATIVE ${PROJECT_SOURCE_DIR} src/* src/util/*)
+file(GLOB EPANET_LIB_ALL RELATIVE ${PROJECT_SOURCE_DIR} src/* src/util/* include/epanet2_fireflow.h)
 source_group("Library" FILES ${EPANET_LIB_ALL})
 
 # the shared library
