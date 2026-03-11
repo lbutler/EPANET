@@ -78,6 +78,30 @@ IF (MSVC)
   add_definitions(-D_CRT_SECURE_NO_DEPRECATE -MT)
 ENDIF (MSVC)
 
+# Fetch and build Lua 5.4.8 as a static library
+include(FetchContent)
+FetchContent_Declare(
+    lua
+    URL https://www.lua.org/ftp/lua-5.4.8.tar.gz
+    DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_MakeAvailable(lua)
+
+file(GLOB LUA_LIB_SOURCES "${lua_SOURCE_DIR}/src/*.c")
+list(REMOVE_ITEM LUA_LIB_SOURCES
+    "${lua_SOURCE_DIR}/src/lua.c"
+    "${lua_SOURCE_DIR}/src/luac.c"
+)
+
+add_library(lua_static STATIC ${LUA_LIB_SOURCES})
+target_include_directories(lua_static PUBLIC "${lua_SOURCE_DIR}/src")
+set_target_properties(lua_static PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+if(UNIX)
+    target_compile_definitions(lua_static PRIVATE LUA_USE_POSIX)
+    target_link_libraries(lua_static PRIVATE m)
+endif()
+
 # configure file groups
 file(GLOB EPANET_SOURCES RELATIVE ${PROJECT_SOURCE_DIR} src/*.c src/util/*.c)
 file(GLOB EPANET_LIB_ALL RELATIVE ${PROJECT_SOURCE_DIR} src/* src/util/*)
@@ -95,6 +119,7 @@ ELSE(TRUE)
 ENDIF(MSVC AND "${CMAKE_VS_PLATFORM_NAME}" MATCHES "(Win32)")
 
 target_include_directories(epanet2 PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_link_libraries(epanet2 PRIVATE lua_static)
 
 install(TARGETS epanet2 DESTINATION .)
 install(TARGETS runepanet DESTINATION .)
