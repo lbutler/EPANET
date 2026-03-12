@@ -3,9 +3,20 @@
 #include <stdio.h>
 #include "luascript.h"
 #include "funcs.h"
+#include "epanet2_2.h"
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
+
+typedef struct
+{
+    int index;
+} LuaNode;
+
+typedef struct
+{
+    int index;
+} LuaLink;
 
 static int lua_epanet_print(lua_State *L)
 {
@@ -55,6 +66,71 @@ int scriptdata(Project *pr, char *line)
     return 0;
 }
 
+static int lua_node_index(lua_State *L)
+{
+    Project *pr = (Project *)lua_touserdata(L, lua_upvalueindex(1));
+    LuaNode *node = (LuaNode *)luaL_checkudata(L, 1, "epanet.node");
+    const char *key = luaL_checkstring(L, 2);
+    int property = -1;
+    double value;
+
+    if (strcmp(key, "pressure") == 0)
+        property = 11;
+
+    if (property < 0)
+        return luaL_error(L, "unknown node property: %s", key);
+    EN_getnodevalue(pr, node->index, property, &value);
+    lua_pushnumber(L, value);
+    return 1;
+}
+
+static int lua_get_node(lua_State *L)
+{
+    Project *pr = (Project *)lua_touserdata(L, lua_upvalueindex(1));
+    const char *id = luaL_checkstring(L, 1);
+    int index = findnode(&pr->network, id);
+    if (index == 0)
+        return luaL_error(L, "node not found: %s", id);
+
+    LuaNode *node = (LuaNode *)lua_newuserdata(L, sizeof(LuaNode));
+    node->index = index;
+    luaL_getmetatable(L, "epanet.node");
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
+static int lua_link_newindex(lua_State *L)
+{
+    Project *pr = (Project *)lua_touserdata(L, lua_upvalueindex(1));
+    LuaLink *link = (LuaLink *)luaL_checkudata(L, 1, "epanet.link");
+    const char *key = luaL_checkstring(L, 2);
+    double value = luaL_checknumber(L, 3);
+    int property = -1;
+
+    if (strcmp(key, "setting") == 0)
+        property = 12;
+
+    if (property < 0)
+        return luaL_error(L, "unknown link property: %s", key);
+    EN_setlinkvalue(pr, link->index, property, value);
+    return 0;
+}
+
+static int lua_get_link(lua_State *L)
+{
+    Project *pr = (Project *)lua_touserdata(L, lua_upvalueindex(1));
+    const char *id = luaL_checkstring(L, 1);
+    int index = findlink(&pr->network, id);
+    if (index == 0)
+        return luaL_error(L, "link not found: %s", id);
+
+    LuaLink *link = (LuaLink *)lua_newuserdata(L, sizeof(LuaLink));
+    link->index = index;
+    luaL_getmetatable(L, "epanet.link");
+    lua_setmetatable(L, -2);
+    return 1;
+}
+
 void luascript_open(Project *pr)
 {
     lua_State *L;
@@ -69,6 +145,26 @@ void luascript_open(Project *pr)
     lua_pushlightuserdata(L, pr);
     lua_pushcclosure(L, lua_epanet_print, 1);
     lua_setglobal(L, "print");
+
+    luaL_newmetatable(L, "epanet.node");
+    lua_pushlightuserdata(L, pr);
+    lua_pushcclosure(L, lua_node_index, 1);
+    lua_setfield(L, -2, "__index");
+    lua_pop(L, 1);
+
+    lua_pushlightuserdata(L, pr);
+    lua_pushcclosure(L, lua_get_node, 1);
+    lua_setglobal(L, "get_node");
+
+    luaL_newmetatable(L, "epanet.link");
+    lua_pushlightuserdata(L, pr);
+    lua_pushcclosure(L, lua_link_newindex, 1);
+    lua_setfield(L, -2, "__newindex");
+    lua_pop(L, 1);
+
+    lua_pushlightuserdata(L, pr);
+    lua_pushcclosure(L, lua_get_link, 1);
+    lua_setglobal(L, "get_link");
 
     pr->lua = L;
 }
