@@ -76,6 +76,10 @@ static int lua_node_index(lua_State *L)
 
     if (strcmp(key, "pressure") == 0)
         property = 11;
+    else if (strcmp(key, "demand") == 0)
+        property = 9;
+    else if (strcmp(key, "head") == 0)
+        property = 10;
 
     if (property < 0)
         return luaL_error(L, "unknown node property: %s", key);
@@ -99,6 +103,30 @@ static int lua_get_node(lua_State *L)
     return 1;
 }
 
+static int lua_link_index(lua_State *L)
+{
+    Project *pr = (Project *)lua_touserdata(L, lua_upvalueindex(1));
+    LuaLink *link = (LuaLink *)luaL_checkudata(L, 1, "epanet.link");
+    const char *key = luaL_checkstring(L, 2);
+    int property = -1;
+    double value;
+
+    if (strcmp(key, "flow") == 0)
+        property = 8;
+    else if (strcmp(key, "velocity") == 0)
+        property = 9;
+    else if (strcmp(key, "status") == 0)
+        property = 11;
+    else if (strcmp(key, "setting") == 0)
+        property = 12;
+
+    if (property < 0)
+        return luaL_error(L, "unknown link property: %s", key);
+    EN_getlinkvalue(pr, link->index, property, &value);
+    lua_pushnumber(L, value);
+    return 1;
+}
+
 static int lua_link_newindex(lua_State *L)
 {
     Project *pr = (Project *)lua_touserdata(L, lua_upvalueindex(1));
@@ -109,6 +137,8 @@ static int lua_link_newindex(lua_State *L)
 
     if (strcmp(key, "setting") == 0)
         property = 12;
+    else if (strcmp(key, "status") == 0)
+        property = 11;
 
     if (property < 0)
         return luaL_error(L, "unknown link property: %s", key);
@@ -157,6 +187,9 @@ void luascript_open(Project *pr)
     lua_setglobal(L, "get_node");
 
     luaL_newmetatable(L, "epanet.link");
+    lua_pushlightuserdata(L, pr);
+    lua_pushcclosure(L, lua_link_index, 1);
+    lua_setfield(L, -2, "__index");
     lua_pushlightuserdata(L, pr);
     lua_pushcclosure(L, lua_link_newindex, 1);
     lua_setfield(L, -2, "__newindex");
