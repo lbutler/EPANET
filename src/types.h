@@ -986,8 +986,9 @@ typedef struct Project
 
   void (*viewprog)(char *); // Pointer to progress viewing function
 
-  char *Script; // Lua script source from [SCRIPT] section
-  void *lua;    // Lua state (lua_State*)
+  char *Script;    // Lua script source from [SCRIPT] section
+  void *lua;       // Lua state (lua_State*)
+  int LuaChanged;  // Flag: Lua script changed a link status/setting
 
 } Project, *EN_Project;
 

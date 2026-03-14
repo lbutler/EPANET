@@ -361,6 +361,10 @@ void initpointers(Project *pr)
 
     pr->report.reportCallback = NULL;
 
+    pr->Script = NULL;
+    pr->lua = NULL;
+    pr->LuaChanged = 0;
+
     initrules(pr);
 }
 

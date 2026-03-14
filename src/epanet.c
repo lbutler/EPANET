@@ -594,8 +594,6 @@ int DLLEXPORT EN_runH(EN_Project p, long *currentTime)
     if (!p->hydraul.OpenHflag)
         return 103;
     errcode = runhyd(p, currentTime);
-    if (!errcode)
-        luascript_run(p);
     if (errcode)
         errmsg(p, errcode);
     return errcode;

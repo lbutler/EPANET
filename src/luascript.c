@@ -143,6 +143,7 @@ static int lua_link_newindex(lua_State *L)
     if (property < 0)
         return luaL_error(L, "unknown link property: %s", key);
     EN_setlinkvalue(pr, link->index, property, value);
+    pr->LuaChanged = 1;
     return 0;
 }
 
@@ -202,13 +203,15 @@ void luascript_open(Project *pr)
     pr->lua = L;
 }
 
-void luascript_run(Project *pr)
+int luascript_run(Project *pr)
 {
     lua_State *L;
     if (pr->lua == NULL || pr->Script == NULL)
-        return;
+        return 0;
+    pr->LuaChanged = 0;
     L = (lua_State *)pr->lua;
     luaL_dostring(L, pr->Script);
+    return pr->LuaChanged;
 }
 
 void luascript_close(Project *pr)
