@@ -184,7 +184,7 @@ void luascript_open(Project *pr)
 
     lua_pushlightuserdata(L, pr);
     lua_pushcclosure(L, lua_get_node, 1);
-    lua_setglobal(L, "get_node");
+    lua_setglobal(L, "node");
 
     luaL_newmetatable(L, "epanet.link");
     lua_pushlightuserdata(L, pr);
@@ -197,7 +197,7 @@ void luascript_open(Project *pr)
 
     lua_pushlightuserdata(L, pr);
     lua_pushcclosure(L, lua_get_link, 1);
-    lua_setglobal(L, "get_link");
+    lua_setglobal(L, "link");
 
     pr->lua = L;
 }
