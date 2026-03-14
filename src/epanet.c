@@ -372,7 +372,8 @@ int DLLEXPORT EN_close(EN_Project p)
  **----------------------------------------------------------------
  */
 {
-    // Close Lua scripting state
+    // Fire Lua termination event and close scripting state
+    luascript_event(p, "term");
     luascript_close(p);
 
     // Free all project data
@@ -594,6 +595,8 @@ int DLLEXPORT EN_runH(EN_Project p, long *currentTime)
     if (!p->hydraul.OpenHflag)
         return 103;
     errcode = runhyd(p, currentTime);
+    if (!errcode)
+        luascript_event(p, "report");
     if (errcode)
         errmsg(p, errcode);
     return errcode;

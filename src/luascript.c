@@ -201,17 +201,48 @@ void luascript_open(Project *pr)
     lua_setglobal(L, "link");
 
     pr->lua = L;
+
+    // Execute the script once to define on_event and other globals
+    if (pr->Script != NULL)
+        luaL_dostring(L, pr->Script);
+
+    // Fire the init event
+    luascript_event(pr, "init");
+}
+
+int luascript_event(Project *pr, const char *event)
+{
+    lua_State *L;
+    if (pr->lua == NULL)
+        return 0;
+    L = (lua_State *)pr->lua;
+    pr->LuaChanged = 0;
+    lua_getglobal(L, "on_event");
+    if (lua_isfunction(L, -1))
+    {
+        lua_pushstring(L, event);
+        lua_pcall(L, 1, 0, 0);
+    }
+    else
+    {
+        lua_pop(L, 1);
+    }
+    return pr->LuaChanged;
 }
 
 int luascript_run(Project *pr)
 {
     lua_State *L;
+    int changed;
     if (pr->lua == NULL || pr->Script == NULL)
         return 0;
     pr->LuaChanged = 0;
     L = (lua_State *)pr->lua;
     luaL_dostring(L, pr->Script);
-    return pr->LuaChanged;
+    changed = pr->LuaChanged;
+    if (luascript_event(pr, "iteration"))
+        changed = 1;
+    return changed;
 }
 
 void luascript_close(Project *pr)
