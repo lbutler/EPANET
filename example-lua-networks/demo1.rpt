@@ -1,0 +1,1263 @@
+  Page 1                                    Sun Mar 15 13:59:38 2026
+
+  ******************************************************************
+  *                           E P A N E T                          *
+  *                   Hydraulic and Water Quality                  *
+  *                   Analysis for Pipe Networks                   *
+  *                          Version 2.3.05                        *
+  ******************************************************************
+  
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.67051626654727
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+  Analysis begun Sun Mar 15 13:59:38 2026
+
+   
+  Hydraulic Status:
+  -----------------------------------------------------------------------
+     0:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 1.558068
+              Trial  2: relative flow change = 0.953444
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.60852566167325
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.150092
+              Trial  4: relative flow change = 0.042847
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.33948838747795
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  5: relative flow change = 0.013400
+              Trial  6: relative flow change = 0.002364
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.061747606272954
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  7: relative flow change = 0.000591
+                        maximum  flow change = 0.0140 for Link P90
+                        maximum  head error  = 0.0000 for Link P30
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.34693482987821
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     0:00:00: Balanced after 7 trials
+     0:00:00: Reservoir R2 is closed
+     0:00:00: Tank T1 is emptying at 5.00 m
+   
+     1:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.084693
+              Trial  2: relative flow change = 0.001584
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.85202009410342
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P82
+                        maximum  head error  = 0.0000 for Link P82
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.46272437590139
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     1:00:00: Balanced after 3 trials
+   
+     2:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.092423
+              Trial  2: relative flow change = 0.001708
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.17608254459792
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.43476574579375
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     2:00:00: Balanced after 3 trials
+   
+     3:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.156810
+              Trial  2: relative flow change = 0.003081
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.10116555461466
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P69
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.014649842789088
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     3:00:00: Balanced after 3 trials
+   
+     4:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.281334
+              Trial  2: relative flow change = 0.005490
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.70791288128517
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000007
+                        maximum  flow change = 0.0001 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.56836989778838
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     4:00:00: Balanced after 3 trials
+   
+     5:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.330217
+              Trial  2: relative flow change = 0.006210
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.81542714056639
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000006
+                        maximum  flow change = 0.0001 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.63969068741311
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     5:00:00: Balanced after 3 trials
+   
+     6:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.187991
+              Trial  2: relative flow change = 0.003451
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.60361024088533
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.39889473674671
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     6:00:00: Balanced after 3 trials
+   
+     7:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.153562
+              Trial  2: relative flow change = 0.002816
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.22892816924344
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.72304788609592
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     7:00:00: Balanced after 3 trials
+   
+     8:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.146367
+              Trial  2: relative flow change = 0.002694
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.23601037426228
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.45679134031355
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     8:00:00: Balanced after 3 trials
+   
+     9:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.171882
+              Trial  2: relative flow change = 0.003165
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.37571600687139
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.69135238174347
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+     9:00:00: Balanced after 3 trials
+   
+    10:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.208156
+              Trial  2: relative flow change = 0.003836
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.36497619328127
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.93390601418633
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    10:00:00: Balanced after 3 trials
+   
+    10:57:22: Pump PU1 changed by Tank T1 control
+    10:57:22: Balancing the network:
+
+              Trial  1: relative flow change = 1.101667
+              Trial  2: relative flow change = 0.804744
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.76485704809834
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.348996
+              Trial  4: relative flow change = 0.052921
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.5205561963801
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  5: relative flow change = 0.001351
+              Trial  6: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P20
+                        maximum  head error  = 0.0000 for Link P20
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.59608761733968
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    10:57:22: Balanced after 6 trials
+    10:57:22: Reservoir R2 is emptying
+    10:57:22: Tank T1 is filling at 3.50 m
+    10:57:22: Pump PU1 changed from closed to open
+   
+    11:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.056555
+              Trial  2: relative flow change = 0.002052
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.84413014438431
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P65
+                        maximum  head error  = 0.0000 for Link P122
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.18712703168245
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    11:00:00: Balanced after 3 trials
+   
+    12:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.025430
+              Trial  2: relative flow change = 0.000576
+                        maximum  flow change = 0.0139 for Link P125
+                        maximum  head error  = 0.0000 for Link P121
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.20246670073111
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    12:00:00: Balanced after 2 trials
+   
+    13:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.021449
+              Trial  2: relative flow change = 0.000461
+                        maximum  flow change = 0.0139 for Link V1
+                        maximum  head error  = 0.0000 for Link P6
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.09700857161863
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    13:00:00: Balanced after 2 trials
+   
+    14:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.054844
+              Trial  2: relative flow change = 0.001459
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.65877344252536
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P53
+                        maximum  head error  = 0.0000 for Link P122
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.80976882349403
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    14:00:00: Balanced after 3 trials
+   
+    15:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.031953
+              Trial  2: relative flow change = 0.000813
+                        maximum  flow change = 0.0208 for Link P125
+                        maximum  head error  = 0.0000 for Link P122
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.79100603720976
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    15:00:00: Balanced after 2 trials
+   
+    16:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.069240
+              Trial  2: relative flow change = 0.002741
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.77057741149863
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000005
+                        maximum  flow change = 0.0001 for Link P121
+                        maximum  head error  = 0.0000 for Link P49
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.79588969492059
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    16:00:00: Balanced after 3 trials
+   
+    17:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.052048
+              Trial  2: relative flow change = 0.001638
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.32286815849465
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P121
+                        maximum  head error  = 0.0000 for Link P49
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.20970119689531
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    17:00:00: Balanced after 3 trials
+   
+    18:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.100662
+              Trial  2: relative flow change = 0.004489
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.67600491537396
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000012
+                        maximum  flow change = 0.0004 for Link P121
+                        maximum  head error  = 0.0000 for Link P121
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.38199763647787
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    18:00:00: Balanced after 3 trials
+   
+    19:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.095868
+              Trial  2: relative flow change = 0.002759
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.17359908983053
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000005
+                        maximum  flow change = 0.0001 for Link P102
+                        maximum  head error  = 0.0000 for Link P122
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.81968070885288
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    19:00:00: Balanced after 3 trials
+   
+    20:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.022379
+              Trial  2: relative flow change = 0.000477
+                        maximum  flow change = 0.0139 for Link V1
+                        maximum  head error  = 0.0000 for Link P6
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.94483299606163
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    20:00:00: Balanced after 2 trials
+   
+    20:34:41: Pump PU1 changed by Tank T1 control
+    20:34:41: Balancing the network:
+
+              Trial  1: relative flow change = 2.861687
+              Trial  2: relative flow change = 0.076389
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.91743853824269
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.005993
+              Trial  4: relative flow change = 0.000141
+                        maximum  flow change = 0.0018 for Link P53
+                        maximum  head error  = 0.0000 for Link P122
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.74192833709354
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    20:34:41: Balanced after 4 trials
+    20:34:41: Reservoir R2 is closed
+    20:34:41: Tank T1 is emptying at 5.20 m
+    20:34:41: Pump PU1 changed from open to closed
+   
+    21:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.159877
+              Trial  2: relative flow change = 0.002944
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.74702444572868
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.79397832190461
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    21:00:00: Balanced after 3 trials
+   
+    22:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.316359
+              Trial  2: relative flow change = 0.005840
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.1378359036085
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000006
+                        maximum  flow change = 0.0001 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.98173270464238
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    22:00:00: Balanced after 3 trials
+   
+    23:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.464997
+              Trial  2: relative flow change = 0.008630
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.42590716361216
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+              Trial  3: relative flow change = 0.000009
+                        maximum  flow change = 0.0000 for Link P76
+                        maximum  head error  = 0.0000 for Link P93
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.48947563781086
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    23:00:00: Balanced after 3 trials
+   
+    24:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P89
+                        maximum  head error  = 0.0000 for Link P143
+
+  Starting Lua test script
+  Variable a:	10
+  Variable b:	3
+  a + b =	13
+  a - b =	7
+  a * b =	30
+  a / b =	3.3333333333333
+  a ^ b =	1000.0
+  Square root of	16	=	4.0
+  sin(90 degrees in radians) =	1.0
+  Random number (0–1) =	0.77914902021778
+  Loop test:
+  Iteration:	1
+  Iteration:	2
+  Iteration:	3
+  Iteration:	4
+  Iteration:	5
+  Pressure is normal:	25
+    24:00:00: Balanced after 1 trials
+   
+  Hydraulic Flow Balance (L/s)
+  ================================
+  Total Inflow:            12.314
+  Consumer Demand:         13.075
+  Demand Deficit:           0.000
+  Emitter Flow:             0.000
+  Leakage Flow:             0.000
+  Total Outflow:           13.075
+  Storage Flow:            -0.761
+  Flow Ratio:               1.000
+  ================================
+
+  Analysis ended Sun Mar 15 13:59:38 2026

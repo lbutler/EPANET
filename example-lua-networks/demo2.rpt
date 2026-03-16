@@ -1,0 +1,355 @@
+  Page 1                                    Sun Mar 15 13:59:34 2026
+
+  ******************************************************************
+  *                           E P A N E T                          *
+  *                   Hydraulic and Water Quality                  *
+  *                   Analysis for Pipe Networks                   *
+  *                          Version 2.3.05                        *
+  ******************************************************************
+  
+  ## Simulation starting...
+  Analysis begun Sun Mar 15 13:59:34 2026
+
+   
+  Hydraulic Status:
+  -----------------------------------------------------------------------
+     0:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 1.558068
+              Trial  2: relative flow change = 0.953444
+              Trial  3: relative flow change = 0.150092
+              Trial  4: relative flow change = 0.042847
+              Trial  5: relative flow change = 0.013400
+              Trial  6: relative flow change = 0.002364
+              Trial  7: relative flow change = 0.000591
+                        maximum  flow change = 0.0140 for Link P90
+                        maximum  head error  = 0.0000 for Link P30
+
+     0:00:00: Balanced after 7 trials
+     0:00:00: Reservoir R2 is closed
+     0:00:00: Tank T1 is emptying at 5.00 m
+   
+  ### Time step complete. Pressure at J1 is: 	42.660335180866
+     1:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.084693
+              Trial  2: relative flow change = 0.001584
+              Trial  3: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P82
+                        maximum  head error  = 0.0000 for Link P82
+
+     1:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	42.651214425991
+     2:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.092423
+              Trial  2: relative flow change = 0.001708
+              Trial  3: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+     2:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	42.64357449691
+     3:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.156810
+              Trial  2: relative flow change = 0.003081
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P69
+                        maximum  head error  = 0.0000 for Link P44
+
+     3:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	42.457405265779
+     4:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.281334
+              Trial  2: relative flow change = 0.005490
+              Trial  3: relative flow change = 0.000007
+                        maximum  flow change = 0.0001 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+     4:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	41.988624555849
+     5:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.330217
+              Trial  2: relative flow change = 0.006210
+              Trial  3: relative flow change = 0.000006
+                        maximum  flow change = 0.0001 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+     5:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	40.914671319114
+     6:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.187991
+              Trial  2: relative flow change = 0.003451
+  ## iteration event...
+  ### Pressure at J1 is: 	39.871552228042
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  ## iteration event...
+  ### Pressure at J1 is: 	39.871526742651
+     6:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	39.871526742651
+     7:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.153562
+              Trial  2: relative flow change = 0.002816
+  ## iteration event...
+  ### Pressure at J1 is: 	38.666286420674
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  ## iteration event...
+  ### Pressure at J1 is: 	38.666263310515
+     7:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	38.666263310515
+     8:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.146367
+              Trial  2: relative flow change = 0.002694
+  ## iteration event...
+  ### Pressure at J1 is: 	39.276101615259
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  ## iteration event...
+  ### Pressure at J1 is: 	39.276085334772
+     8:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	39.276085334772
+     9:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.171882
+              Trial  2: relative flow change = 0.003165
+  ## iteration event...
+  ### Pressure at J1 is: 	39.814544101765
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+  ## iteration event...
+  ### Pressure at J1 is: 	39.814527377162
+     9:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	39.814527377162
+    10:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.208156
+              Trial  2: relative flow change = 0.003836
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+    10:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	40.279032802015
+    10:57:22: Pump PU1 changed by Tank T1 control
+    10:57:22: Balancing the network:
+
+              Trial  1: relative flow change = 1.101667
+              Trial  2: relative flow change = 0.804744
+              Trial  3: relative flow change = 0.348996
+              Trial  4: relative flow change = 0.052921
+              Trial  5: relative flow change = 0.001351
+              Trial  6: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P20
+                        maximum  head error  = 0.0000 for Link P20
+
+    10:57:22: Balanced after 6 trials
+    10:57:22: Reservoir R2 is emptying
+    10:57:22: Tank T1 is filling at 3.50 m
+    10:57:22: Pump PU1 changed from closed to open
+   
+  ### Time step complete. Pressure at J1 is: 	50.181576316728
+    11:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.056555
+              Trial  2: relative flow change = 0.002052
+              Trial  3: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P65
+                        maximum  head error  = 0.0000 for Link P122
+
+    11:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	49.685615909774
+    12:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.025430
+              Trial  2: relative flow change = 0.000576
+                        maximum  flow change = 0.0139 for Link P125
+                        maximum  head error  = 0.0000 for Link P121
+
+    12:00:00: Balanced after 2 trials
+   
+  ### Time step complete. Pressure at J1 is: 	49.580938166309
+    13:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.021449
+              Trial  2: relative flow change = 0.000461
+                        maximum  flow change = 0.0139 for Link V1
+                        maximum  head error  = 0.0000 for Link P6
+
+    13:00:00: Balanced after 2 trials
+   
+  ### Time step complete. Pressure at J1 is: 	49.862902591776
+    14:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.054844
+              Trial  2: relative flow change = 0.001459
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P53
+                        maximum  head error  = 0.0000 for Link P122
+
+    14:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	50.445166371995
+    15:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.031953
+              Trial  2: relative flow change = 0.000813
+                        maximum  flow change = 0.0208 for Link P125
+                        maximum  head error  = 0.0000 for Link P122
+
+    15:00:00: Balanced after 2 trials
+   
+  ### Time step complete. Pressure at J1 is: 	50.840567351915
+    16:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.069240
+              Trial  2: relative flow change = 0.002741
+              Trial  3: relative flow change = 0.000005
+                        maximum  flow change = 0.0001 for Link P121
+                        maximum  head error  = 0.0000 for Link P49
+
+    16:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	50.370377936186
+    17:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.052048
+              Trial  2: relative flow change = 0.001638
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P121
+                        maximum  head error  = 0.0000 for Link P49
+
+    17:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	50.059645626941
+    18:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.100662
+              Trial  2: relative flow change = 0.004489
+              Trial  3: relative flow change = 0.000012
+                        maximum  flow change = 0.0004 for Link P121
+                        maximum  head error  = 0.0000 for Link P121
+
+    18:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	49.409597903714
+    19:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.095868
+              Trial  2: relative flow change = 0.002759
+              Trial  3: relative flow change = 0.000005
+                        maximum  flow change = 0.0001 for Link P102
+                        maximum  head error  = 0.0000 for Link P122
+
+    19:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	50.207351059455
+    20:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.022379
+              Trial  2: relative flow change = 0.000477
+                        maximum  flow change = 0.0139 for Link V1
+                        maximum  head error  = 0.0000 for Link P6
+
+    20:00:00: Balanced after 2 trials
+   
+  ### Time step complete. Pressure at J1 is: 	50.476737074579
+    20:34:41: Pump PU1 changed by Tank T1 control
+    20:34:41: Balancing the network:
+
+              Trial  1: relative flow change = 2.861687
+              Trial  2: relative flow change = 0.076389
+              Trial  3: relative flow change = 0.005993
+              Trial  4: relative flow change = 0.000141
+                        maximum  flow change = 0.0018 for Link P53
+                        maximum  head error  = 0.0000 for Link P122
+
+    20:34:41: Balanced after 4 trials
+    20:34:41: Reservoir R2 is closed
+    20:34:41: Tank T1 is emptying at 5.20 m
+    20:34:41: Pump PU1 changed from open to closed
+   
+  ### Time step complete. Pressure at J1 is: 	41.20254343632
+    21:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.159877
+              Trial  2: relative flow change = 0.002944
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+    21:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	41.648852527772
+    22:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.316359
+              Trial  2: relative flow change = 0.005840
+              Trial  3: relative flow change = 0.000006
+                        maximum  flow change = 0.0001 for Link P6
+                        maximum  head error  = 0.0000 for Link P44
+
+    22:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	42.149255149916
+    23:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.464997
+              Trial  2: relative flow change = 0.008630
+              Trial  3: relative flow change = 0.000009
+                        maximum  flow change = 0.0000 for Link P76
+                        maximum  head error  = 0.0000 for Link P93
+
+    23:00:00: Balanced after 3 trials
+   
+  ### Time step complete. Pressure at J1 is: 	42.525049432248
+    24:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P89
+                        maximum  head error  = 0.0000 for Link P143
+
+    24:00:00: Balanced after 1 trials
+   
+  ### Time step complete. Pressure at J1 is: 	42.451096755599
+  Hydraulic Flow Balance (L/s)
+  ================================
+  Total Inflow:            12.314
+  Consumer Demand:         13.075
+  Demand Deficit:           0.000
+  Emitter Flow:             0.000
+  Leakage Flow:             0.000
+  Total Outflow:           13.075
+  Storage Flow:            -0.761
+  Flow Ratio:               1.000
+  ================================
+
+  Analysis ended Sun Mar 15 13:59:34 2026
+
+  ### Simulation finished. Cleaning up.
