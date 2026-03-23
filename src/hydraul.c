@@ -141,6 +141,14 @@ void inithyd(Project *pr, int initflag)
             || link->Type == FCV) && (hyd->LinkSetting[i] != MISSING)
         ) hyd->LinkStatus[i] = ACTIVE;
 
+        // Start VSP pumps in ACTIVE position
+        if (link->Type == PUMP)
+        {
+            int p = findpump(net, i);
+            if (net->Pump[p].Hset > 0.0)
+                hyd->LinkStatus[i] = ACTIVE;
+        }
+
         // Initialize flows if necessary
         if (hyd->LinkStatus[i] <= CLOSED)
         {
@@ -213,6 +221,43 @@ int   runhyd(Project *pr, long *t)
     errcode = hydsolve(pr,&iter,&relerr);
     if (!errcode)
     {
+        // Back-calculate speed for VSP pumps
+        {
+            Network *net = &pr->network;
+            int j, k, n1, n2;
+            double h_target, q, disc;
+            Spump *pump;
+
+            for (j = 1; j <= net->Npumps; j++)
+            {
+                pump = &net->Pump[j];
+                if (pump->Hset <= 0.0) continue;
+                k = pump->Link;
+                if (hyd->LinkStatus[k] <= CLOSED)
+                {
+                    hyd->LinkSetting[k] = 0.0;
+                    continue;
+                }
+
+                n1 = net->Link[k].N1;
+                n2 = net->Link[k].N2;
+                h_target = hyd->NodeHead[n2] - hyd->NodeHead[n1];
+                q = ABS(hyd->LinkFlow[k]);
+
+                // For 1-point curve (C=2): N = sqrt((H_gain + R*Q^2) / (-H0))
+                // H0 and R are stored as negatives of curve coefficients
+                disc = (h_target + pump->R * q * q) / (-pump->H0);
+                if (disc > 0.0)
+                    hyd->LinkSetting[k] = sqrt(disc);
+                else
+                    hyd->LinkSetting[k] = 0.0;
+
+                // Clamp speed to reasonable range
+                if (hyd->LinkSetting[k] < 0.01) hyd->LinkSetting[k] = 0.01;
+                if (hyd->LinkSetting[k] > 3.0) hyd->LinkSetting[k] = 3.0;
+            }
+        }
+
         // Report new status & save results
         if (rpt->Statflag) writehydstat(pr,iter,relerr);
 

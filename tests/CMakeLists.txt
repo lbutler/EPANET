@@ -33,7 +33,7 @@ set(toolkit_test_srcs
      test_node.cpp
      test_demand.cpp
      test_link.cpp
-#     test_pump.cpp
+     test_pump.cpp
      test_pattern.cpp
      test_curve.cpp
      test_control.cpp

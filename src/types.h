@@ -465,6 +465,7 @@ typedef struct             // Pump Object
   int     Upat;            // utilization pattern index
   int     Epat;            // energy cost pattern index
   double  Ecost;           // unit energy cost
+  double  Hset;            // pressure target for VSP (internal head units)
   Senergy Energy;          // energy usage statistics
 } Spump;
 

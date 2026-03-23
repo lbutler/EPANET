@@ -273,6 +273,13 @@ int saveinpfile(Project *pr, const char *fname)
             strcat(s, s1);
         }
 
+        // Optional pressure target for VSP pumps
+        if (pump->Hset > 0.0)
+        {
+            sprintf(s1, "\tPRESSURE %.4f", pump->Hset * pr->Ucf[PRESSURE]);
+            strcat(s, s1);
+        }
+
         fprintf(f, "\n%s", s);
         if (link->Comment) fprintf(f, "\t;%s", link->Comment);
     }

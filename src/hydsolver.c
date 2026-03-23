@@ -261,6 +261,31 @@ int  badvalve(Project *pr, int n)
             return 0;
         }
     }
+
+    // Check if node belongs to an active VSP pump
+    for (i = 1; i <= net->Npumps; i++)
+    {
+        if (net->Pump[i].Hset <= 0.0) continue;
+        k = net->Pump[i].Link;
+        link = &net->Link[k];
+        n1 = link->N1;
+        n2 = link->N2;
+        if (n == n1 || n == n2)
+        {
+            if (hyd->LinkStatus[k] == ACTIVE)
+            {
+                if (rpt->Statflag == FULL)
+                {
+                    sprintf(pr->Msg, FMT61,
+                            clocktime(rpt->Atime, time->Htime), link->ID);
+                    writeline(pr, pr->Msg);
+                }
+                hyd->LinkStatus[k] = XPRESSURE;
+                return 1;
+            }
+            return 0;
+        }
+    }
     return 0;
 }
 

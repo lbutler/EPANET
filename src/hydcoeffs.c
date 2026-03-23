@@ -54,6 +54,7 @@ static void    DWpipecoeff(Project *pr, int k);
 static double  frictionFactor(double q, double e, double s, double *dfdq);
 
 static void    pumpcoeff(Project *pr, int k);
+static void    vsppumpcoeffs(Project *pr);
 static void    curvecoeff(Project *pr, int i, double q, double *h0, double *r);
 
 static void    valvecoeff(Project *pr, int k);
@@ -318,6 +319,9 @@ void   matrixcoeffs(Project *pr)
     // Finally, find coeffs. for PRV/PSV/FCV control valves whose
     // status is not fixed to OPEN/CLOSED
     valvecoeffs(pr);
+
+    // Find coeffs. for VSP pumps in ACTIVE mode (PRV-like constraint)
+    vsppumpcoeffs(pr);
 }
 
 
@@ -451,6 +455,58 @@ void  valvecoeffs(Project *pr)
             fcvcoeff(pr, k, n1, n2);
             break;
         default:   continue;
+        }
+    }
+}
+
+
+void  vsppumpcoeffs(Project *pr)
+/*
+**--------------------------------------------------------------
+**   Input:   none
+**   Output:  none
+**   Purpose: computes coeffs. of the linearized hydraulic eqns.
+**            contributed by VSP pumps in ACTIVE mode.
+**            Uses the same PRV penalty method to fix the head at
+**            the downstream node to the pump's pressure target.
+**--------------------------------------------------------------
+*/
+{
+    Network *net = &pr->network;
+    Hydraul *hyd = &pr->hydraul;
+    Smatrix *sm = &hyd->smatrix;
+
+    int    i, k, n1, n2;
+    int    j1, j2;
+    double hset;
+    Spump  *pump;
+    Slink  *link;
+
+    for (i = 1; i <= net->Npumps; i++)
+    {
+        pump = &net->Pump[i];
+        if (pump->Hset <= 0.0) continue;
+
+        k = pump->Link;
+        if (hyd->LinkStatus[k] != ACTIVE) continue;
+
+        link = &net->Link[k];
+        n1 = link->N1;
+        n2 = link->N2;
+        j1 = sm->Row[n1];
+        j2 = sm->Row[n2];
+        hset = net->Node[n2].El + pump->Hset;
+
+        // Set coeffs. to force head at downstream
+        // node equal to pressure target & force flow
+        // to equal flow excess at downstream node.
+        hyd->P[k] = 0.0;
+        hyd->Y[k] = hyd->LinkFlow[k] + hyd->Xflow[n2];
+        sm->F[j2] += (hset * CBIG);
+        sm->Aii[j2] += CBIG;
+        if (hyd->Xflow[n2] < 0.0)
+        {
+            sm->F[j1] += hyd->Xflow[n2];
         }
     }
 }
@@ -818,6 +874,14 @@ void  pumpcoeff(Project *pr, int k)
     q = ABS(hyd->LinkFlow[k]);
     p = findpump(&pr->network, k);
     pump = &pr->network.Pump[p];
+
+    // VSP pump in ACTIVE mode - coefficients handled by vsppumpcoeffs()
+    if (pump->Hset > 0.0 && hyd->LinkStatus[k] == ACTIVE)
+    {
+        hyd->P[k] = 0.0;
+        hyd->Y[k] = hyd->LinkFlow[k];
+        return;
+    }
 
     // If no pump curve treat pump as an open valve
     if (pump->Ptype == NOCURVE)
