@@ -3681,8 +3681,8 @@ local prv_open = 999999
 local NR_TOL = 1e-6
 local NR_MAX = 20
 
--- Track iteration pass within each timestep
-local pass = 0
+-- Has the speed been calculated for this timestep?
+local calculated = false
 
 -- Newton-Raphson solver: find pump speed N for given flow Q and target head
 local function solve_speed(Q, H_target)
@@ -3720,60 +3720,62 @@ end
 function on_event(event)
 
     if event == "init" then
-        link("V1").setting = prv_target
         print(string.format("VSP-PRV (3-point) initialised: target pressure = %.1f m", prv_target))
         print(string.format("Pump curve: A=%.1f  B=%.1f  C=%.4f", A, B, C))
 
     elseif event == "iteration" then
-        pass = pass + 1
+        if not calculated then
+            local pump = link("PU2")
+            local prv  = link("V1")
 
-        if pass == 1 then
-            -- Pass 1: PRV is constraining, solver has converged
-            local Q      = link("PU2").flow
-            local H_J137 = node("J137").head
-            local H_J138 = node("J138").head
-            local H_J112 = node("J112").head
-            local H_J113 = node("J113").head
+            if pump.setting < 0.999 or prv.setting >= prv_open then
+                -- Previous timestep left pump at calculated speed and PRV open.
+                -- Reset: pump to full speed, PRV to target, then re-solve.
+                pump.setting = 1.0
+                prv.setting  = prv_target
+                print("  Reset: pump -> 1.0, PRV -> target")
+            else
+                -- Pump at full speed, PRV constraining — calculate speed.
+                local Q      = pump.flow
+                local H_J137 = node("J137").head
+                local H_J138 = node("J138").head
+                local H_J112 = node("J112").head
+                local H_J113 = node("J113").head
 
-            local H_pump   = H_J138 - H_J137
-            local PRV_drop = H_J112 - H_J113
-            local H_target = H_pump - PRV_drop
+                local H_pump   = H_J138 - H_J137
+                local PRV_drop = H_J112 - H_J113
+                local H_target = H_pump - PRV_drop
 
-            -- Newton-Raphson for speed
-            local N = solve_speed(Q, H_target)
+                -- Newton-Raphson for speed
+                local N = solve_speed(Q, H_target)
+                if N < 0.01 then N = 0.01 end
+                if N > 3.0  then N = 3.0  end
 
-            -- Clamp final result
-            if N < 0.01 then N = 0.01 end
-            if N > 3.0  then N = 3.0  end
+                print(string.format("  Calc: Q=%.4f  H_pump=%.2f  PRV_drop=%.2f  H_target=%.2f  => N=%.4f",
+                    Q, H_pump, PRV_drop, H_target, N))
 
-            print(string.format("  Pass 1: Q=%.4f  H_pump=%.2f  PRV_drop=%.2f  H_target=%.2f  => N=%.4f",
-                Q, H_pump, PRV_drop, H_target, N))
-
-            -- Open the PRV and set the calculated pump speed
-            link("V1").setting  = prv_open
-            link("PU2").setting = N
-
+                -- Open PRV and set calculated speed
+                prv.setting  = prv_open
+                pump.setting = N
+                calculated   = true
+            end
         else
-            -- Pass 2+: PRV is open, pump at calculated N — verify, no changes
-            local Q      = link("PU2").flow
-            local p_J113 = node("J113").pressure
-            local N      = link("PU2").setting
-            print(string.format("  Pass 2: Q=%.4f  J113_pressure=%.2f  N=%.4f  (verify)",
-                Q, p_J113, N))
+            -- Verification pass — pump at N, PRV open, no changes
+            print(string.format("  Verify: Q=%.4f  J113_P=%.2f  N=%.4f",
+                link("PU2").flow, node("J113").pressure, link("PU2").setting))
         end
 
     elseif event == "report" then
-        local Q      = link("PU2").flow
+        -- Log final results. Do NOT reset here — EPANET saves results
+        -- after the report event, so settings must stay as-is.
         local N      = link("PU2").setting
+        local Q      = link("PU2").flow
         local p_J113 = node("J113").pressure
         local p_J126 = node("J126").pressure
         print(string.format("Step: N=%.4f  Q=%.4f  J113_P=%.2f  J126_P=%.2f", N, Q, p_J113, p_J126))
 
-        -- Reset pump to full speed and PRV to target for next timestep.
-        -- The pump must run at full speed so the PRV has excess head to throttle.
-        link("PU2").setting = 1.0
-        link("V1").setting = prv_target
-        pass = 0
+        -- Prepare for next timestep (reset happens in iteration, not here)
+        calculated = false
     end
 end
 

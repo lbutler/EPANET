@@ -1,4 +1,4 @@
-  Page 1                                    Sun Mar 22 23:29:59 2026
+  Page 1                                    Sun Mar 22 23:36:42 2026
 
   ******************************************************************
   *                           E P A N E T                          *
@@ -9,7 +9,7 @@
   
   VSP-PRV (3-point) initialised: target pressure = 80.0 m
   Pump curve: A=60.0  B=10.0  C=2.5850
-  Analysis begun Sun Mar 22 23:29:59 2026
+  Analysis begun Sun Mar 22 23:36:42 2026
 
    
   Hydraulic Status:
@@ -32,7 +32,7 @@
                         maximum  flow change = 0.0140 for Link P90
                         maximum  head error  = 0.0000 for Link P30
 
-    Pass 1: Q=0.9695  H_pump=50.77  PRV_drop=27.72  H_target=23.05  => N=0.7522
+    Calc: Q=0.9695  H_pump=50.77  PRV_drop=27.72  H_target=23.05  => N=0.7522
       Lua script changed status — re-solving (pass 1)
      0:00:00: Balancing the network:
 
@@ -45,7 +45,7 @@
                         maximum  flow change = 0.0061 for Link P97
                         maximum  head error  = 0.0000 for Link P82
 
-    Pass 2: Q=0.9695  J113_pressure=80.00  N=0.7522  (verify)
+    Verify: Q=0.9695  J113_P=80.00  N=0.7522
      0:00:00: Balanced after 5 trials
      0:00:00: Reservoir R2 is closed
      0:00:00: Tank T1 is emptying at 5.00 m
@@ -54,14 +54,26 @@
   Step: N=0.7522  Q=0.9695  J113_P=80.00  J126_P=87.39
      1:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.084230
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000072
-                        maximum  flow change = 0.0005 for Link P6
+              Trial  1: relative flow change = 0.084233
+              Trial  2: relative flow change = 0.000058
+                        maximum  flow change = 0.0006 for Link P91
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=0.9627  H_pump=50.94  PRV_drop=27.88  H_target=23.06  => N=0.7503
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+     1:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000014
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P125
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000022
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=0.9627  H_pump=50.94  PRV_drop=27.88  H_target=23.06  => N=0.7503
+      Lua script changed status — re-solving (pass 2)
      1:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.958798
@@ -73,20 +85,32 @@
                         maximum  flow change = 0.0001 for Link P72
                         maximum  head error  = 0.0000 for Link P58
 
-    Pass 2: Q=0.9626  J113_pressure=80.00  N=0.7503  (verify)
+    Verify: Q=0.9626  J113_P=80.00  N=0.7503
      1:00:00: Balanced after 5 trials
    
   Step: N=0.7503  Q=0.9626  J113_P=80.00  J126_P=87.39
      2:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.091832
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000100
-                        maximum  flow change = 0.0008 for Link P6
+              Trial  1: relative flow change = 0.091835
+              Trial  2: relative flow change = 0.000085
+                        maximum  flow change = 0.0008 for Link P91
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=0.9557  H_pump=51.10  PRV_drop=28.04  H_target=23.07  => N=0.7484
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+     2:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000014
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000025
+                        maximum  flow change = 0.0001 for Link P85
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=0.9557  H_pump=51.10  PRV_drop=28.04  H_target=23.07  => N=0.7484
+      Lua script changed status — re-solving (pass 2)
      2:00:00: Balancing the network:
 
               Trial  1: relative flow change = 1.043730
@@ -98,45 +122,69 @@
                         maximum  flow change = 0.0002 for Link P92
                         maximum  head error  = 0.0000 for Link P58
 
-    Pass 2: Q=0.9556  J113_pressure=80.00  N=0.7484  (verify)
+    Verify: Q=0.9556  J113_P=80.00  N=0.7484
      2:00:00: Balanced after 5 trials
    
   Step: N=0.7484  Q=0.9556  J113_P=80.00  J126_P=87.39
      3:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.155712
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000305
-                        maximum  flow change = 0.0033 for Link P6
+              Trial  1: relative flow change = 0.155709
+              Trial  2: relative flow change = 0.000293
+                        maximum  flow change = 0.0034 for Link P6
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=0.9696  H_pump=50.77  PRV_drop=27.52  H_target=23.25  => N=0.7543
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+     3:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000013
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000020
+                        maximum  flow change = 0.0001 for Link P89
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=0.9696  H_pump=50.77  PRV_drop=27.52  H_target=23.25  => N=0.7543
+      Lua script changed status — re-solving (pass 2)
      3:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.884679
               PRV V1 switched from active to open
-              Trial  2: relative flow change = 0.726873
-              Trial  3: relative flow change = 0.036524
+              Trial  2: relative flow change = 0.726874
+              Trial  3: relative flow change = 0.036527
               Trial  4: relative flow change = 0.001189
               Trial  5: relative flow change = 0.000004
                         maximum  flow change = 0.0000 for Link P44
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 2: Q=0.9695  J113_pressure=80.00  N=0.7543  (verify)
+    Verify: Q=0.9695  J113_P=80.00  N=0.7543
      3:00:00: Balanced after 5 trials
    
   Step: N=0.7543  Q=0.9695  J113_P=80.00  J126_P=87.39
      4:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.280417
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000663
-                        maximum  flow change = 0.0092 for Link P6
+              Trial  1: relative flow change = 0.280415
+              Trial  2: relative flow change = 0.000656
+                        maximum  flow change = 0.0092 for Link P91
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=1.0044  H_pump=49.89  PRV_drop=26.17  H_target=23.72  => N=0.7693
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+     4:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000009
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P125_2
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000014
+                        maximum  flow change = 0.0001 for Link P115
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0044  H_pump=49.89  PRV_drop=26.17  H_target=23.72  => N=0.7693
+      Lua script changed status — re-solving (pass 2)
      4:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.619241
@@ -144,23 +192,35 @@
               Trial  2: relative flow change = 0.520954
               Trial  3: relative flow change = 0.018449
               Trial  4: relative flow change = 0.000329
-                        maximum  flow change = 0.0035 for Link P91
+                        maximum  flow change = 0.0035 for Link P6
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 2: Q=1.0043  J113_pressure=80.00  N=0.7693  (verify)
+    Verify: Q=1.0043  J113_P=80.00  N=0.7693
      4:00:00: Balanced after 4 trials
    
   Step: N=0.7693  Q=1.0043  J113_P=80.00  J126_P=87.39
      5:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.330402
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000400
+              Trial  1: relative flow change = 0.330401
+              Trial  2: relative flow change = 0.000396
                         maximum  flow change = 0.0076 for Link P6
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=1.0655  H_pump=48.22  PRV_drop=23.44  H_target=24.78  => N=0.7981
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+     5:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000006
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P125
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000008
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+    Calc: Q=1.0655  H_pump=48.22  PRV_drop=23.44  H_target=24.78  => N=0.7981
+      Lua script changed status — re-solving (pass 2)
      5:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.400867
@@ -168,23 +228,35 @@
               Trial  2: relative flow change = 0.350331
               Trial  3: relative flow change = 0.006921
               Trial  4: relative flow change = 0.000049
-                        maximum  flow change = 0.0004 for Link P36
+                        maximum  flow change = 0.0004 for Link P35
                         maximum  head error  = 0.0000 for Link P13
 
-    Pass 2: Q=1.0654  J113_pressure=80.00  N=0.7981  (verify)
+    Verify: Q=1.0654  J113_P=80.00  N=0.7981
      5:00:00: Balanced after 4 trials
    
   Step: N=0.7981  Q=1.0654  J113_P=80.00  J126_P=87.39
      6:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.188824
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000053
-                        maximum  flow change = 0.0011 for Link P6
+              Trial  1: relative flow change = 0.188823
+              Trial  2: relative flow change = 0.000050
+                        maximum  flow change = 0.0011 for Link P91
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=1.1086  H_pump=46.95  PRV_drop=21.14  H_target=25.81  => N=0.8211
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+     6:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000004
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000006
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.1086  H_pump=46.95  PRV_drop=21.14  H_target=25.81  => N=0.8211
+      Lua script changed status — re-solving (pass 2)
      6:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.320697
@@ -192,23 +264,35 @@
               Trial  2: relative flow change = 0.284662
               Trial  3: relative flow change = 0.003986
               Trial  4: relative flow change = 0.000018
-                        maximum  flow change = 0.0002 for Link P36
+                        maximum  flow change = 0.0002 for Link P87
                         maximum  head error  = 0.0000 for Link P13
 
-    Pass 2: Q=1.1085  J113_pressure=80.00  N=0.8211  (verify)
+    Verify: Q=1.1085  J113_P=80.00  N=0.8211
      6:00:00: Balanced after 4 trials
    
   Step: N=0.8211  Q=1.1085  J113_P=80.00  J126_P=87.39
      7:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.154497
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000024
-                        maximum  flow change = 0.0005 for Link P6
+              Trial  1: relative flow change = 0.154496
+              Trial  2: relative flow change = 0.000021
+                        maximum  flow change = 0.0005 for Link P91
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=1.1502  H_pump=45.64  PRV_drop=18.65  H_target=26.99  => N=0.8450
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+     7:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000005
+                        maximum  flow change = 0.0001 for Link P64
+                        maximum  head error  = 0.0000 for Link PU2
+
+    Calc: Q=1.1502  H_pump=45.64  PRV_drop=18.65  H_target=26.99  => N=0.8450
+      Lua script changed status — re-solving (pass 2)
      7:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.268133
@@ -216,23 +300,35 @@
               Trial  2: relative flow change = 0.240823
               Trial  3: relative flow change = 0.002835
               Trial  4: relative flow change = 0.000009
-                        maximum  flow change = 0.0001 for Link P56
+                        maximum  flow change = 0.0001 for Link P87
                         maximum  head error  = 0.0000 for Link P13
 
-    Pass 2: Q=1.1502  J113_pressure=80.00  N=0.8450  (verify)
+    Verify: Q=1.1502  J113_P=80.00  N=0.8450
      7:00:00: Balanced after 4 trials
    
   Step: N=0.8450  Q=1.1502  J113_P=80.00  J126_P=87.39
      8:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.147767
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000017
+              Trial  1: relative flow change = 0.147768
+              Trial  2: relative flow change = 0.000014
                         maximum  flow change = 0.0003 for Link P6
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=1.1155  H_pump=46.73  PRV_drop=20.34  H_target=26.40  => N=0.8287
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+     8:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P125
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000006
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.1155  H_pump=46.73  PRV_drop=20.34  H_target=26.40  => N=0.8287
+      Lua script changed status — re-solving (pass 2)
      8:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.310598
@@ -240,23 +336,35 @@
               Trial  2: relative flow change = 0.276284
               Trial  3: relative flow change = 0.003742
               Trial  4: relative flow change = 0.000016
-                        maximum  flow change = 0.0002 for Link P87
+                        maximum  flow change = 0.0002 for Link P13
                         maximum  head error  = 0.0000 for Link P13
 
-    Pass 2: Q=1.1154  J113_pressure=80.00  N=0.8287  (verify)
+    Verify: Q=1.1154  J113_P=80.00  N=0.8287
      8:00:00: Balanced after 4 trials
    
   Step: N=0.8287  Q=1.1154  J113_P=80.00  J126_P=87.39
      9:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.173380
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000030
+              Trial  1: relative flow change = 0.173381
+              Trial  2: relative flow change = 0.000025
                         maximum  flow change = 0.0005 for Link P6
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=1.0808  H_pump=47.78  PRV_drop=21.90  H_target=25.87  => N=0.8131
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+     9:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000004
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000007
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0808  H_pump=47.78  PRV_drop=21.90  H_target=25.87  => N=0.8131
+      Lua script changed status — re-solving (pass 2)
      9:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.368280
@@ -264,23 +372,35 @@
               Trial  2: relative flow change = 0.323839
               Trial  3: relative flow change = 0.005525
               Trial  4: relative flow change = 0.000034
-                        maximum  flow change = 0.0003 for Link P87
+                        maximum  flow change = 0.0003 for Link P36
                         maximum  head error  = 0.0000 for Link P13
 
-    Pass 2: Q=1.0807  J113_pressure=80.00  N=0.8131  (verify)
+    Verify: Q=1.0807  J113_P=80.00  N=0.8131
      9:00:00: Balanced after 4 trials
    
   Step: N=0.8131  Q=1.0807  J113_P=80.00  J126_P=87.39
     10:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.209715
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000059
-                        maximum  flow change = 0.0009 for Link P6
+              Trial  1: relative flow change = 0.209716
+              Trial  2: relative flow change = 0.000054
+                        maximum  flow change = 0.0009 for Link P91
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=1.0460  H_pump=48.77  PRV_drop=23.35  H_target=25.42  => N=0.7983
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+    10:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000005
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000009
+                        maximum  flow change = 0.0001 for Link P115
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0460  H_pump=48.77  PRV_drop=23.35  H_target=25.42  => N=0.7983
+      Lua script changed status — re-solving (pass 2)
     10:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.451742
@@ -288,10 +408,10 @@
               Trial  2: relative flow change = 0.391070
               Trial  3: relative flow change = 0.009318
               Trial  4: relative flow change = 0.000080
-                        maximum  flow change = 0.0006 for Link P91
+                        maximum  flow change = 0.0006 for Link P6
                         maximum  head error  = 0.0000 for Link P13
 
-    Pass 2: Q=1.0460  J113_pressure=80.00  N=0.7983  (verify)
+    Verify: Q=1.0460  J113_P=80.00  N=0.7983
     10:00:00: Balanced after 4 trials
    
   Step: N=0.7983  Q=1.0460  J113_P=80.00  J126_P=87.39
@@ -299,20 +419,32 @@
     10:57:22: Balancing the network:
 
               Trial  1: relative flow change = 1.099817
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.802322
+              Trial  2: relative flow change = 0.802320
               Trial  3: relative flow change = 0.347588
               Trial  4: relative flow change = 0.052697
               Trial  5: relative flow change = 0.001345
               Trial  6: relative flow change = 0.000003
-                        maximum  flow change = 0.0001 for Link P21
+                        maximum  flow change = 0.0001 for Link P20
                         maximum  head error  = 0.0000 for Link P20
 
-    Pass 1: Q=1.0459  H_pump=48.77  PRV_drop=30.93  H_target=17.84  => N=0.7236
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
     10:57:22: Balancing the network:
 
-              Trial  1: relative flow change = 0.095743
+              Trial  1: relative flow change = 0.000002
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0460  H_pump=48.77  PRV_drop=30.92  H_target=17.84  => N=0.7236
+      Lua script changed status — re-solving (pass 2)
+    10:57:22: Balancing the network:
+
+              Trial  1: relative flow change = 0.095746
               PRV V1 switched from active to open
               Trial  2: relative flow change = 0.100887
               Trial  3: relative flow change = 0.001464
@@ -320,7 +452,7 @@
                         maximum  flow change = 0.0001 for Link P121
                         maximum  head error  = 0.0000 for Link P121
 
-    Pass 2: Q=1.0459  J113_pressure=80.00  N=0.7236  (verify)
+    Verify: Q=1.0459  J113_P=80.00  N=0.7236
     10:57:22: Balanced after 4 trials
     10:57:22: Reservoir R2 is emptying
     10:57:22: Tank T1 is filling at 3.50 m
@@ -329,18 +461,30 @@
   Step: N=0.7236  Q=1.0459  J113_P=80.00  J126_P=87.39
     11:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.057450
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.001443
-              Trial  3: relative flow change = 0.000004
-                        maximum  flow change = 0.0001 for Link PU2
-                        maximum  head error  = 0.0000 for Link PU2
+              Trial  1: relative flow change = 0.057448
+              Trial  2: relative flow change = 0.001441
+              Trial  3: relative flow change = 0.000002
+                        maximum  flow change = 0.0001 for Link P102
+                        maximum  head error  = 0.0000 for Link P122
 
-    Pass 1: Q=1.0807  H_pump=47.78  PRV_drop=29.41  H_target=18.37  => N=0.7409
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
     11:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.097819
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0808  H_pump=47.78  PRV_drop=29.41  H_target=18.37  => N=0.7409
+      Lua script changed status — re-solving (pass 2)
+    11:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.097821
               PRV V1 switched from active to open
               Trial  2: relative flow change = 0.102889
               Trial  3: relative flow change = 0.001491
@@ -348,20 +492,32 @@
                         maximum  flow change = 0.0000 for Link P121
                         maximum  head error  = 0.0000 for Link P121
 
-    Pass 2: Q=1.0807  J113_pressure=80.00  N=0.7409  (verify)
+    Verify: Q=1.0807  J113_P=80.00  N=0.7409
     11:00:00: Balanced after 4 trials
    
   Step: N=0.7409  Q=1.0807  J113_P=80.00  J126_P=87.39
     12:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.025756
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000251
+              Trial  1: relative flow change = 0.025755
+              Trial  2: relative flow change = 0.000249
                         maximum  flow change = 0.0054 for Link P120
                         maximum  head error  = 0.0000 for Link P122
 
-    Pass 1: Q=1.0947  H_pump=47.37  PRV_drop=28.90  H_target=18.46  => N=0.7467
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+    12:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+    Calc: Q=1.0947  H_pump=47.37  PRV_drop=28.90  H_target=18.46  => N=0.7467
+      Lua script changed status — re-solving (pass 2)
     12:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.099241
@@ -370,50 +526,74 @@
               Trial  3: relative flow change = 0.001538
               Trial  4: relative flow change = 0.000001
                         maximum  flow change = 0.0000 for Link P121
-                        maximum  head error  = 0.0000 for Link P121
+                        maximum  head error  = 0.0000 for Link PU2
 
-    Pass 2: Q=1.0946  J113_pressure=80.00  N=0.7467  (verify)
+    Verify: Q=1.0946  J113_P=80.00  N=0.7467
     12:00:00: Balanced after 4 trials
    
   Step: N=0.7467  Q=1.0946  J113_P=80.00  J126_P=87.39
     13:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.021698
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000191
+              Trial  1: relative flow change = 0.021699
+              Trial  2: relative flow change = 0.000189
                         maximum  flow change = 0.0041 for Link P120
                         maximum  head error  = 0.0000 for Link P122
 
-    Pass 1: Q=1.0808  H_pump=47.78  PRV_drop=29.63  H_target=18.15  => N=0.7387
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+    13:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+    Calc: Q=1.0808  H_pump=47.78  PRV_drop=29.63  H_target=18.15  => N=0.7387
+      Lua script changed status — re-solving (pass 2)
     13:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.098864
               PRV V1 switched from active to open
-              Trial  2: relative flow change = 0.104049
+              Trial  2: relative flow change = 0.104050
               Trial  3: relative flow change = 0.001525
               Trial  4: relative flow change = 0.000001
                         maximum  flow change = 0.0000 for Link P121
                         maximum  head error  = 0.0000 for Link PU2
 
-    Pass 2: Q=1.0807  J113_pressure=80.00  N=0.7387  (verify)
+    Verify: Q=1.0807  J113_P=80.00  N=0.7387
     13:00:00: Balanced after 4 trials
    
   Step: N=0.7387  Q=1.0807  J113_P=80.00  J126_P=87.39
     14:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.055728
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.001310
-              Trial  3: relative flow change = 0.000004
-                        maximum  flow change = 0.0001 for Link PU2
-                        maximum  head error  = 0.0000 for Link PU2
+              Trial  1: relative flow change = 0.055729
+              Trial  2: relative flow change = 0.001308
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P53
+                        maximum  head error  = 0.0000 for Link P122
 
-    Pass 1: Q=1.0459  H_pump=48.77  PRV_drop=31.25  H_target=17.52  => N=0.7202
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
     14:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.097291
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0460  H_pump=48.77  PRV_drop=31.25  H_target=17.52  => N=0.7203
+      Lua script changed status — re-solving (pass 2)
+    14:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.097294
               PRV V1 switched from active to open
               Trial  2: relative flow change = 0.102592
               Trial  3: relative flow change = 0.001505
@@ -421,20 +601,32 @@
                         maximum  flow change = 0.0001 for Link P121
                         maximum  head error  = 0.0000 for Link P121
 
-    Pass 2: Q=1.0459  J113_pressure=80.00  N=0.7202  (verify)
+    Verify: Q=1.0459  J113_P=80.00  N=0.7203
     14:00:00: Balanced after 4 trials
    
-  Step: N=0.7202  Q=1.0459  J113_P=80.00  J126_P=87.39
+  Step: N=0.7203  Q=1.0459  J113_P=80.00  J126_P=87.39
     15:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.032395
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000525
+              Trial  1: relative flow change = 0.032397
+              Trial  2: relative flow change = 0.000523
                         maximum  flow change = 0.0100 for Link P120
                         maximum  head error  = 0.0000 for Link P122
 
-    Pass 1: Q=1.0252  H_pump=49.34  PRV_drop=32.26  H_target=17.08  => N=0.7086
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+    15:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000004
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link PU2
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0252  H_pump=49.34  PRV_drop=32.26  H_target=17.08  => N=0.7086
+      Lua script changed status — re-solving (pass 2)
     15:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.096492
@@ -445,49 +637,73 @@
                         maximum  flow change = 0.0001 for Link P121
                         maximum  head error  = 0.0000 for Link P121
 
-    Pass 2: Q=1.0251  J113_pressure=80.00  N=0.7086  (verify)
+    Verify: Q=1.0251  J113_P=80.00  N=0.7086
     15:00:00: Balanced after 4 trials
    
   Step: N=0.7086  Q=1.0251  J113_P=80.00  J126_P=87.39
     16:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.070233
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.002058
-              Trial  3: relative flow change = 0.000006
-                        maximum  flow change = 0.0001 for Link P102
-                        maximum  head error  = 0.0000 for Link PU2
+              Trial  1: relative flow change = 0.070231
+              Trial  2: relative flow change = 0.002056
+              Trial  3: relative flow change = 0.000004
+                        maximum  flow change = 0.0001 for Link P65
+                        maximum  head error  = 0.0000 for Link P65
 
-    Pass 1: Q=1.0654  H_pump=48.22  PRV_drop=30.66  H_target=17.56  => N=0.7275
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
     16:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.099690
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0655  H_pump=48.22  PRV_drop=30.66  H_target=17.56  => N=0.7275
+      Lua script changed status — re-solving (pass 2)
+    16:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.099693
               PRV V1 switched from active to open
               Trial  2: relative flow change = 0.105088
               Trial  3: relative flow change = 0.001550
               Trial  4: relative flow change = 0.000001
                         maximum  flow change = 0.0000 for Link P121
-                        maximum  head error  = 0.0000 for Link P121
+                        maximum  head error  = 0.0000 for Link PU2
 
-    Pass 2: Q=1.0654  J113_pressure=80.00  N=0.7275  (verify)
+    Verify: Q=1.0654  J113_P=80.00  N=0.7275
     16:00:00: Balanced after 4 trials
    
   Step: N=0.7275  Q=1.0654  J113_P=80.00  J126_P=87.39
     17:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.052758
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.001066
-              Trial  3: relative flow change = 0.000003
-                        maximum  flow change = 0.0001 for Link P125
-                        maximum  head error  = 0.0000 for Link PU2
+              Trial  1: relative flow change = 0.052756
+              Trial  2: relative flow change = 0.001064
+              Trial  3: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P65
+                        maximum  head error  = 0.0000 for Link P122
 
-    Pass 1: Q=1.0946  H_pump=47.37  PRV_drop=29.49  H_target=17.87  => N=0.7408
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
     17:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.102200
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0947  H_pump=47.37  PRV_drop=29.49  H_target=17.87  => N=0.7409
+      Lua script changed status — re-solving (pass 2)
+    17:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.102203
               PRV V1 switched from active to open
               Trial  2: relative flow change = 0.107723
               Trial  3: relative flow change = 0.001637
@@ -495,24 +711,36 @@
                         maximum  flow change = 0.0000 for Link P121
                         maximum  head error  = 0.0000 for Link P121
 
-    Pass 2: Q=1.0946  J113_pressure=80.00  N=0.7408  (verify)
+    Verify: Q=1.0946  J113_P=80.00  N=0.7409
     17:00:00: Balanced after 4 trials
    
-  Step: N=0.7408  Q=1.0946  J113_P=80.00  J126_P=87.39
+  Step: N=0.7409  Q=1.0946  J113_P=80.00  J126_P=87.39
     18:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.102063
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.003507
+              Trial  1: relative flow change = 0.102062
+              Trial  2: relative flow change = 0.003505
               Trial  3: relative flow change = 0.000009
-                        maximum  flow change = 0.0003 for Link P121
-                        maximum  head error  = 0.0000 for Link PU2
+                        maximum  flow change = 0.0002 for Link P121
+                        maximum  head error  = 0.0000 for Link P121
 
-    Pass 1: Q=1.1502  H_pump=45.64  PRV_drop=27.10  H_target=18.54  => N=0.7671
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
     18:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.107227
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.1502  H_pump=45.64  PRV_drop=27.10  H_target=18.54  => N=0.7671
+      Lua script changed status — re-solving (pass 2)
+    18:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.107229
               PRV V1 switched from active to open
               Trial  2: relative flow change = 0.113047
               Trial  3: relative flow change = 0.001798
@@ -520,45 +748,69 @@
                         maximum  flow change = 0.0001 for Link P121
                         maximum  head error  = 0.0000 for Link P121
 
-    Pass 2: Q=1.1502  J113_pressure=80.00  N=0.7671  (verify)
+    Verify: Q=1.1502  J113_P=80.00  N=0.7671
     18:00:00: Balanced after 4 trials
    
   Step: N=0.7671  Q=1.1502  J113_P=80.00  J126_P=87.39
     19:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.097262
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.002976
-              Trial  3: relative flow change = 0.000005
-                        maximum  flow change = 0.0001 for Link P123
-                        maximum  head error  = 0.0000 for Link PU2
+              Trial  1: relative flow change = 0.097263
+              Trial  2: relative flow change = 0.002974
+              Trial  3: relative flow change = 0.000004
+                        maximum  flow change = 0.0001 for Link P65
+                        maximum  head error  = 0.0000 for Link P122
 
-    Pass 1: Q=1.0946  H_pump=47.37  PRV_drop=29.68  H_target=17.69  => N=0.7390
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
     19:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.103165
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P125
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+    Calc: Q=1.0947  H_pump=47.37  PRV_drop=29.67  H_target=17.69  => N=0.7391
+      Lua script changed status — re-solving (pass 2)
+    19:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.103167
               PRV V1 switched from active to open
               Trial  2: relative flow change = 0.108802
               Trial  3: relative flow change = 0.001671
               Trial  4: relative flow change = 0.000002
                         maximum  flow change = 0.0000 for Link P121
-                        maximum  head error  = 0.0000 for Link PU2
+                        maximum  head error  = 0.0000 for Link P121
 
-    Pass 2: Q=1.0946  J113_pressure=80.00  N=0.7390  (verify)
+    Verify: Q=1.0946  J113_P=80.00  N=0.7391
     19:00:00: Balanced after 4 trials
    
-  Step: N=0.7390  Q=1.0946  J113_P=80.00  J126_P=87.39
+  Step: N=0.7391  Q=1.0946  J113_P=80.00  J126_P=87.39
     20:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.022647
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000201
+              Trial  1: relative flow change = 0.022648
+              Trial  2: relative flow change = 0.000199
                         maximum  flow change = 0.0042 for Link P120
                         maximum  head error  = 0.0000 for Link P122
 
-    Pass 1: Q=1.0808  H_pump=47.78  PRV_drop=30.38  H_target=17.40  => N=0.7312
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+    20:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000003
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P125_2
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000003
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+    Calc: Q=1.0808  H_pump=47.78  PRV_drop=30.38  H_target=17.40  => N=0.7312
+      Lua script changed status — re-solving (pass 2)
     20:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.102730
@@ -569,34 +821,46 @@
                         maximum  flow change = 0.0000 for Link P121
                         maximum  head error  = 0.0000 for Link P121
 
-    Pass 2: Q=1.0807  J113_pressure=80.00  N=0.7312  (verify)
+    Verify: Q=1.0807  J113_P=80.00  N=0.7312
     20:00:00: Balanced after 4 trials
    
   Step: N=0.7312  Q=1.0807  J113_P=80.00  J126_P=87.39
     20:34:41: Pump PU1 changed by Tank T1 control
     20:34:41: Balancing the network:
 
-              Trial  1: relative flow change = 2.832917
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.075611
-              Trial  3: relative flow change = 0.005934
+              Trial  1: relative flow change = 2.832919
+              Trial  2: relative flow change = 0.075606
+              Trial  3: relative flow change = 0.005931
               Trial  4: relative flow change = 0.000140
-                        maximum  flow change = 0.0018 for Link P33
+                        maximum  flow change = 0.0018 for Link P54
                         maximum  head error  = 0.0000 for Link P122
 
-    Pass 1: Q=1.0807  H_pump=47.78  PRV_drop=23.29  H_target=24.49  => N=0.8001
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
     20:34:41: Balancing the network:
 
-              Trial  1: relative flow change = 0.368274
+              Trial  1: relative flow change = 0.000006
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P125
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000008
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0808  H_pump=47.78  PRV_drop=23.29  H_target=24.49  => N=0.8001
+      Lua script changed status — re-solving (pass 2)
+    20:34:41: Balancing the network:
+
+              Trial  1: relative flow change = 0.368281
               PRV V1 switched from active to open
               Trial  2: relative flow change = 0.323839
               Trial  3: relative flow change = 0.005525
               Trial  4: relative flow change = 0.000034
-                        maximum  flow change = 0.0003 for Link P36
+                        maximum  flow change = 0.0003 for Link P35
                         maximum  head error  = 0.0000 for Link P13
 
-    Pass 2: Q=1.0807  J113_pressure=80.00  N=0.8001  (verify)
+    Verify: Q=1.0807  J113_P=80.00  N=0.8001
     20:34:41: Balanced after 4 trials
     20:34:41: Reservoir R2 is closed
     20:34:41: Tank T1 is emptying at 5.20 m
@@ -605,14 +869,26 @@
   Step: N=0.8001  Q=1.0807  J113_P=80.00  J126_P=87.39
     21:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.161024
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000037
-                        maximum  flow change = 0.0005 for Link P6
+              Trial  1: relative flow change = 0.161025
+              Trial  2: relative flow change = 0.000031
+                        maximum  flow change = 0.0005 for Link P91
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=1.0530  H_pump=48.57  PRV_drop=24.52  H_target=24.05  => N=0.7873
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+    21:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000005
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000009
+                        maximum  flow change = 0.0001 for Link P115
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0530  H_pump=48.57  PRV_drop=24.52  H_target=24.05  => N=0.7873
+      Lua script changed status — re-solving (pass 2)
     21:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.432156
@@ -620,23 +896,35 @@
               Trial  2: relative flow change = 0.375476
               Trial  3: relative flow change = 0.008360
               Trial  4: relative flow change = 0.000067
-                        maximum  flow change = 0.0005 for Link P13
+                        maximum  flow change = 0.0005 for Link P56
                         maximum  head error  = 0.0000 for Link P13
 
-    Pass 2: Q=1.0529  J113_pressure=80.00  N=0.7873  (verify)
+    Verify: Q=1.0529  J113_P=80.00  N=0.7873
     21:00:00: Balanced after 4 trials
    
   Step: N=0.7873  Q=1.0529  J113_P=80.00  J126_P=87.39
     22:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.318377
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000186
+              Trial  1: relative flow change = 0.318379
+              Trial  2: relative flow change = 0.000179
                         maximum  flow change = 0.0024 for Link P6
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=1.0113  H_pump=49.71  PRV_drop=26.15  H_target=23.56  => N=0.7698
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
+    22:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000007
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000013
+                        maximum  flow change = 0.0001 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=1.0113  H_pump=49.71  PRV_drop=26.15  H_target=23.56  => N=0.7698
+      Lua script changed status — re-solving (pass 2)
     22:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.583602
@@ -644,38 +932,58 @@
               Trial  2: relative flow change = 0.493241
               Trial  3: relative flow change = 0.017849
               Trial  4: relative flow change = 0.000287
-                        maximum  flow change = 0.0027 for Link P91
+                        maximum  flow change = 0.0027 for Link P6
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 2: Q=1.0112  J113_pressure=80.00  N=0.7698  (verify)
+    Verify: Q=1.0112  J113_P=80.00  N=0.7698
     22:00:00: Balanced after 4 trials
    
   Step: N=0.7698  Q=1.0112  J113_P=80.00  J126_P=87.39
     23:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.466495
-              PRV V1 switched from open to active
-              Trial  2: relative flow change = 0.000825
+              Trial  1: relative flow change = 0.466499
+              Trial  2: relative flow change = 0.000814
                         maximum  flow change = 0.0078 for Link P6
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 1: Q=0.9696  H_pump=50.77  PRV_drop=27.58  H_target=23.18  => N=0.7536
+    Reset: pump -> 1.0, PRV -> target
       Lua script changed status — re-solving (pass 1)
     23:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.884678
+              Trial  1: relative flow change = 0.000015
+              PRV V1 switched from open to active
+                        maximum  flow change = 0.0001 for Link V1
+                        maximum  head error  = 0.0000 for Link PU2
+
+              Trial  2: relative flow change = 0.000021
+                        maximum  flow change = 0.0001 for Link P61
+                        maximum  head error  = 0.0000 for Link P143
+
+    Calc: Q=0.9696  H_pump=50.77  PRV_drop=27.58  H_target=23.18  => N=0.7536
+      Lua script changed status — re-solving (pass 2)
+    23:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.884679
               PRV V1 switched from active to open
-              Trial  2: relative flow change = 0.726872
-              Trial  3: relative flow change = 0.036518
+              Trial  2: relative flow change = 0.726874
+              Trial  3: relative flow change = 0.036527
               Trial  4: relative flow change = 0.001189
               Trial  5: relative flow change = 0.000004
-                        maximum  flow change = 0.0000 for Link P44
+                        maximum  flow change = 0.0000 for Link P69
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 2: Q=0.9695  J113_pressure=80.00  N=0.7536  (verify)
+    Verify: Q=0.9695  J113_P=80.00  N=0.7536
     23:00:00: Balanced after 5 trials
    
   Step: N=0.7536  Q=0.9695  J113_P=80.00  J126_P=87.39
+    24:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P61
+                        maximum  head error  = 0.0000 for Link PU2
+
+    Reset: pump -> 1.0, PRV -> target
+      Lua script changed status — re-solving (pass 1)
     24:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000012
@@ -687,8 +995,8 @@
                         maximum  flow change = 0.0001 for Link P126
                         maximum  head error  = 0.0000 for Link P143
 
-    Pass 1: Q=0.9696  H_pump=50.77  PRV_drop=27.51  H_target=23.26  => N=0.7544
-      Lua script changed status — re-solving (pass 1)
+    Calc: Q=0.9696  H_pump=50.77  PRV_drop=27.51  H_target=23.26  => N=0.7544
+      Lua script changed status — re-solving (pass 2)
     24:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.884679
@@ -697,10 +1005,10 @@
               Trial  3: relative flow change = 0.036527
               Trial  4: relative flow change = 0.001189
               Trial  5: relative flow change = 0.000004
-                        maximum  flow change = 0.0000 for Link P69
+                        maximum  flow change = 0.0000 for Link P44
                         maximum  head error  = 0.0000 for Link P44
 
-    Pass 2: Q=0.9695  J113_pressure=80.00  N=0.7544  (verify)
+    Verify: Q=0.9695  J113_P=80.00  N=0.7544
     24:00:00: Balanced after 5 trials
    
   Step: N=0.7544  Q=0.9695  J113_P=80.00  J126_P=87.39
@@ -716,7 +1024,7 @@
   Flow Ratio:               1.000
   ================================
 
-  Analysis ended Sun Mar 22 23:29:59 2026
+  Analysis ended Sun Mar 22 23:36:42 2026
 
    
   Node Results at 0:00:00 hrs:
@@ -736,8 +1044,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  0.97      0.00    -23.05      1.00  Pump
-  V1                   0.97      0.05      0.00     80.00  PRV
+  PU2                  0.97      0.00    -23.05      0.75  Pump
+  V1                   0.97      0.05      0.00 999998.94  PRV
    
    
   Node Results at 1:00:00 hrs:
@@ -757,8 +1065,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  0.96      0.00    -23.06      1.00  Pump
-  V1                   0.96      0.05      0.00     80.00  PRV
+  PU2                  0.96      0.00    -23.06      0.75  Pump
+  V1                   0.96      0.05      0.00 999998.94  PRV
    
    
   Node Results at 2:00:00 hrs:
@@ -778,8 +1086,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  0.96      0.00    -23.07      1.00  Pump
-  V1                   0.96      0.05      0.00     80.00  PRV
+  PU2                  0.96      0.00    -23.07      0.75  Pump
+  V1                   0.96      0.05      0.00 999998.94  PRV
    
    
   Node Results at 3:00:00 hrs:
@@ -799,8 +1107,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  0.97      0.00    -23.25      1.00  Pump
-  V1                   0.97      0.05      0.00     80.00  PRV
+  PU2                  0.97      0.00    -23.25      0.75  Pump
+  V1                   0.97      0.05      0.00 999998.94  PRV
    
    
   Node Results at 4:00:00 hrs:
@@ -820,8 +1128,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.00      0.00    -23.72      1.00  Pump
-  V1                   1.00      0.06      0.00     80.00  PRV
+  PU2                  1.00      0.00    -23.72      0.77  Pump
+  V1                   1.00      0.06      0.00 999998.94  PRV
    
    
   Node Results at 5:00:00 hrs:
@@ -841,8 +1149,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.07      0.00    -24.78      1.00  Pump
-  V1                   1.07      0.06      0.00     80.00  PRV
+  PU2                  1.07      0.00    -24.78      0.80  Pump
+  V1                   1.07      0.06      0.00 999998.94  PRV
    
    
   Node Results at 6:00:00 hrs:
@@ -862,8 +1170,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.11      0.00    -25.81      1.00  Pump
-  V1                   1.11      0.06      0.00     80.00  PRV
+  PU2                  1.11      0.00    -25.81      0.82  Pump
+  V1                   1.11      0.06      0.00 999998.94  PRV
    
    
   Node Results at 7:00:00 hrs:
@@ -883,8 +1191,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.15      0.00    -26.99      1.00  Pump
-  V1                   1.15      0.07      0.00     80.00  PRV
+  PU2                  1.15      0.00    -26.99      0.84  Pump
+  V1                   1.15      0.07      0.00 999998.94  PRV
    
    
   Node Results at 8:00:00 hrs:
@@ -904,8 +1212,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.12      0.00    -26.40      1.00  Pump
-  V1                   1.12      0.06      0.00     80.00  PRV
+  PU2                  1.12      0.00    -26.40      0.83  Pump
+  V1                   1.12      0.06      0.00 999998.94  PRV
    
    
   Node Results at 9:00:00 hrs:
@@ -925,8 +1233,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.08      0.00    -25.88      1.00  Pump
-  V1                   1.08      0.06      0.00     80.00  PRV
+  PU2                  1.08      0.00    -25.88      0.81  Pump
+  V1                   1.08      0.06      0.00 999998.94  PRV
    
    
   Node Results at 10:00:00 hrs:
@@ -946,8 +1254,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.05      0.00    -25.42      1.00  Pump
-  V1                   1.05      0.06      0.00     80.00  PRV
+  PU2                  1.05      0.00    -25.42      0.80  Pump
+  V1                   1.05      0.06      0.00 999998.94  PRV
    
    
   Node Results at 11:00:00 hrs:
@@ -967,8 +1275,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.08      0.00    -18.37      1.00  Pump
-  V1                   1.08      0.06      0.00     80.00  PRV
+  PU2                  1.08      0.00    -18.37      0.74  Pump
+  V1                   1.08      0.06      0.00 999998.94  PRV
    
    
   Node Results at 12:00:00 hrs:
@@ -988,8 +1296,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.09      0.00    -18.46      1.00  Pump
-  V1                   1.09      0.06      0.00     80.00  PRV
+  PU2                  1.09      0.00    -18.46      0.75  Pump
+  V1                   1.09      0.06      0.00 999998.94  PRV
    
    
   Node Results at 13:00:00 hrs:
@@ -1009,8 +1317,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.08      0.00    -18.15      1.00  Pump
-  V1                   1.08      0.06      0.00     80.00  PRV
+  PU2                  1.08      0.00    -18.15      0.74  Pump
+  V1                   1.08      0.06      0.00 999998.94  PRV
    
    
   Node Results at 14:00:00 hrs:
@@ -1030,8 +1338,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.05      0.00    -17.52      1.00  Pump
-  V1                   1.05      0.06      0.00     80.00  PRV
+  PU2                  1.05      0.00    -17.52      0.72  Pump
+  V1                   1.05      0.06      0.00 999998.94  PRV
    
    
   Node Results at 15:00:00 hrs:
@@ -1051,8 +1359,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.03      0.00    -17.08      1.00  Pump
-  V1                   1.03      0.06      0.00     80.00  PRV
+  PU2                  1.03      0.00    -17.08      0.71  Pump
+  V1                   1.03      0.06      0.00 999998.94  PRV
    
    
   Node Results at 16:00:00 hrs:
@@ -1072,8 +1380,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.07      0.00    -17.56      1.00  Pump
-  V1                   1.07      0.06      0.00     80.00  PRV
+  PU2                  1.07      0.00    -17.57      0.73  Pump
+  V1                   1.07      0.06      0.00 999998.94  PRV
    
    
   Node Results at 17:00:00 hrs:
@@ -1093,8 +1401,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.09      0.00    -17.87      1.00  Pump
-  V1                   1.09      0.06      0.00     80.00  PRV
+  PU2                  1.09      0.00    -17.88      0.74  Pump
+  V1                   1.09      0.06      0.00 999998.94  PRV
    
    
   Node Results at 18:00:00 hrs:
@@ -1114,8 +1422,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.15      0.00    -18.54      1.00  Pump
-  V1                   1.15      0.07      0.00     80.00  PRV
+  PU2                  1.15      0.00    -18.54      0.77  Pump
+  V1                   1.15      0.07      0.00 999998.94  PRV
    
    
   Node Results at 19:00:00 hrs:
@@ -1135,8 +1443,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.09      0.00    -17.69      1.00  Pump
-  V1                   1.09      0.06      0.00     80.00  PRV
+  PU2                  1.09      0.00    -17.70      0.74  Pump
+  V1                   1.09      0.06      0.00 999998.94  PRV
    
    
   Node Results at 20:00:00 hrs:
@@ -1156,8 +1464,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.08      0.00    -17.40      1.00  Pump
-  V1                   1.08      0.06      0.00     80.00  PRV
+  PU2                  1.08      0.00    -17.40      0.73  Pump
+  V1                   1.08      0.06      0.00 999998.94  PRV
    
    
   Node Results at 21:00:00 hrs:
@@ -1177,8 +1485,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.05      0.00    -24.05      1.00  Pump
-  V1                   1.05      0.06      0.00     80.00  PRV
+  PU2                  1.05      0.00    -24.05      0.79  Pump
+  V1                   1.05      0.06      0.00 999998.94  PRV
    
    
   Node Results at 22:00:00 hrs:
@@ -1198,8 +1506,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  1.01      0.00    -23.56      1.00  Pump
-  V1                   1.01      0.06      0.00     80.00  PRV
+  PU2                  1.01      0.00    -23.56      0.77  Pump
+  V1                   1.01      0.06      0.00 999998.94  PRV
    
    
   Node Results at 23:00:00 hrs:
@@ -1219,8 +1527,8 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  0.97      0.00    -23.19      1.00  Pump
-  V1                   0.97      0.05      0.00     80.00  PRV
+  PU2                  0.97      0.00    -23.19      0.75  Pump
+  V1                   0.97      0.05      0.00 999998.94  PRV
    
    
   Node Results at 24:00:00 hrs:
@@ -1240,6 +1548,6 @@
                        Flow  Velocity  Headloss   Setting
   Link                  L/s       m/s    /1000m          
   --------------------------------------------------------
-  PU2                  0.97      0.00    -23.26      1.00  Pump
-  V1                   0.97      0.05      0.00     80.00  PRV
+  PU2                  0.97      0.00    -23.26      0.75  Pump
+  V1                   0.97      0.05      0.00 999998.94  PRV
    
