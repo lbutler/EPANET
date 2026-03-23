@@ -25,6 +25,7 @@ int  linkstatus(Project *);
 static StatusType cvstatus(Project *, StatusType, double, double);
 static StatusType pumpstatus(Project *, int, double);
 static StatusType vsppumpstatus(Project *, int, StatusType, double, double, double);
+static StatusType vspflowstatus(Project *, int, StatusType, double, double);
 static StatusType prvstatus(Project *, int, StatusType, double, double, double);
 static StatusType psvstatus(Project *, int, StatusType, double, double, double);
 static StatusType fcvstatus(Project *, int, StatusType, double, double);
@@ -96,21 +97,31 @@ int  valvestatus(Project *pr)
         }
     }
 
-    // Check VSP pumps (pressure-controlling pumps)
+    // Check VSP pumps (pressure- or flow-controlling pumps)
     for (i = 1; i <= net->Npumps; i++)
     {
         Spump *pump = &net->Pump[i];
-        if (pump->Hset <= 0.0) continue;
+        if (pump->Hset <= 0.0 && pump->Qset <= 0.0) continue;
 
         k = pump->Link;
         Slink *link = &net->Link[k];
         int n1 = link->N1;
         int n2 = link->N2;
-        double hset = net->Node[n2].El + pump->Hset;
         StatusType status = hyd->LinkStatus[k];
 
-        hyd->LinkStatus[k] = vsppumpstatus(pr, k, status, hset,
-                                           hyd->NodeHead[n1], hyd->NodeHead[n2]);
+        if (pump->Qset > 0.0)
+        {
+            // Flow-mode: FCV-like status
+            hyd->LinkStatus[k] = vspflowstatus(pr, k, status,
+                                               hyd->NodeHead[n1], hyd->NodeHead[n2]);
+        }
+        else
+        {
+            // Pressure-mode: PRV-like status
+            double hset = net->Node[n2].El + pump->Hset;
+            hyd->LinkStatus[k] = vsppumpstatus(pr, k, status, hset,
+                                               hyd->NodeHead[n1], hyd->NodeHead[n2]);
+        }
 
         if (status != hyd->LinkStatus[k])
         {
@@ -173,7 +184,7 @@ int  linkstatus(Project *pr)
         {
             // Skip VSP pumps - handled in valvestatus()
             int p = findpump(net, k);
-            if (net->Pump[p].Hset > 0.0) continue;
+            if (net->Pump[p].Hset > 0.0 || net->Pump[p].Qset > 0.0) continue;
             hyd->LinkStatus[k] = pumpstatus(pr, k, -dh);
         }
 
@@ -348,6 +359,48 @@ StatusType  vsppumpstatus(Project *pr, int k, StatusType s, double hset,
 
     default:
         break;
+    }
+    return status;
+}
+
+
+StatusType  vspflowstatus(Project *pr, int k, StatusType s,
+                    double h1, double h2)
+/*
+**-----------------------------------------------------------
+**  Input:   k    = link index
+**           s    = current status
+**           h1   = head at upstream node
+**           h2   = head at downstream node
+**  Output:  returns new pump status
+**  Purpose: updates status of a flow-controlled VSP pump
+**           using FCV-like logic.
+**-----------------------------------------------------------
+*/
+{
+    Hydraul *hyd = &pr->hydraul;
+
+    StatusType status = s;
+
+    // Reverse head or reverse flow → cannot maintain
+    if (h1 - h2 < -hyd->Htol)
+    {
+        status = XFCV;
+    }
+    else if (hyd->LinkFlow[k] < -hyd->Qtol)
+    {
+        status = XFCV;
+    }
+    // Was unable to maintain → try to reactivate when flow recovers
+    else if (s == XFCV)
+    {
+        Network *net = &pr->network;
+        int p = findpump(net, k);
+        double qset = net->Pump[p].Qset;
+        if (hyd->LinkFlow[k] >= qset)
+        {
+            status = ACTIVE;
+        }
     }
     return status;
 }

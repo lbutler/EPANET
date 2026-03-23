@@ -145,7 +145,7 @@ void inithyd(Project *pr, int initflag)
         if (link->Type == PUMP)
         {
             int p = findpump(net, i);
-            if (net->Pump[p].Hset > 0.0)
+            if (net->Pump[p].Hset > 0.0 || net->Pump[p].Qset > 0.0)
                 hyd->LinkStatus[i] = ACTIVE;
         }
 
@@ -234,9 +234,10 @@ int   runhyd(Project *pr, long *t)
             for (j = 1; j <= net->Npumps; j++)
             {
                 pump = &net->Pump[j];
-                if (pump->Hset <= 0.0) continue;
+                if (pump->Hset <= 0.0 && pump->Qset <= 0.0) continue;
                 k = pump->Link;
-                if (hyd->LinkStatus[k] <= CLOSED)
+                if (hyd->LinkStatus[k] <= CLOSED ||
+                    hyd->LinkStatus[k] == XFCV)
                 {
                     hyd->LinkSetting[k] = 0.0;
                     continue;
@@ -245,7 +246,12 @@ int   runhyd(Project *pr, long *t)
                 n1 = net->Link[k].N1;
                 n2 = net->Link[k].N2;
                 h_target = hyd->NodeHead[n2] - hyd->NodeHead[n1];
-                q = ABS(hyd->LinkFlow[k]);
+
+                // For flow-mode, use the target flow; otherwise use solved flow
+                if (pump->Qset > 0.0)
+                    q = pump->Qset;
+                else
+                    q = ABS(hyd->LinkFlow[k]);
                 max_speed = net->Link[k].InitSetting;
 
                 if (pump->Ptype == CUSTOM)

@@ -485,7 +485,7 @@ void  vsppumpcoeffs(Project *pr)
     for (i = 1; i <= net->Npumps; i++)
     {
         pump = &net->Pump[i];
-        if (pump->Hset <= 0.0) continue;
+        if (pump->Hset <= 0.0 && pump->Qset <= 0.0) continue;
 
         k = pump->Link;
         if (hyd->LinkStatus[k] != ACTIVE) continue;
@@ -495,18 +495,34 @@ void  vsppumpcoeffs(Project *pr)
         n2 = link->N2;
         j1 = sm->Row[n1];
         j2 = sm->Row[n2];
-        hset = net->Node[n2].El + pump->Hset;
 
-        // Set coeffs. to force head at downstream
-        // node equal to pressure target & force flow
-        // to equal flow excess at downstream node.
-        hyd->P[k] = 0.0;
-        hyd->Y[k] = hyd->LinkFlow[k] + hyd->Xflow[n2];
-        sm->F[j2] += (hset * CBIG);
-        sm->Aii[j2] += CBIG;
-        if (hyd->Xflow[n2] < 0.0)
+        if (pump->Qset > 0.0)
         {
-            sm->F[j1] += hyd->Xflow[n2];
+            // FCV-like: break network at pump and treat
+            // flow target as external demand/supply.
+            double q = pump->Qset;
+            hyd->Xflow[n1] -= q;
+            hyd->Xflow[n2] += q;
+            hyd->Y[k] = hyd->LinkFlow[k] - q;
+            sm->F[j1] -= q;
+            sm->F[j2] += q;
+            hyd->P[k] = 1.0 / CBIG;
+            sm->Aij[sm->Ndx[k]] -= hyd->P[k];
+            sm->Aii[j1] += hyd->P[k];
+            sm->Aii[j2] += hyd->P[k];
+        }
+        else
+        {
+            // PRV-like: force head at downstream node
+            hset = net->Node[n2].El + pump->Hset;
+            hyd->P[k] = 0.0;
+            hyd->Y[k] = hyd->LinkFlow[k] + hyd->Xflow[n2];
+            sm->F[j2] += (hset * CBIG);
+            sm->Aii[j2] += CBIG;
+            if (hyd->Xflow[n2] < 0.0)
+            {
+                sm->F[j1] += hyd->Xflow[n2];
+            }
         }
     }
 }
@@ -876,7 +892,7 @@ void  pumpcoeff(Project *pr, int k)
     pump = &pr->network.Pump[p];
 
     // VSP pump in ACTIVE mode - coefficients handled by vsppumpcoeffs()
-    if (pump->Hset > 0.0 && hyd->LinkStatus[k] == ACTIVE)
+    if ((pump->Hset > 0.0 || pump->Qset > 0.0) && hyd->LinkStatus[k] == ACTIVE)
     {
         hyd->P[k] = 0.0;
         hyd->Y[k] = hyd->LinkFlow[k];

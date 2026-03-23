@@ -265,7 +265,7 @@ int  badvalve(Project *pr, int n)
     // Check if node belongs to an active VSP pump
     for (i = 1; i <= net->Npumps; i++)
     {
-        if (net->Pump[i].Hset <= 0.0) continue;
+        if (net->Pump[i].Hset <= 0.0 && net->Pump[i].Qset <= 0.0) continue;
         k = net->Pump[i].Link;
         link = &net->Link[k];
         n1 = link->N1;
@@ -280,7 +280,10 @@ int  badvalve(Project *pr, int n)
                             clocktime(rpt->Atime, time->Htime), link->ID);
                     writeline(pr, pr->Msg);
                 }
-                hyd->LinkStatus[k] = XPRESSURE;
+                if (net->Pump[i].Qset > 0.0)
+                    hyd->LinkStatus[k] = XFCV;
+                else
+                    hyd->LinkStatus[k] = XPRESSURE;
                 return 1;
             }
             return 0;

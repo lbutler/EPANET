@@ -318,7 +318,7 @@ int validatepumps(Project *pr)
         }
         
         // VSP pump requires a power function or custom pump curve
-        if (!errcode && pump->Hset > 0.0)
+        if (!errcode && (pump->Hset > 0.0 || pump->Qset > 0.0))
         {
             if (pump->Ptype != POWER_FUNC && pump->Ptype != CUSTOM)
                 errcode = 226;

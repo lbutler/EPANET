@@ -280,6 +280,13 @@ int saveinpfile(Project *pr, const char *fname)
             strcat(s, s1);
         }
 
+        // Optional flow target for VSP pumps
+        if (pump->Qset > 0.0)
+        {
+            sprintf(s1, "\tFLOW %.4f", pump->Qset * pr->Ucf[FLOW]);
+            strcat(s, s1);
+        }
+
         // Optional minimum speed for VSP pumps
         if (pump->Nmin > 0.0)
         {

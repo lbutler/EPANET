@@ -610,11 +610,13 @@ void convertunits(Project *pr)
         {
             link->Km /= pr->Ucf[POWER];
 
-            // Convert VSP pressure target from user units to internal units
+            // Convert VSP targets from user units to internal units
             {
                 int p = findpump(net, k);
                 if (net->Pump[p].Hset > 0.0)
                     net->Pump[p].Hset /= pr->Ucf[PRESSURE];
+                if (net->Pump[p].Qset > 0.0)
+                    net->Pump[p].Qset /= pr->Ucf[FLOW];
             }
         }
         

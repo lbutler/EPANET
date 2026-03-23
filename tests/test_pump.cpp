@@ -23,6 +23,8 @@
 #define DATA_PATH_3PT_NOVSP    "./pump-test-3pt-novsp.inp"
 #define DATA_PATH_MULTI_VSP    "./pump-test-multi-vsp.inp"
 #define DATA_PATH_MULTI_NOVSP  "./pump-test-multi-novsp.inp"
+#define DATA_PATH_FLOW_VSP     "./pump-test-flow-vsp.inp"
+#define DATA_PATH_FLOW_NOVSP   "./pump-test-flow-novsp.inp"
 #define DATA_PATH_VSP_MINSPD   "./pump-test-vsp-minspeed.inp"
 #define DATA_PATH_RPT_A        "./test_vsp_a.rpt"
 #define DATA_PATH_OUT_A        "./test_vsp_a.out"
@@ -168,6 +170,108 @@ BOOST_AUTO_TEST_CASE(test_vsp_multi_eps)
 BOOST_AUTO_TEST_CASE(test_vsp_multi_crossvalidation)
 {
     run_vsp_crossvalidation_test(DATA_PATH_MULTI_VSP, DATA_PATH_MULTI_NOVSP, 15.0);
+}
+
+// === Flow-controlled pump tests ===
+
+BOOST_AUTO_TEST_CASE(test_vsp_flow_eps)
+/*
+    Tests that a flow-controlled VSP pump achieves target flow
+    at every timestep pushing into a tank.
+*/
+{
+    int error;
+    EN_Project ph = NULL;
+    int linkIndex;
+    double flow, setting;
+    long t, tstep;
+
+    EN_createproject(&ph);
+    error = EN_open(ph, DATA_PATH_FLOW_VSP, DATA_PATH_RPT_A, DATA_PATH_OUT_A);
+    BOOST_REQUIRE(error == 0);
+
+    EN_getlinkindex(ph, (char*)"PU1", &linkIndex);
+
+    error = EN_openH(ph);
+    BOOST_REQUIRE(error == 0);
+    error = EN_initH(ph, EN_NOSAVE);
+    BOOST_REQUIRE(error == 0);
+
+    int step_count = 0;
+    do {
+        error = EN_runH(ph, &t);
+        BOOST_REQUIRE(error <= 6);
+
+        EN_getlinkvalue(ph, linkIndex, EN_FLOW, &flow);
+        BOOST_CHECK_CLOSE(flow, 8.0, 1.0);  // target flow = 8 LPS
+
+        EN_getlinkvalue(ph, linkIndex, EN_SETTING, &setting);
+        BOOST_CHECK(setting > 0.1);
+        BOOST_CHECK(setting < 3.0);
+
+        step_count++;
+        error = EN_nextH(ph, &tstep);
+        BOOST_REQUIRE(error == 0);
+    } while (tstep > 0);
+
+    BOOST_CHECK(step_count > 1);
+
+    EN_closeH(ph);
+    EN_close(ph);
+    EN_deleteproject(ph);
+}
+
+BOOST_AUTO_TEST_CASE(test_vsp_flow_crossvalidation)
+/*
+    Validates flow-controlled VSP speed by applying it as a fixed
+    speed and checking the flow matches.
+*/
+{
+    int error;
+    EN_Project ph_vsp = NULL, ph_novsp = NULL;
+    int lIdx;
+
+    // --- Run flow-VSP for first timestep ---
+    EN_createproject(&ph_vsp);
+    error = EN_open(ph_vsp, DATA_PATH_FLOW_VSP, DATA_PATH_RPT_A, DATA_PATH_OUT_A);
+    BOOST_REQUIRE(error == 0);
+
+    EN_getlinkindex(ph_vsp, (char*)"PU1", &lIdx);
+    EN_settimeparam(ph_vsp, EN_DURATION, 0);
+
+    error = EN_solveH(ph_vsp);
+    BOOST_REQUIRE(error <= 6);
+
+    double speed_vsp, flow_vsp;
+    EN_getlinkvalue(ph_vsp, lIdx, EN_SETTING, &speed_vsp);
+    EN_getlinkvalue(ph_vsp, lIdx, EN_FLOW, &flow_vsp);
+
+    BOOST_CHECK_CLOSE(flow_vsp, 8.0, 1.0);
+
+    EN_close(ph_vsp);
+    EN_deleteproject(ph_vsp);
+
+    // --- Run no-VSP with computed speed ---
+    EN_createproject(&ph_novsp);
+    error = EN_open(ph_novsp, DATA_PATH_FLOW_NOVSP, DATA_PATH_RPT_B,
+                    DATA_PATH_OUT_B);
+    BOOST_REQUIRE(error == 0);
+
+    EN_getlinkindex(ph_novsp, (char*)"PU1", &lIdx);
+    EN_settimeparam(ph_novsp, EN_DURATION, 0);
+    EN_setlinkvalue(ph_novsp, lIdx, EN_INITSETTING, speed_vsp);
+
+    error = EN_solveH(ph_novsp);
+    BOOST_REQUIRE(error <= 6);
+
+    double flow_novsp;
+    EN_getlinkvalue(ph_novsp, lIdx, EN_FLOW, &flow_novsp);
+
+    BOOST_CHECK_CLOSE(flow_novsp, 8.0, 2.0);
+    BOOST_CHECK_CLOSE(flow_novsp, flow_vsp, 2.0);
+
+    EN_close(ph_novsp);
+    EN_deleteproject(ph_novsp);
 }
 
 // === MINSPEED test ===

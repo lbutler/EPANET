@@ -3391,6 +3391,7 @@ int DLLEXPORT EN_addlink(EN_Project p, const char *id, int linkType,
         pump->Epat = 0;
         pump->Ecost = 0;
         pump->Hset = 0.0;
+        pump->Qset = 0.0;
         pump->Nmin = 0.0;
         pump->Energy.TotalCost = MISSING;
     }
