@@ -226,6 +226,9 @@ int   runhyd(Project *pr, long *t)
             Network *net = &pr->network;
             int j, k, n1, n2;
             double h_target, q, disc;
+            double A, B, C, QC, expn;
+            double N, f, fp, dN;
+            double max_speed;
             Spump *pump;
 
             for (j = 1; j <= net->Npumps; j++)
@@ -243,18 +246,55 @@ int   runhyd(Project *pr, long *t)
                 n2 = net->Link[k].N2;
                 h_target = hyd->NodeHead[n2] - hyd->NodeHead[n1];
                 q = ABS(hyd->LinkFlow[k]);
+                max_speed = net->Link[k].InitSetting;
 
-                // For 1-point curve (C=2): N = sqrt((H_gain + R*Q^2) / (-H0))
-                // H0 and R are stored as negatives of curve coefficients
-                disc = (h_target + pump->R * q * q) / (-pump->H0);
-                if (disc > 0.0)
-                    hyd->LinkSetting[k] = sqrt(disc);
+                // Pump curve coefficients:
+                // A = shutoff head, B = flow coefficient, C = exponent
+                A = -pump->H0;
+                B = pump->R;
+                C = pump->N;
+
+                if (ABS(C - 2.0) < 1.0e-6)
+                {
+                    // 1-point curve (C=2): algebraic solution
+                    // Head gain = A*N^2 - B*Q^2
+                    disc = (h_target + B * q * q) / A;
+                    if (disc > 0.0)
+                        N = sqrt(disc);
+                    else
+                        N = 0.0;
+                }
                 else
-                    hyd->LinkSetting[k] = 0.0;
+                {
+                    // 3-point curve (C!=2): Newton-Raphson
+                    // Head gain = A*N^2 - B*Q^C*N^(2-C)
+                    // f(N)  = A*N^2 - B*QC*N^exp - h_target
+                    // f'(N) = 2*A*N - exp*B*QC*N^(exp-1)
+                    QC = pow(q, C);
+                    expn = 2.0 - C;
 
-                // Clamp speed to reasonable range
-                if (hyd->LinkSetting[k] < 0.01) hyd->LinkSetting[k] = 0.01;
-                if (hyd->LinkSetting[k] > 3.0) hyd->LinkSetting[k] = 3.0;
+                    N = 1.0;  // initial guess
+                    for (int iter = 0; iter < 20; iter++)
+                    {
+                        f = A * N * N - B * QC * pow(N, expn) - h_target;
+                        fp = 2.0 * A * N - expn * B * QC * pow(N, expn - 1.0);
+
+                        if (fabs(fp) < 1.0e-12) break;
+
+                        dN = f / fp;
+                        N = N - dN;
+
+                        if (N < 0.001) N = 0.001;
+                        if (N > 5.0)   N = 5.0;
+
+                        if (fabs(dN) < 1.0e-6) break;
+                    }
+                }
+
+                // Clamp speed to [0.01, max_speed]
+                if (N < 0.01) N = 0.01;
+                if (N > max_speed) N = max_speed;
+                hyd->LinkSetting[k] = N;
             }
         }
 

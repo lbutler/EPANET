@@ -299,9 +299,12 @@ StatusType  vsppumpstatus(Project *pr, int k, StatusType s, double hset,
 
     htol = hyd->Htol;
 
-    // Get pump's maximum head (shutoff head at full speed)
+    // Get pump's maximum head (shutoff head at max speed)
     p = findpump(net, k);
-    hmax = net->Pump[p].Hmax;
+    {
+        double max_speed = net->Link[k].InitSetting;
+        hmax = SQR(max_speed) * net->Pump[p].Hmax;
+    }
 
     status = s;
     switch (s)
