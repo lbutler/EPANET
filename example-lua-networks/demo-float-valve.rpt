@@ -1,0 +1,3397 @@
+  Page 1                                    Sun Mar 22 23:02:36 2026
+
+  ******************************************************************
+  *                           E P A N E T                          *
+  *                   Hydraulic and Water Quality                  *
+  *                   Analysis for Pipe Networks                   *
+  *                          Version 2.3.05                        *
+  ******************************************************************
+  
+  Float valve simulation in EPANET
+   
+      Input Data File ................... demo-float-valve.inp
+      Number of Junctions................ 4
+      Number of Reservoirs............... 1
+      Number of Tanks ................... 1
+      Number of Pipes ................... 3
+      Number of Pumps ................... 0
+      Number of Valves .................. 2
+      Headloss Formula .................. Darcy-Weisbach
+      Nodal Demand Model ................ DDA
+      Hydraulic Timestep ................ 15.00 min
+      Hydraulic Accuracy ................ 0.010000
+      Status Check Frequency ............ 2
+      Maximum Trials Checked ............ 10
+      Damping Limit Threshold ........... 0.000000
+      Maximum Trials .................... 500
+      Quality Analysis .................. None
+      Specific Gravity .................. 1.00
+      Relative Kinematic Viscosity ...... 1.00
+      Relative Chemical Diffusivity ..... 1.00
+      Demand Multiplier ................. 1.00
+      Total Duration .................... 1425.00 min
+      Reporting Criteria:
+         Selected Nodes
+         Selected Links
+   
+  Analysis begun Sun Mar 22 23:02:36 2026
+
+   
+  Hydraulic Status:
+  -----------------------------------------------------------------------
+     0:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 14.116564
+              Trial  2: relative flow change = 0.586676
+              Trial  3: relative flow change = 0.001437
+                        maximum  flow change = 0.0078 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.360 m | open=14.0% | K=5662.4
+      Lua script changed status — re-solving (pass 1)
+     0:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.024323
+              Trial  2: relative flow change = 0.025720
+              Trial  3: relative flow change = 0.000776
+                        maximum  flow change = 0.0040 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     0:00:00: Balanced after 3 trials
+     0:00:00: Reservoir Res is emptying
+     0:00:00: Tank Tank is closed at 2.36 m
+   
+    Step: level=2.360 m | open=14.0% | K=5662.4 | inflow=2.068 LPS
+     0:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.023594
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 1.2
+
+    Float valve: level=2.360 m | open=14.0% | K=5693.8
+      Lua script changed status — re-solving (pass 1)
+     0:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001135
+                        maximum  flow change = 0.0057 for Link Res.1
+                        maximum  head error  = 0.0002 for Link Res.1
+
+     0:15:00: Balanced after 1 trials
+     0:15:00: Tank Tank is filling at 2.36 m
+   
+    Step: level=2.360 m | open=14.0% | K=5693.8 | inflow=2.062 LPS
+     0:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.010254
+              Trial  2: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.364 m | open=13.6% | K=5999.5
+      Lua script changed status — re-solving (pass 1)
+     0:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.010662
+              Trial  2: relative flow change = 0.010920
+              Trial  3: relative flow change = 0.000141
+                        maximum  flow change = 0.0007 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     0:30:00: Balanced after 3 trials
+   
+    Step: level=2.364 m | open=13.6% | K=5999.5 | inflow=2.009 LPS
+     0:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001161
+                        maximum  flow change = 0.0113 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.368 m | open=13.2% | K=6361.2
+      Lua script changed status — re-solving (pass 1)
+     0:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.011873
+              Trial  2: relative flow change = 0.012193
+              Trial  3: relative flow change = 0.000176
+                        maximum  flow change = 0.0008 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     0:45:00: Balanced after 3 trials
+   
+    Step: level=2.368 m | open=13.2% | K=6361.2 | inflow=1.951 LPS
+     1:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.015806
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 1.2
+
+    Float valve: level=2.372 m | open=12.8% | K=6683.1
+      Lua script changed status — re-solving (pass 1)
+     1:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.010146
+              Trial  2: relative flow change = 0.010378
+              Trial  3: relative flow change = 0.000126
+                        maximum  flow change = 0.0006 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     1:00:00: Balanced after 3 trials
+   
+    Step: level=2.372 m | open=12.8% | K=6683.1 | inflow=1.904 LPS
+     1:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.004912
+                        maximum  flow change = 0.0448 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.376 m | open=12.4% | K=7161.3
+      Lua script changed status — re-solving (pass 1)
+     1:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.014131
+              Trial  2: relative flow change = 0.014584
+              Trial  3: relative flow change = 0.000248
+                        maximum  flow change = 0.0011 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     1:15:00: Balanced after 3 trials
+   
+    Step: level=2.376 m | open=12.4% | K=7161.3 | inflow=1.839 LPS
+     1:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.005029
+                        maximum  flow change = 0.0448 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.381 m | open=11.9% | K=7643.7
+      Lua script changed status — re-solving (pass 1)
+     1:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.013202
+              Trial  2: relative flow change = 0.013599
+              Trial  3: relative flow change = 0.000218
+                        maximum  flow change = 0.0009 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     1:30:00: Balanced after 3 trials
+   
+    Step: level=2.381 m | open=11.9% | K=7643.7 | inflow=1.780 LPS
+     1:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.003890
+                        maximum  flow change = 0.0336 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.384 m | open=11.6% | K=7993.8
+      Lua script changed status — re-solving (pass 1)
+     1:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009106
+                        maximum  flow change = 0.0390 for Link 1.2
+                        maximum  head error  = 0.0100 for Link Res.1
+
+     1:45:00: Balanced after 1 trials
+   
+    Step: level=2.384 m | open=11.6% | K=7993.8 | inflow=1.741 LPS
+     2:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.021066
+              Trial  2: relative flow change = 0.000101
+                        maximum  flow change = 0.0004 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.388 m | open=11.2% | K=8415.4
+      Lua script changed status — re-solving (pass 1)
+     2:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.010263
+              Trial  2: relative flow change = 0.010504
+              Trial  3: relative flow change = 0.000133
+                        maximum  flow change = 0.0006 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     2:00:00: Balanced after 3 trials
+   
+    Step: level=2.388 m | open=11.2% | K=8415.4 | inflow=1.696 LPS
+     2:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.013650
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.389 m | open=11.1% | K=8541.6
+      Lua script changed status — re-solving (pass 1)
+     2:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.003031
+                        maximum  flow change = 0.0125 for Link 1.2
+                        maximum  head error  = 0.0011 for Link Res.1
+
+     2:15:00: Balanced after 1 trials
+   
+    Step: level=2.389 m | open=11.1% | K=8541.6 | inflow=1.684 LPS
+     2:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.003053
+                        maximum  flow change = 0.0125 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.391 m | open=10.9% | K=8864.9
+      Lua script changed status — re-solving (pass 1)
+     2:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007518
+                        maximum  flow change = 0.0307 for Link Res.1
+                        maximum  head error  = 0.0069 for Link Res.1
+
+     2:30:00: Balanced after 1 trials
+   
+    Step: level=2.391 m | open=10.9% | K=8864.9 | inflow=1.653 LPS
+     2:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.021279
+              Trial  2: relative flow change = 0.000069
+                        maximum  flow change = 0.0003 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.394 m | open=10.6% | K=9177.7
+      Lua script changed status — re-solving (pass 1)
+     2:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006892
+                        maximum  flow change = 0.0282 for Link Res.1
+                        maximum  head error  = 0.0060 for Link Res.1
+
+     2:45:00: Balanced after 1 trials
+   
+    Step: level=2.394 m | open=10.6% | K=9177.7 | inflow=1.625 LPS
+     3:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.021236
+              Trial  2: relative flow change = 0.000061
+                        maximum  flow change = 0.0002 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.394 m | open=10.6% | K=9235.8
+      Lua script changed status — re-solving (pass 1)
+     3:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001279
+                        maximum  flow change = 0.0051 for Link 1.2
+                        maximum  head error  = 0.0002 for Link Res.1
+
+     3:00:00: Balanced after 1 trials
+   
+    Step: level=2.394 m | open=10.6% | K=9235.8 | inflow=1.619 LPS
+     3:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.004113
+                        maximum  flow change = 0.0225 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.396 m | open=10.4% | K=9450.7
+      Lua script changed status — re-solving (pass 1)
+     3:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.004647
+                        maximum  flow change = 0.0184 for Link Res.1
+                        maximum  head error  = 0.0026 for Link Res.1
+
+     3:15:00: Balanced after 1 trials
+   
+    Step: level=2.396 m | open=10.4% | K=9450.7 | inflow=1.601 LPS
+     3:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006249
+                        maximum  flow change = 0.0184 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.398 m | open=10.2% | K=9703.6
+      Lua script changed status — re-solving (pass 1)
+     3:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.005353
+                        maximum  flow change = 0.0209 for Link 1.2
+                        maximum  head error  = 0.0035 for Link Res.1
+
+     3:30:00: Balanced after 1 trials
+   
+    Step: level=2.398 m | open=10.2% | K=9703.6 | inflow=1.580 LPS
+     3:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006945
+                        maximum  flow change = 0.0209 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.399 m | open=10.1% | K=9951.0
+      Lua script changed status — re-solving (pass 1)
+     3:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.005092
+                        maximum  flow change = 0.0196 for Link 1.2
+                        maximum  head error  = 0.0032 for Link Res.1
+
+     3:45:00: Balanced after 1 trials
+   
+    Step: level=2.399 m | open=10.1% | K=9951.0 | inflow=1.560 LPS
+     4:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009650
+                        maximum  flow change = 0.0347 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.401 m | open=9.9% | K=10428.6
+      Lua script changed status — re-solving (pass 1)
+     4:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009411
+                        maximum  flow change = 0.0357 for Link 1.2
+                        maximum  head error  = 0.0110 for Link Res.1
+
+     4:00:00: Balanced after 1 trials
+   
+    Step: level=2.401 m | open=9.9% | K=10428.6 | inflow=1.524 LPS
+     4:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.025653
+              Trial  2: relative flow change = 0.000109
+                        maximum  flow change = 0.0004 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.402 m | open=9.8% | K=11245.3
+      Lua script changed status — re-solving (pass 1)
+     4:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.014639
+              Trial  2: relative flow change = 0.015141
+              Trial  3: relative flow change = 0.000279
+                        maximum  flow change = 0.0010 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     4:15:00: Balanced after 3 trials
+     4:15:00: Tank Tank is emptying at 2.40 m
+   
+    Step: level=2.402 m | open=9.8% | K=11245.3 | inflow=1.468 LPS
+     4:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.004548
+                        maximum  flow change = 0.0337 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.401 m | open=9.9% | K=10445.6
+      Lua script changed status — re-solving (pass 1)
+     4:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.014934
+              Trial  2: relative flow change = 0.014989
+              Trial  3: relative flow change = 0.000272
+                        maximum  flow change = 0.0010 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     4:30:00: Balanced after 3 trials
+     4:30:00: Tank Tank is closed at 2.40 m
+   
+    Step: level=2.401 m | open=9.9% | K=10445.6 | inflow=1.523 LPS
+     4:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.016051
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 1.2
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.401 m | open=9.9% | K=10313.6
+      Lua script changed status — re-solving (pass 1)
+     4:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002504
+                        maximum  flow change = 0.0097 for Link Res.1
+                        maximum  head error  = 0.0008 for Link Res.1
+
+     4:45:00: Balanced after 1 trials
+     4:45:00: Tank Tank is emptying at 2.40 m
+   
+    Step: level=2.401 m | open=9.9% | K=10313.6 | inflow=1.532 LPS
+     5:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.019684
+              Trial  2: relative flow change = 0.000007
+                        maximum  flow change = 0.0000 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.399 m | open=10.1% | K=9825.7
+      Lua script changed status — re-solving (pass 1)
+     5:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009503
+                        maximum  flow change = 0.0380 for Link 1.2
+                        maximum  head error  = 0.0117 for Link Res.1
+
+     5:00:00: Balanced after 1 trials
+   
+    Step: level=2.399 m | open=10.1% | K=9825.7 | inflow=1.570 LPS
+     5:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.016355
+              Trial  2: relative flow change = 0.000113
+                        maximum  flow change = 0.0005 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.395 m | open=10.5% | K=9317.7
+      Lua script changed status — re-solving (pass 1)
+     5:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.010409
+              Trial  2: relative flow change = 0.010440
+              Trial  3: relative flow change = 0.000137
+                        maximum  flow change = 0.0006 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     5:15:00: Balanced after 3 trials
+   
+    Step: level=2.395 m | open=10.5% | K=9317.7 | inflow=1.612 LPS
+     5:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.008167
+                        maximum  flow change = 0.0673 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.391 m | open=10.9% | K=8877.2
+      Lua script changed status — re-solving (pass 1)
+     5:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009615
+                        maximum  flow change = 0.0400 for Link 1.2
+                        maximum  head error  = 0.0117 for Link Res.1
+
+     5:30:00: Balanced after 1 trials
+   
+    Step: level=2.391 m | open=10.9% | K=8877.2 | inflow=1.652 LPS
+     5:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.030486
+              Trial  2: relative flow change = 0.000113
+                        maximum  flow change = 0.0005 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.389 m | open=11.1% | K=8570.3
+      Lua script changed status — re-solving (pass 1)
+     5:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006849
+                        maximum  flow change = 0.0296 for Link 1.2
+                        maximum  head error  = 0.0062 for Link Res.1
+
+     5:45:00: Balanced after 1 trials
+   
+    Step: level=2.389 m | open=11.1% | K=8570.3 | inflow=1.681 LPS
+     6:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.033383
+              Trial  2: relative flow change = 0.000058
+                        maximum  flow change = 0.0003 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.385 m | open=11.5% | K=8047.5
+      Lua script changed status — re-solving (pass 1)
+     6:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.012076
+              Trial  2: relative flow change = 0.012121
+              Trial  3: relative flow change = 0.000188
+                        maximum  flow change = 0.0009 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     6:00:00: Balanced after 3 trials
+   
+    Step: level=2.385 m | open=11.5% | K=8047.5 | inflow=1.735 LPS
+     6:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.014615
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.378 m | open=12.2% | K=7328.9
+      Lua script changed status — re-solving (pass 1)
+     6:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.017990
+              Trial  2: relative flow change = 0.018092
+              Trial  3: relative flow change = 0.000413
+                        maximum  flow change = 0.0020 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     6:15:00: Balanced after 3 trials
+   
+    Step: level=2.378 m | open=12.2% | K=7328.9 | inflow=1.818 LPS
+     6:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.076227
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.371 m | open=12.9% | K=6605.7
+      Lua script changed status — re-solving (pass 1)
+     6:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.018758
+              Trial  2: relative flow change = 0.018899
+              Trial  3: relative flow change = 0.000479
+                        maximum  flow change = 0.0026 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     6:30:00: Balanced after 3 trials
+   
+    Step: level=2.371 m | open=12.9% | K=6605.7 | inflow=1.915 LPS
+     6:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.050747
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.354 m | open=14.6% | K=5191.4
+      Lua script changed status — re-solving (pass 1)
+     6:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.043846
+              Trial  2: relative flow change = 0.044635
+              Trial  3: relative flow change = 0.002540
+                        maximum  flow change = 0.0156 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     6:45:00: Balanced after 3 trials
+   
+    Step: level=2.354 m | open=14.6% | K=5191.4 | inflow=2.160 LPS
+     7:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.065445
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.332 m | open=16.8% | K=3821.8
+      Lua script changed status — re-solving (pass 1)
+     7:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.062563
+              Trial  2: relative flow change = 0.063637
+              Trial  3: relative flow change = 0.004540
+                        maximum  flow change = 0.0294 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     7:00:00: Balanced after 3 trials
+   
+    Step: level=2.332 m | open=16.8% | K=3821.8 | inflow=2.517 LPS
+     7:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.036902
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.326 m | open=17.4% | K=3504.6
+      Lua script changed status — re-solving (pass 1)
+     7:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.016566
+              Trial  2: relative flow change = 0.016654
+              Trial  3: relative flow change = 0.000353
+                        maximum  flow change = 0.0025 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     7:15:00: Balanced after 3 trials
+   
+    Step: level=2.326 m | open=17.4% | K=3504.6 | inflow=2.629 LPS
+     7:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.013992
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.315 m | open=18.5% | K=2977.8
+      Lua script changed status — re-solving (pass 1)
+     7:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.032645
+              Trial  2: relative flow change = 0.032940
+              Trial  3: relative flow change = 0.001290
+                        maximum  flow change = 0.0094 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     7:30:00: Balanced after 3 trials
+   
+    Step: level=2.315 m | open=18.5% | K=2977.8 | inflow=2.852 LPS
+     7:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.018966
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.309 m | open=19.1% | K=2746.0
+      Lua script changed status — re-solving (pass 1)
+     7:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.015848
+              Trial  2: relative flow change = 0.015922
+              Trial  3: relative flow change = 0.000316
+                        maximum  flow change = 0.0024 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     7:45:00: Balanced after 3 trials
+   
+    Step: level=2.309 m | open=19.1% | K=2746.0 | inflow=2.970 LPS
+     8:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.022584
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.301 m | open=19.9% | K=2451.0
+      Lua script changed status — re-solving (pass 1)
+     8:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.023146
+              Trial  2: relative flow change = 0.023279
+              Trial  3: relative flow change = 0.000643
+                        maximum  flow change = 0.0051 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     8:00:00: Balanced after 3 trials
+   
+    Step: level=2.301 m | open=19.9% | K=2451.0 | inflow=3.143 LPS
+     8:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001481
+                        maximum  flow change = 0.0234 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.300 m | open=20.0% | K=2420.6
+      Lua script changed status — re-solving (pass 1)
+     8:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002490
+                        maximum  flow change = 0.0197 for Link Res.1
+                        maximum  head error  = 0.0008 for Link Res.1
+
+     8:15:00: Balanced after 1 trials
+   
+    Step: level=2.300 m | open=20.0% | K=2420.6 | inflow=3.163 LPS
+     8:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009688
+                        maximum  flow change = 0.1132 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.299 m | open=20.1% | K=2390.5
+      Lua script changed status — re-solving (pass 1)
+     8:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002521
+                        maximum  flow change = 0.0199 for Link 1.2
+                        maximum  head error  = 0.0008 for Link Res.1
+
+     8:30:00: Balanced after 1 trials
+     8:30:00: Tank Tank is filling at 2.30 m
+   
+    Step: level=2.299 m | open=20.1% | K=2390.5 | inflow=3.183 LPS
+     8:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.011237
+              Trial  2: relative flow change = 0.000008
+                        maximum  flow change = 0.0001 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.300 m | open=20.0% | K=2402.5
+      Lua script changed status — re-solving (pass 1)
+     8:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001008
+                        maximum  flow change = 0.0079 for Link 1.2
+                        maximum  head error  = 0.0001 for Link Res.1
+
+     8:45:00: Balanced after 1 trials
+   
+    Step: level=2.300 m | open=20.0% | K=2402.5 | inflow=3.175 LPS
+     9:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.020933
+              Trial  2: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.303 m | open=19.7% | K=2498.9
+      Lua script changed status — re-solving (pass 1)
+     9:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.008029
+                        maximum  flow change = 0.0612 for Link Res.1
+                        maximum  head error  = 0.0077 for Link Res.1
+
+     9:00:00: Balanced after 1 trials
+   
+    Step: level=2.303 m | open=19.7% | K=2498.9 | inflow=3.114 LPS
+     9:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.025008
+              Trial  2: relative flow change = 0.000078
+                        maximum  flow change = 0.0006 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.310 m | open=19.0% | K=2757.5
+      Lua script changed status — re-solving (pass 1)
+     9:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.019342
+              Trial  2: relative flow change = 0.020218
+              Trial  3: relative flow change = 0.000486
+                        maximum  flow change = 0.0036 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+     9:15:00: Balanced after 3 trials
+     9:15:00: Tank Tank is closed at 2.31 m
+   
+    Step: level=2.310 m | open=19.0% | K=2757.5 | inflow=2.964 LPS
+     9:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006849
+                        maximum  flow change = 0.1020 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.310 m | open=19.0% | K=2772.7
+      Lua script changed status — re-solving (pass 1)
+     9:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001095
+                        maximum  flow change = 0.0081 for Link 1.2
+                        maximum  head error  = 0.0002 for Link Res.1
+
+     9:30:00: Balanced after 1 trials
+     9:30:00: Tank Tank is emptying at 2.31 m
+   
+    Step: level=2.310 m | open=19.0% | K=2772.7 | inflow=2.955 LPS
+     9:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.016594
+              Trial  2: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.309 m | open=19.1% | K=2732.7
+      Lua script changed status — re-solving (pass 1)
+     9:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002952
+                        maximum  flow change = 0.0217 for Link Res.1
+                        maximum  head error  = 0.0011 for Link Res.1
+
+     9:45:00: Balanced after 1 trials
+     9:45:00: Tank Tank is filling at 2.31 m
+   
+    Step: level=2.309 m | open=19.1% | K=2732.7 | inflow=2.977 LPS
+    10:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.014694
+              Trial  2: relative flow change = 0.000011
+                        maximum  flow change = 0.0001 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.311 m | open=18.9% | K=2811.4
+      Lua script changed status — re-solving (pass 1)
+    10:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.005762
+                        maximum  flow change = 0.0417 for Link Res.1
+                        maximum  head error  = 0.0040 for Link Res.1
+
+    10:00:00: Balanced after 1 trials
+   
+    Step: level=2.311 m | open=18.9% | K=2811.4 | inflow=2.935 LPS
+    10:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007413
+                        maximum  flow change = 0.0417 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.316 m | open=18.4% | K=3003.7
+      Lua script changed status — re-solving (pass 1)
+    10:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.013299
+              Trial  2: relative flow change = 0.013660
+              Trial  3: relative flow change = 0.000222
+                        maximum  flow change = 0.0016 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    10:15:00: Balanced after 3 trials
+   
+    Step: level=2.316 m | open=18.4% | K=3003.7 | inflow=2.840 LPS
+    10:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.022198
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 1.2
+                        maximum  head error  = 0.0000 for Link 1.2
+
+    Float valve: level=2.319 m | open=18.1% | K=3137.3
+      Lua script changed status — re-solving (pass 1)
+    10:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.008535
+                        maximum  flow change = 0.0605 for Link 1.2
+                        maximum  head error  = 0.0095 for Link Res.1
+
+    10:30:00: Balanced after 1 trials
+    10:30:00: Tank Tank is emptying at 2.32 m
+   
+    Step: level=2.319 m | open=18.1% | K=3137.3 | inflow=2.779 LPS
+    10:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.012645
+              Trial  2: relative flow change = 0.000093
+                        maximum  flow change = 0.0007 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.317 m | open=18.3% | K=3078.6
+      Lua script changed status — re-solving (pass 1)
+    10:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.003741
+                        maximum  flow change = 0.0265 for Link 1.2
+                        maximum  head error  = 0.0018 for Link Res.1
+
+    10:45:00: Balanced after 1 trials
+   
+    Step: level=2.317 m | open=18.3% | K=3078.6 | inflow=2.805 LPS
+    11:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.041108
+              Trial  2: relative flow change = 0.000018
+                        maximum  flow change = 0.0001 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.314 m | open=18.6% | K=2952.1
+      Lua script changed status — re-solving (pass 1)
+    11:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.008694
+                        maximum  flow change = 0.0601 for Link Res.1
+                        maximum  head error  = 0.0088 for Link Res.1
+
+    11:00:00: Balanced after 1 trials
+    11:00:00: Tank Tank is filling at 2.31 m
+   
+    Step: level=2.314 m | open=18.6% | K=2952.1 | inflow=2.865 LPS
+    11:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.024621
+              Trial  2: relative flow change = 0.000089
+                        maximum  flow change = 0.0006 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.319 m | open=18.1% | K=3145.9
+      Lua script changed status — re-solving (pass 1)
+    11:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.012609
+              Trial  2: relative flow change = 0.012975
+              Trial  3: relative flow change = 0.000203
+                        maximum  flow change = 0.0014 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    11:15:00: Balanced after 3 trials
+   
+    Step: level=2.319 m | open=18.1% | K=3145.9 | inflow=2.775 LPS
+    11:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.032251
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 1.2
+
+    Float valve: level=2.320 m | open=18.0% | K=3186.7
+      Lua script changed status — re-solving (pass 1)
+    11:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002665
+                        maximum  flow change = 0.0178 for Link 1.2
+                        maximum  head error  = 0.0008 for Link Res.1
+
+    11:30:00: Balanced after 1 trials
+   
+    Step: level=2.320 m | open=18.0% | K=3186.7 | inflow=2.757 LPS
+    11:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.016919
+              Trial  2: relative flow change = 0.000009
+                        maximum  flow change = 0.0001 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.327 m | open=17.3% | K=3514.0
+      Lua script changed status — re-solving (pass 1)
+    11:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.019391
+              Trial  2: relative flow change = 0.020267
+              Trial  3: relative flow change = 0.000484
+                        maximum  flow change = 0.0031 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    11:45:00: Balanced after 3 trials
+   
+    Step: level=2.327 m | open=17.3% | K=3514.0 | inflow=2.625 LPS
+    12:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.004344
+                        maximum  flow change = 0.0561 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.329 m | open=17.1% | K=3622.7
+      Lua script changed status — re-solving (pass 1)
+    12:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006139
+                        maximum  flow change = 0.0394 for Link Res.1
+                        maximum  head error  = 0.0046 for Link Res.1
+
+    12:00:00: Balanced after 1 trials
+   
+    Step: level=2.329 m | open=17.1% | K=3622.7 | inflow=2.586 LPS
+    12:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.019247
+              Trial  2: relative flow change = 0.000046
+                        maximum  flow change = 0.0003 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.332 m | open=16.8% | K=3776.3
+      Lua script changed status — re-solving (pass 1)
+    12:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.008200
+                        maximum  flow change = 0.0526 for Link 1.2
+                        maximum  head error  = 0.0086 for Link Res.1
+
+    12:15:00: Balanced after 1 trials
+    12:15:00: Tank Tank is closed at 2.33 m
+   
+    Step: level=2.332 m | open=16.8% | K=3776.3 | inflow=2.533 LPS
+    12:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.017420
+              Trial  2: relative flow change = 0.000087
+                        maximum  flow change = 0.0005 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.332 m | open=16.8% | K=3777.7
+      Lua script changed status — re-solving (pass 1)
+    12:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000076
+                        maximum  flow change = 0.0005 for Link Res.1
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    12:30:00: Balanced after 1 trials
+    12:30:00: Tank Tank is filling at 2.33 m
+   
+    Step: level=2.332 m | open=16.8% | K=3777.7 | inflow=2.532 LPS
+    12:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000966
+                        maximum  flow change = 0.0112 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.333 m | open=16.7% | K=3824.1
+      Lua script changed status — re-solving (pass 1)
+    12:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002449
+                        maximum  flow change = 0.0154 for Link 1.2
+                        maximum  head error  = 0.0007 for Link Res.1
+
+    12:45:00: Balanced after 1 trials
+   
+    Step: level=2.333 m | open=16.7% | K=3824.1 | inflow=2.517 LPS
+    13:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.021975
+              Trial  2: relative flow change = 0.000007
+                        maximum  flow change = 0.0000 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.334 m | open=16.6% | K=3879.3
+      Lua script changed status — re-solving (pass 1)
+    13:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002810
+                        maximum  flow change = 0.0179 for Link 1.2
+                        maximum  head error  = 0.0010 for Link Res.1
+
+    13:00:00: Balanced after 1 trials
+    13:00:00: Tank Tank is emptying at 2.33 m
+   
+    Step: level=2.334 m | open=16.6% | K=3879.3 | inflow=2.499 LPS
+    13:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.005466
+                        maximum  flow change = 0.0337 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.331 m | open=16.9% | K=3735.2
+      Lua script changed status — re-solving (pass 1)
+    13:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007524
+                        maximum  flow change = 0.0482 for Link 1.2
+                        maximum  head error  = 0.0072 for Link Res.1
+
+    13:15:00: Balanced after 1 trials
+   
+    Step: level=2.331 m | open=16.9% | K=3735.2 | inflow=2.547 LPS
+    13:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.028295
+              Trial  2: relative flow change = 0.000072
+                        maximum  flow change = 0.0005 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.327 m | open=17.3% | K=3560.0
+      Lua script changed status — re-solving (pass 1)
+    13:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009794
+                        maximum  flow change = 0.0626 for Link Res.1
+                        maximum  head error  = 0.0115 for Link Res.1
+
+    13:30:00: Balanced after 1 trials
+    13:30:00: Tank Tank is filling at 2.33 m
+   
+    Step: level=2.327 m | open=17.3% | K=3560.0 | inflow=2.609 LPS
+    13:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.030260
+              Trial  2: relative flow change = 0.000114
+                        maximum  flow change = 0.0008 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.328 m | open=17.2% | K=3605.6
+      Lua script changed status — re-solving (pass 1)
+    13:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002508
+                        maximum  flow change = 0.0165 for Link Res.1
+                        maximum  head error  = 0.0008 for Link Res.1
+
+    13:45:00: Balanced after 1 trials
+    13:45:00: Tank Tank is emptying at 2.33 m
+   
+    Step: level=2.328 m | open=17.2% | K=3605.6 | inflow=2.592 LPS
+    14:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009377
+                        maximum  flow change = 0.0908 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.326 m | open=17.4% | K=3503.7
+      Lua script changed status — re-solving (pass 1)
+    14:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.005680
+                        maximum  flow change = 0.0377 for Link 1.2
+                        maximum  head error  = 0.0041 for Link Res.1
+
+    14:00:00: Balanced after 1 trials
+   
+    Step: level=2.326 m | open=17.4% | K=3503.7 | inflow=2.629 LPS
+    14:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007377
+                        maximum  flow change = 0.0377 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.323 m | open=17.7% | K=3333.6
+      Lua script changed status — re-solving (pass 1)
+    14:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.010000
+                        maximum  flow change = 0.0671 for Link Res.1
+                        maximum  head error  = 0.0124 for Link Res.1
+
+    14:15:00: Balanced after 1 trials
+   
+    Step: level=2.323 m | open=17.7% | K=3333.6 | inflow=2.696 LPS
+    14:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.016764
+              Trial  2: relative flow change = 0.000124
+                        maximum  flow change = 0.0008 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.320 m | open=18.0% | K=3209.3
+      Lua script changed status — re-solving (pass 1)
+    14:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007665
+                        maximum  flow change = 0.0522 for Link 1.2
+                        maximum  head error  = 0.0072 for Link Res.1
+
+    14:30:00: Balanced after 1 trials
+   
+    Step: level=2.320 m | open=18.0% | K=3209.3 | inflow=2.748 LPS
+    14:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.011062
+              Trial  2: relative flow change = 0.000073
+                        maximum  flow change = 0.0005 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.320 m | open=18.0% | K=3186.5
+      Lua script changed status — re-solving (pass 1)
+    14:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001433
+                        maximum  flow change = 0.0098 for Link 1.2
+                        maximum  head error  = 0.0003 for Link Res.1
+
+    14:45:00: Balanced after 1 trials
+    14:45:00: Tank Tank is filling at 2.32 m
+   
+    Step: level=2.320 m | open=18.0% | K=3186.5 | inflow=2.757 LPS
+    15:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.004765
+                        maximum  flow change = 0.0459 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.321 m | open=17.9% | K=3225.3
+      Lua script changed status — re-solving (pass 1)
+    15:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002414
+                        maximum  flow change = 0.0166 for Link 1.2
+                        maximum  head error  = 0.0007 for Link Res.1
+
+    15:00:00: Balanced after 1 trials
+    15:00:00: Tank Tank is closed at 2.32 m
+   
+    Step: level=2.321 m | open=17.9% | K=3225.3 | inflow=2.740 LPS
+    15:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.013371
+              Trial  2: relative flow change = 0.000007
+                        maximum  flow change = 0.0001 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.321 m | open=17.9% | K=3241.4
+      Lua script changed status — re-solving (pass 1)
+    15:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001006
+                        maximum  flow change = 0.0068 for Link 1.2
+                        maximum  head error  = 0.0001 for Link Res.1
+
+    15:15:00: Balanced after 1 trials
+    15:15:00: Tank Tank is filling at 2.32 m
+   
+    Step: level=2.321 m | open=17.9% | K=3241.4 | inflow=2.733 LPS
+    15:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.005210
+                        maximum  flow change = 0.0571 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.323 m | open=17.7% | K=3342.8
+      Lua script changed status — re-solving (pass 1)
+    15:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006148
+                        maximum  flow change = 0.0415 for Link Res.1
+                        maximum  head error  = 0.0047 for Link Res.1
+
+    15:30:00: Balanced after 1 trials
+   
+    Step: level=2.323 m | open=17.7% | K=3342.8 | inflow=2.692 LPS
+    15:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.014552
+              Trial  2: relative flow change = 0.000047
+                        maximum  flow change = 0.0003 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.324 m | open=17.6% | K=3404.3
+      Lua script changed status — re-solving (pass 1)
+    15:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.003610
+                        maximum  flow change = 0.0243 for Link 1.2
+                        maximum  head error  = 0.0017 for Link Res.1
+
+    15:45:00: Balanced after 1 trials
+    15:45:00: Tank Tank is emptying at 2.32 m
+   
+    Step: level=2.324 m | open=17.6% | K=3404.3 | inflow=2.667 LPS
+    16:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.011324
+              Trial  2: relative flow change = 0.000017
+                        maximum  flow change = 0.0001 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.324 m | open=17.6% | K=3362.8
+      Lua script changed status — re-solving (pass 1)
+    16:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002463
+                        maximum  flow change = 0.0164 for Link 1.2
+                        maximum  head error  = 0.0008 for Link Res.1
+
+    16:00:00: Balanced after 1 trials
+    16:00:00: Tank Tank is closed at 2.32 m
+   
+    Step: level=2.324 m | open=17.6% | K=3362.8 | inflow=2.684 LPS
+    16:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.012474
+              Trial  2: relative flow change = 0.000007
+                        maximum  flow change = 0.0001 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.324 m | open=17.6% | K=3372.9
+      Lua script changed status — re-solving (pass 1)
+    16:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000596
+                        maximum  flow change = 0.0040 for Link 1.2
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    16:15:00: Balanced after 1 trials
+    16:15:00: Tank Tank is emptying at 2.32 m
+   
+    Step: level=2.324 m | open=17.6% | K=3372.9 | inflow=2.680 LPS
+    16:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.029902
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 1.2
+
+    Float valve: level=2.322 m | open=17.8% | K=3304.6
+      Lua script changed status — re-solving (pass 1)
+    16:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.003966
+                        maximum  flow change = 0.0277 for Link 1.2
+                        maximum  head error  = 0.0021 for Link Res.1
+
+    16:30:00: Balanced after 1 trials
+   
+    Step: level=2.322 m | open=17.8% | K=3304.6 | inflow=2.707 LPS
+    16:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.022942
+              Trial  2: relative flow change = 0.000021
+                        maximum  flow change = 0.0001 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.315 m | open=18.5% | K=2985.6
+      Lua script changed status — re-solving (pass 1)
+    16:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.020583
+              Trial  2: relative flow change = 0.020689
+              Trial  3: relative flow change = 0.000512
+                        maximum  flow change = 0.0037 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    16:45:00: Balanced after 3 trials
+   
+    Step: level=2.315 m | open=18.5% | K=2985.6 | inflow=2.848 LPS
+    17:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.047268
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.314 m | open=18.6% | K=2934.7
+      Lua script changed status — re-solving (pass 1)
+    17:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.003599
+                        maximum  flow change = 0.0247 for Link Res.1
+                        maximum  head error  = 0.0015 for Link Res.1
+
+    17:00:00: Balanced after 1 trials
+    17:00:00: Tank Tank is filling at 2.31 m
+   
+    Step: level=2.314 m | open=18.6% | K=2934.7 | inflow=2.873 LPS
+    17:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.014974
+              Trial  2: relative flow change = 0.000015
+                        maximum  flow change = 0.0001 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.322 m | open=17.8% | K=3276.0
+      Lua script changed status — re-solving (pass 1)
+    17:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.021942
+              Trial  2: relative flow change = 0.023065
+              Trial  3: relative flow change = 0.000618
+                        maximum  flow change = 0.0041 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    17:15:00: Balanced after 3 trials
+   
+    Step: level=2.322 m | open=17.8% | K=3276.0 | inflow=2.719 LPS
+    17:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001679
+                        maximum  flow change = 0.0224 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.325 m | open=17.5% | K=3455.4
+      Lua script changed status — re-solving (pass 1)
+    17:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.010690
+              Trial  2: relative flow change = 0.010951
+              Trial  3: relative flow change = 0.000144
+                        maximum  flow change = 0.0009 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    17:30:00: Balanced after 3 trials
+   
+    Step: level=2.325 m | open=17.5% | K=3455.4 | inflow=2.647 LPS
+    17:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002579
+                        maximum  flow change = 0.0336 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.328 m | open=17.2% | K=3577.9
+      Lua script changed status — re-solving (pass 1)
+    17:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007007
+                        maximum  flow change = 0.0453 for Link Res.1
+                        maximum  head error  = 0.0061 for Link Res.1
+
+    17:45:00: Balanced after 1 trials
+   
+    Step: level=2.328 m | open=17.2% | K=3577.9 | inflow=2.602 LPS
+    18:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.034340
+              Trial  2: relative flow change = 0.000060
+                        maximum  flow change = 0.0004 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.331 m | open=16.9% | K=3729.3
+      Lua script changed status — re-solving (pass 1)
+    18:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.008063
+                        maximum  flow change = 0.0528 for Link 1.2
+                        maximum  head error  = 0.0086 for Link Res.1
+
+    18:00:00: Balanced after 1 trials
+    18:00:00: Tank Tank is emptying at 2.33 m
+   
+    Step: level=2.331 m | open=16.9% | K=3729.3 | inflow=2.549 LPS
+    18:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.016854
+              Trial  2: relative flow change = 0.000084
+                        maximum  flow change = 0.0005 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.328 m | open=17.2% | K=3587.4
+      Lua script changed status — re-solving (pass 1)
+    18:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007629
+                        maximum  flow change = 0.0504 for Link 1.2
+                        maximum  head error  = 0.0075 for Link Res.1
+
+    18:15:00: Balanced after 1 trials
+   
+    Step: level=2.328 m | open=17.2% | K=3587.4 | inflow=2.599 LPS
+    18:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.012639
+              Trial  2: relative flow change = 0.000073
+                        maximum  flow change = 0.0005 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.323 m | open=17.7% | K=3339.1
+      Lua script changed status — re-solving (pass 1)
+    18:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.014244
+              Trial  2: relative flow change = 0.014300
+              Trial  3: relative flow change = 0.000252
+                        maximum  flow change = 0.0017 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    18:30:00: Balanced after 3 trials
+   
+    Step: level=2.323 m | open=17.7% | K=3339.1 | inflow=2.693 LPS
+    18:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.027900
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 1.2
+
+    Float valve: level=2.319 m | open=18.1% | K=3155.7
+      Lua script changed status — re-solving (pass 1)
+    18:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.011564
+              Trial  2: relative flow change = 0.011595
+              Trial  3: relative flow change = 0.000161
+                        maximum  flow change = 0.0011 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    18:45:00: Balanced after 3 trials
+    18:45:00: Tank Tank is filling at 2.32 m
+   
+    Step: level=2.319 m | open=18.1% | K=3155.7 | inflow=2.770 LPS
+    19:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009013
+                        maximum  flow change = 0.1245 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.321 m | open=17.9% | K=3258.6
+      Lua script changed status — re-solving (pass 1)
+    19:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006379
+                        maximum  flow change = 0.0438 for Link 1.2
+                        maximum  head error  = 0.0052 for Link Res.1
+
+    19:00:00: Balanced after 1 trials
+   
+    Step: level=2.321 m | open=17.9% | K=3258.6 | inflow=2.727 LPS
+    19:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.010711
+              Trial  2: relative flow change = 0.000052
+                        maximum  flow change = 0.0004 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.322 m | open=17.8% | K=3283.6
+      Lua script changed status — re-solving (pass 1)
+    19:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001527
+                        maximum  flow change = 0.0104 for Link Res.1
+                        maximum  head error  = 0.0003 for Link Res.1
+
+    19:15:00: Balanced after 1 trials
+   
+    Step: level=2.322 m | open=17.8% | K=3283.6 | inflow=2.716 LPS
+    19:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.004085
+                        maximum  flow change = 0.0347 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.323 m | open=17.7% | K=3317.2
+      Lua script changed status — re-solving (pass 1)
+    19:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.002037
+                        maximum  flow change = 0.0138 for Link Res.1
+                        maximum  head error  = 0.0005 for Link Res.1
+
+    19:30:00: Balanced after 1 trials
+    19:30:00: Tank Tank is closed at 2.32 m
+   
+    Step: level=2.323 m | open=17.7% | K=3317.2 | inflow=2.702 LPS
+    19:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.015201
+              Trial  2: relative flow change = 0.000005
+                        maximum  flow change = 0.0000 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.323 m | open=17.7% | K=3321.7
+      Lua script changed status — re-solving (pass 1)
+    19:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000262
+                        maximum  flow change = 0.0018 for Link 1.2
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    19:45:00: Balanced after 1 trials
+    19:45:00: Tank Tank is emptying at 2.32 m
+   
+    Step: level=2.323 m | open=17.7% | K=3321.7 | inflow=2.700 LPS
+    20:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.013634
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.320 m | open=18.0% | K=3201.3
+      Lua script changed status — re-solving (pass 1)
+    20:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007460
+                        maximum  flow change = 0.0508 for Link 1.2
+                        maximum  head error  = 0.0068 for Link Res.1
+
+    20:00:00: Balanced after 1 trials
+    20:00:00: Tank Tank is closed at 2.32 m
+   
+    Step: level=2.320 m | open=18.0% | K=3201.3 | inflow=2.751 LPS
+    20:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.015934
+              Trial  2: relative flow change = 0.000069
+                        maximum  flow change = 0.0005 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.320 m | open=18.0% | K=3195.7
+      Lua script changed status — re-solving (pass 1)
+    20:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000352
+                        maximum  flow change = 0.0024 for Link 1.2
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    20:15:00: Balanced after 1 trials
+    20:15:00: Tank Tank is filling at 2.32 m
+   
+    Step: level=2.320 m | open=18.0% | K=3195.7 | inflow=2.753 LPS
+    20:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006998
+                        maximum  flow change = 0.0898 for Link Tank.4
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.322 m | open=17.8% | K=3295.1
+      Lua script changed status — re-solving (pass 1)
+    20:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006180
+                        maximum  flow change = 0.0415 for Link 1.2
+                        maximum  head error  = 0.0047 for Link Res.1
+
+    20:30:00: Balanced after 1 trials
+   
+    Step: level=2.322 m | open=17.8% | K=3295.1 | inflow=2.711 LPS
+    20:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.028098
+              Trial  2: relative flow change = 0.000049
+                        maximum  flow change = 0.0003 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.325 m | open=17.5% | K=3459.7
+      Lua script changed status — re-solving (pass 1)
+    20:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009972
+                        maximum  flow change = 0.0645 for Link 1.2
+                        maximum  head error  = 0.0119 for Link Res.1
+
+    20:45:00: Balanced after 1 trials
+   
+    Step: level=2.325 m | open=17.5% | K=3459.7 | inflow=2.647 LPS
+    21:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.050500
+              Trial  2: relative flow change = 0.000118
+                        maximum  flow change = 0.0008 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.332 m | open=16.8% | K=3809.4
+      Lua script changed status — re-solving (pass 1)
+    21:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.018534
+              Trial  2: relative flow change = 0.019347
+              Trial  3: relative flow change = 0.000455
+                        maximum  flow change = 0.0029 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    21:00:00: Balanced after 3 trials
+    21:00:00: Tank Tank is emptying at 2.33 m
+   
+    Step: level=2.332 m | open=16.8% | K=3809.4 | inflow=2.521 LPS
+    21:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.017933
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 1.2
+
+    Float valve: level=2.329 m | open=17.1% | K=3631.1
+      Lua script changed status — re-solving (pass 1)
+    21:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.009714
+                        maximum  flow change = 0.0619 for Link Res.1
+                        maximum  head error  = 0.0115 for Link Res.1
+
+    21:15:00: Balanced after 1 trials
+    21:15:00: Tank Tank is closed at 2.33 m
+   
+    Step: level=2.329 m | open=17.1% | K=3631.1 | inflow=2.583 LPS
+    21:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.030645
+              Trial  2: relative flow change = 0.000118
+                        maximum  flow change = 0.0007 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.329 m | open=17.1% | K=3618.7
+      Lua script changed status — re-solving (pass 1)
+    21:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000700
+                        maximum  flow change = 0.0044 for Link Res.1
+                        maximum  head error  = 0.0001 for Link Res.1
+
+    21:30:00: Balanced after 1 trials
+    21:30:00: Tank Tank is filling at 2.33 m
+   
+    Step: level=2.329 m | open=17.1% | K=3618.7 | inflow=2.587 LPS
+    21:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.020946
+              Trial  2: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.333 m | open=16.7% | K=3842.4
+      Lua script changed status — re-solving (pass 1)
+    21:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.011826
+              Trial  2: relative flow change = 0.012149
+              Trial  3: relative flow change = 0.000179
+                        maximum  flow change = 0.0011 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    21:45:00: Balanced after 3 trials
+    21:45:00: Tank Tank is closed at 2.33 m
+   
+    Step: level=2.333 m | open=16.7% | K=3842.4 | inflow=2.511 LPS
+    22:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.015563
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 1.2
+
+    Float valve: level=2.332 m | open=16.8% | K=3821.2
+      Lua script changed status — re-solving (pass 1)
+    22:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.001126
+                        maximum  flow change = 0.0070 for Link Res.1
+                        maximum  head error  = 0.0002 for Link Res.1
+
+    22:00:00: Balanced after 1 trials
+    22:00:00: Tank Tank is filling at 2.33 m
+   
+    Step: level=2.332 m | open=16.8% | K=3821.2 | inflow=2.518 LPS
+    22:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.014641
+              Trial  2: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.335 m | open=16.5% | K=3946.9
+      Lua script changed status — re-solving (pass 1)
+    22:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.006414
+                        maximum  flow change = 0.0401 for Link 1.2
+                        maximum  head error  = 0.0052 for Link Res.1
+
+    22:15:00: Balanced after 1 trials
+    22:15:00: Tank Tank is closed at 2.33 m
+   
+    Step: level=2.335 m | open=16.5% | K=3946.9 | inflow=2.477 LPS
+    22:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.017241
+              Trial  2: relative flow change = 0.000052
+                        maximum  flow change = 0.0003 for Link 2.3
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.335 m | open=16.5% | K=3947.9
+      Lua script changed status — re-solving (pass 1)
+    22:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000050
+                        maximum  flow change = 0.0003 for Link 1.2
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    22:30:00: Balanced after 1 trials
+    22:30:00: Tank Tank is emptying at 2.33 m
+   
+    Step: level=2.335 m | open=16.5% | K=3947.9 | inflow=2.477 LPS
+    22:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.036502
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.332 m | open=16.8% | K=3814.4
+      Lua script changed status — re-solving (pass 1)
+    22:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007102
+                        maximum  flow change = 0.0433 for Link 1.2
+                        maximum  head error  = 0.0059 for Link Res.1
+
+    22:45:00: Balanced after 1 trials
+    22:45:00: Tank Tank is filling at 2.33 m
+   
+    Step: level=2.332 m | open=16.8% | K=3814.4 | inflow=2.520 LPS
+    23:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.011625
+              Trial  2: relative flow change = 0.000060
+                        maximum  flow change = 0.0004 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.336 m | open=16.4% | K=4019.8
+      Lua script changed status — re-solving (pass 1)
+    23:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.010536
+              Trial  2: relative flow change = 0.010789
+              Trial  3: relative flow change = 0.000139
+                        maximum  flow change = 0.0008 for Link 2.3
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    23:00:00: Balanced after 3 trials
+   
+    Step: level=2.336 m | open=16.4% | K=4019.8 | inflow=2.455 LPS
+    23:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.022965
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Tank.4
+
+    Float valve: level=2.339 m | open=16.1% | K=4171.4
+      Lua script changed status — re-solving (pass 1)
+    23:15:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.007609
+                        maximum  flow change = 0.0446 for Link Res.1
+                        maximum  head error  = 0.0069 for Link Res.1
+
+    23:15:00: Balanced after 1 trials
+   
+    Step: level=2.339 m | open=16.1% | K=4171.4 | inflow=2.410 LPS
+    23:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.020715
+              Trial  2: relative flow change = 0.000072
+                        maximum  flow change = 0.0004 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link 3.Tank
+
+    Float valve: level=2.345 m | open=15.5% | K=4566.0
+      Lua script changed status — re-solving (pass 1)
+    23:30:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.018466
+              Trial  2: relative flow change = 0.019247
+              Trial  3: relative flow change = 0.000425
+                        maximum  flow change = 0.0024 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    23:30:00: Balanced after 3 trials
+   
+    Step: level=2.345 m | open=15.5% | K=4566.0 | inflow=2.303 LPS
+    23:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.020899
+              Trial  2: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    Float valve: level=2.351 m | open=14.9% | K=4994.4
+      Lua script changed status — re-solving (pass 1)
+    23:45:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.018575
+              Trial  2: relative flow change = 0.019359
+              Trial  3: relative flow change = 0.000425
+                        maximum  flow change = 0.0022 for Link 3.Tank
+                        maximum  head error  = 0.0000 for Link Res.1
+
+    23:45:00: Balanced after 3 trials
+   
+    Step: level=2.351 m | open=14.9% | K=4994.4 | inflow=2.202 LPS
+  Hydraulic Flow Balance (L/s)
+  ================================
+  Total Inflow:             2.422
+  Consumer Demand:          2.431
+  Demand Deficit:           0.000
+  Emitter Flow:             0.000
+  Leakage Flow:             0.000
+  Total Outflow:            2.431
+  Storage Flow:            -0.007
+  Flow Ratio:               1.001
+  ================================
+
+  Analysis ended Sun Mar 22 23:02:36 2026
+
+   
+  Node Results at 0:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.03    102.36      2.36  Tank
+   
+   
+  Link Results at 0:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.07      0.26     20.00   5662.37  TCV
+   
+   
+  Node Results at 0:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.27    102.36      2.36  Tank
+   
+   
+  Link Results at 0:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.06      0.26     20.00   5693.82  TCV
+   
+   
+  Node Results at 0:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.30    102.36      2.36  Tank
+   
+   
+  Link Results at 0:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.01      0.26     20.00   5999.52  TCV
+   
+   
+  Node Results at 0:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.25    102.37      2.37  Tank
+   
+   
+  Link Results at 0:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.95      0.25     20.00   6361.24  TCV
+   
+   
+  Node Results at 1:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.35    102.37      2.37  Tank
+   
+   
+  Link Results at 1:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.90      0.24     20.00   6683.14  TCV
+   
+   
+  Node Results at 1:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.33    102.38      2.38  Tank
+   
+   
+  Link Results at 1:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.84      0.23     20.00   7161.29  TCV
+   
+   
+  Node Results at 1:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.23    102.38      2.38  Tank
+   
+   
+  Link Results at 1:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.78      0.23     20.00   7643.73  TCV
+   
+   
+  Node Results at 1:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.26    102.38      2.38  Tank
+   
+   
+  Link Results at 1:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.74      0.22     20.00   7993.80  TCV
+   
+   
+  Node Results at 2:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.08    102.39      2.39  Tank
+   
+   
+  Link Results at 2:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.70      0.22     20.00   8415.35  TCV
+   
+   
+  Node Results at 2:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.19    102.39      2.39  Tank
+   
+   
+  Link Results at 2:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.68      0.21     20.00   8541.55  TCV
+   
+   
+  Node Results at 2:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.18    102.39      2.39  Tank
+   
+   
+  Link Results at 2:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.65      0.21     20.00   8864.88  TCV
+   
+   
+  Node Results at 2:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.03    102.39      2.39  Tank
+   
+   
+  Link Results at 2:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.62      0.21     20.00   9177.71  TCV
+   
+   
+  Node Results at 3:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.12    102.39      2.39  Tank
+   
+   
+  Link Results at 3:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.62      0.21     20.00   9235.83  TCV
+   
+   
+  Node Results at 3:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.13    102.40      2.40  Tank
+   
+   
+  Link Results at 3:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.60      0.20     20.00   9450.67  TCV
+   
+   
+  Node Results at 3:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.13    102.40      2.40  Tank
+   
+   
+  Link Results at 3:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.58      0.20     20.00   9703.60  TCV
+   
+   
+  Node Results at 3:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.09    102.40      2.40  Tank
+   
+   
+  Link Results at 3:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.56      0.20     20.00   9950.95  TCV
+   
+   
+  Node Results at 4:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.11    102.40      2.40  Tank
+   
+   
+  Link Results at 4:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.52      0.19     20.00  10428.62  TCV
+   
+   
+  Node Results at 4:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.11    102.40      2.40  Tank
+   
+   
+  Link Results at 4:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.47      0.19     20.00  11245.28  TCV
+   
+   
+  Node Results at 4:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.02    102.40      2.40  Tank
+   
+   
+  Link Results at 4:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.52      0.19     20.00  10445.55  TCV
+   
+   
+  Node Results at 4:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.14    102.40      2.40  Tank
+   
+   
+  Link Results at 4:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.53      0.20     20.00  10313.65  TCV
+   
+   
+  Node Results at 5:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.27    102.40      2.40  Tank
+   
+   
+  Link Results at 5:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.57      0.20     20.00   9825.75  TCV
+   
+   
+  Node Results at 5:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.25    102.39      2.39  Tank
+   
+   
+  Link Results at 5:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.61      0.21     20.00   9317.69  TCV
+   
+   
+  Node Results at 5:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.18    102.39      2.39  Tank
+   
+   
+  Link Results at 5:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.65      0.21     20.00   8877.24  TCV
+   
+   
+  Node Results at 5:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.32    102.39      2.39  Tank
+   
+   
+  Link Results at 5:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.68      0.21     20.00   8570.31  TCV
+   
+   
+  Node Results at 6:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.48    102.38      2.38  Tank
+   
+   
+  Link Results at 6:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.73      0.22     20.00   8047.51  TCV
+   
+   
+  Node Results at 6:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.53    102.38      2.38  Tank
+   
+   
+  Link Results at 6:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.82      0.23     20.00   7328.90  TCV
+   
+   
+  Node Results at 6:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -1.22    102.37      2.37  Tank
+   
+   
+  Link Results at 6:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                1.91      0.24     20.00   6605.71  TCV
+   
+   
+  Node Results at 6:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -1.56    102.35      2.35  Tank
+   
+   
+  Link Results at 6:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.16      0.28     20.00   5191.35  TCV
+   
+   
+  Node Results at 7:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.44    102.33      2.33  Tank
+   
+   
+  Link Results at 7:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.52      0.32     20.00   3821.81  TCV
+   
+   
+  Node Results at 7:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.83    102.33      2.33  Tank
+   
+   
+  Link Results at 7:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.63      0.33     20.00   3504.60  TCV
+   
+   
+  Node Results at 7:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.41    102.31      2.31  Tank
+   
+   
+  Link Results at 7:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.85      0.36     20.00   2977.85  TCV
+   
+   
+  Node Results at 7:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.58    102.31      2.31  Tank
+   
+   
+  Link Results at 7:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.97      0.38     20.00   2745.96  TCV
+   
+   
+  Node Results at 8:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.06    102.30      2.30  Tank
+   
+   
+  Link Results at 8:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                3.14      0.40     20.00   2450.95  TCV
+   
+   
+  Node Results at 8:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.09    102.30      2.30  Tank
+   
+   
+  Link Results at 8:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                3.16      0.40     20.00   2420.57  TCV
+   
+   
+  Node Results at 8:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.05    102.30      2.30  Tank
+   
+   
+  Link Results at 8:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                3.18      0.41     20.00   2390.55  TCV
+   
+   
+  Node Results at 8:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.20    102.30      2.30  Tank
+   
+   
+  Link Results at 8:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                3.18      0.40     20.00   2402.49  TCV
+   
+   
+  Node Results at 9:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.50    102.30      2.30  Tank
+   
+   
+  Link Results at 9:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                3.11      0.40     20.00   2498.87  TCV
+   
+   
+  Node Results at 9:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.03    102.31      2.31  Tank
+   
+   
+  Link Results at 9:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.96      0.38     20.00   2757.50  TCV
+   
+   
+  Node Results at 9:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.07    102.31      2.31  Tank
+   
+   
+  Link Results at 9:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.96      0.38     20.00   2772.74  TCV
+   
+   
+  Node Results at 9:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.14    102.31      2.31  Tank
+   
+   
+  Link Results at 9:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.98      0.38     20.00   2732.68  TCV
+   
+   
+  Node Results at 10:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.34    102.31      2.31  Tank
+   
+   
+  Link Results at 10:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.94      0.37     20.00   2811.40  TCV
+   
+   
+  Node Results at 10:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.22    102.32      2.32  Tank
+   
+   
+  Link Results at 10:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.84      0.36     20.00   3003.65  TCV
+   
+   
+  Node Results at 10:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.10    102.32      2.32  Tank
+   
+   
+  Link Results at 10:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.78      0.35     20.00   3137.30  TCV
+   
+   
+  Node Results at 10:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.21    102.32      2.32  Tank
+   
+   
+  Link Results at 10:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.80      0.36     20.00   3078.60  TCV
+   
+   
+  Node Results at 11:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.32    102.31      2.31  Tank
+   
+   
+  Link Results at 11:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.86      0.36     20.00   2952.13  TCV
+   
+   
+  Node Results at 11:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.07    102.32      2.32  Tank
+   
+   
+  Link Results at 11:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.77      0.35     20.00   3145.86  TCV
+   
+   
+  Node Results at 11:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.50    102.32      2.32  Tank
+   
+   
+  Link Results at 11:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.76      0.35     20.00   3186.70  TCV
+   
+   
+  Node Results at 11:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.15    102.33      2.33  Tank
+   
+   
+  Link Results at 11:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.63      0.33     20.00   3513.98  TCV
+   
+   
+  Node Results at 12:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.21    102.33      2.33  Tank
+   
+   
+  Link Results at 12:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.59      0.33     20.00   3622.72  TCV
+   
+   
+  Node Results at 12:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.00    102.33      2.33  Tank
+   
+   
+  Link Results at 12:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.53      0.32     20.00   3776.26  TCV
+   
+   
+  Node Results at 12:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.06    102.33      2.33  Tank
+   
+   
+  Link Results at 12:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.53      0.32     20.00   3777.69  TCV
+   
+   
+  Node Results at 12:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.07    102.33      2.33  Tank
+   
+   
+  Link Results at 12:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.52      0.32     20.00   3824.12  TCV
+   
+   
+  Node Results at 13:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.19    102.33      2.33  Tank
+   
+   
+  Link Results at 13:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.50      0.32     20.00   3879.30  TCV
+   
+   
+  Node Results at 13:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.24    102.33      2.33  Tank
+   
+   
+  Link Results at 13:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.55      0.32     20.00   3735.16  TCV
+   
+   
+  Node Results at 13:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.06    102.33      2.33  Tank
+   
+   
+  Link Results at 13:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.61      0.33     20.00   3560.00  TCV
+   
+   
+  Node Results at 13:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.15    102.33      2.33  Tank
+   
+   
+  Link Results at 13:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.59      0.33     20.00   3605.60  TCV
+   
+   
+  Node Results at 14:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.25    102.33      2.33  Tank
+   
+   
+  Link Results at 14:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.63      0.33     20.00   3503.72  TCV
+   
+   
+  Node Results at 14:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.19    102.32      2.32  Tank
+   
+   
+  Link Results at 14:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.70      0.34     20.00   3333.57  TCV
+   
+   
+  Node Results at 14:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.04    102.32      2.32  Tank
+   
+   
+  Link Results at 14:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.75      0.35     20.00   3209.29  TCV
+   
+   
+  Node Results at 14:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.06    102.32      2.32  Tank
+   
+   
+  Link Results at 14:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.76      0.35     20.00   3186.53  TCV
+   
+   
+  Node Results at 15:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.03    102.32      2.32  Tank
+   
+   
+  Link Results at 15:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.74      0.35     20.00   3225.26  TCV
+   
+   
+  Node Results at 15:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.16    102.32      2.32  Tank
+   
+   
+  Link Results at 15:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.73      0.35     20.00   3241.36  TCV
+   
+   
+  Node Results at 15:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.09    102.32      2.32  Tank
+   
+   
+  Link Results at 15:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.69      0.34     20.00   3342.77  TCV
+   
+   
+  Node Results at 15:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.06    102.32      2.32  Tank
+   
+   
+  Link Results at 15:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.67      0.34     20.00   3404.28  TCV
+   
+   
+  Node Results at 16:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.02    102.32      2.32  Tank
+   
+   
+  Link Results at 16:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.68      0.34     20.00   3362.82  TCV
+   
+   
+  Node Results at 16:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.10    102.32      2.32  Tank
+   
+   
+  Link Results at 16:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.68      0.34     20.00   3372.94  TCV
+   
+   
+  Node Results at 16:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.52    102.32      2.32  Tank
+   
+   
+  Link Results at 16:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.71      0.34     20.00   3304.62  TCV
+   
+   
+  Node Results at 16:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.09    102.32      2.32  Tank
+   
+   
+  Link Results at 16:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.85      0.36     20.00   2985.61  TCV
+   
+   
+  Node Results at 17:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.56    102.31      2.31  Tank
+   
+   
+  Link Results at 17:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.87      0.37     20.00   2934.69  TCV
+   
+   
+  Node Results at 17:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.27    102.32      2.32  Tank
+   
+   
+  Link Results at 17:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.72      0.35     20.00   3275.99  TCV
+   
+   
+  Node Results at 17:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.18    102.33      2.33  Tank
+   
+   
+  Link Results at 17:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.65      0.34     20.00   3455.38  TCV
+   
+   
+  Node Results at 17:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.21    102.33      2.33  Tank
+   
+   
+  Link Results at 17:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.60      0.33     20.00   3577.87  TCV
+   
+   
+  Node Results at 18:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.20    102.33      2.33  Tank
+   
+   
+  Link Results at 18:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.55      0.32     20.00   3729.27  TCV
+   
+   
+  Node Results at 18:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.36    102.33      2.33  Tank
+   
+   
+  Link Results at 18:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.60      0.33     20.00   3587.42  TCV
+   
+   
+  Node Results at 18:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.29    102.32      2.32  Tank
+   
+   
+  Link Results at 18:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.69      0.34     20.00   3339.07  TCV
+   
+   
+  Node Results at 18:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.16    102.32      2.32  Tank
+   
+   
+  Link Results at 18:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.77      0.35     20.00   3155.65  TCV
+   
+   
+  Node Results at 19:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.04    102.32      2.32  Tank
+   
+   
+  Link Results at 19:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.73      0.35     20.00   3258.65  TCV
+   
+   
+  Node Results at 19:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.05    102.32      2.32  Tank
+   
+   
+  Link Results at 19:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.72      0.35     20.00   3283.59  TCV
+   
+   
+  Node Results at 19:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.01    102.32      2.32  Tank
+   
+   
+  Link Results at 19:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.70      0.34     20.00   3317.24  TCV
+   
+   
+  Node Results at 19:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.19    102.32      2.32  Tank
+   
+   
+  Link Results at 19:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.70      0.34     20.00   3321.65  TCV
+   
+   
+  Node Results at 20:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.01    102.32      2.32  Tank
+   
+   
+  Link Results at 20:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.75      0.35     20.00   3201.27  TCV
+   
+   
+  Node Results at 20:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.16    102.32      2.32  Tank
+   
+   
+  Link Results at 20:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.75      0.35     20.00   3195.70  TCV
+   
+   
+  Node Results at 20:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.25    102.32      2.32  Tank
+   
+   
+  Link Results at 20:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.71      0.35     20.00   3295.06  TCV
+   
+   
+  Node Results at 20:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.49    102.33      2.33  Tank
+   
+   
+  Link Results at 20:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.65      0.34     20.00   3459.70  TCV
+   
+   
+  Node Results at 21:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.24    102.33      2.33  Tank
+   
+   
+  Link Results at 21:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.52      0.32     20.00   3809.43  TCV
+   
+   
+  Node Results at 21:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.02    102.33      2.33  Tank
+   
+   
+  Link Results at 21:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.58      0.33     20.00   3631.08  TCV
+   
+   
+  Node Results at 21:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.30    102.33      2.33  Tank
+   
+   
+  Link Results at 21:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.59      0.33     20.00   3618.72  TCV
+   
+   
+  Node Results at 21:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.03    102.33      2.33  Tank
+   
+   
+  Link Results at 21:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.51      0.32     20.00   3842.43  TCV
+   
+   
+  Node Results at 22:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.16    102.33      2.33  Tank
+   
+   
+  Link Results at 22:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.52      0.32     20.00   3821.18  TCV
+   
+   
+  Node Results at 22:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.00    102.33      2.33  Tank
+   
+   
+  Link Results at 22:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.48      0.32     20.00   3946.94  TCV
+   
+   
+  Node Results at 22:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                -0.17    102.33      2.33  Tank
+   
+   
+  Link Results at 22:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.48      0.32     20.00   3947.93  TCV
+   
+   
+  Node Results at 22:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.27    102.33      2.33  Tank
+   
+   
+  Link Results at 22:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.52      0.32     20.00   3814.44  TCV
+   
+   
+  Node Results at 23:00:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.19    102.34      2.34  Tank
+   
+   
+  Link Results at 23:00:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.45      0.31     20.00   4019.77  TCV
+   
+   
+  Node Results at 23:15:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.46    102.34      2.34  Tank
+   
+   
+  Link Results at 23:15:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.41      0.31     20.00   4171.38  TCV
+   
+   
+  Node Results at 23:30:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.46    102.34      2.34  Tank
+   
+   
+  Link Results at 23:30:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.30      0.29     20.00   4566.01  TCV
+   
+   
+  Node Results at 23:45:00 hrs:
+  ----------------------------------------------
+                     Demand      Head  Pressure
+  Node                  L/s         m    METERS
+  ----------------------------------------------
+  Tank                 0.58    102.35      2.35  Tank
+   
+   
+  Link Results at 23:45:00 hrs:
+  --------------------------------------------------------
+                       Flow  Velocity  Headloss   Setting
+  Link                  L/s       m/s    /1000m          
+  --------------------------------------------------------
+  Res.1                2.20      0.28     20.00   4994.43  TCV
+   

@@ -87,3 +87,23 @@ The table uses four points with deliberately different slopes between segments s
 The observed flow range through V1 over the 24-hour demand cycle is roughly 2.5–9.6 LPS, so the table bounds (3.0–9.0) sit just inside the actual range. This lets the example demonstrate clamping at both ends — low flows hold at 20 m, high flows hold at 34 m.
 
 The script uses `on_event("iteration")` to read the flow and set the PRV after each convergence (triggering a re-solve so the new setting is reflected in the current timestep), and `on_event("report")` to print a summary line per timestep.
+
+## Float valve
+
+```shell
+./../build/bin/runepanet demo-float-valve.inp demo-float-valve.rpt
+```
+
+[View `demo-float-valve.inp` script](demo-float-valve.inp#L72)
+
+This example simulates a float valve controlling inflow to a tank. A float valve progressively closes as the tank level rises, throttling inflow to prevent overflow. The valve is modelled as a TCV (Throttle Control Valve) whose minor-loss coefficient K is adjusted at each timestep based on the current tank water level.
+
+The script works in three steps:
+
+1. **Valve open percentage** — computed from the tank level. The valve is fully open (100%) when the level is below `controlDepth - range` and fully closed (0%) at `controlDepth`. In between, it scales linearly.
+
+2. **K value lookup** — a 9-point characteristic curve maps the open percentage to a minor-loss coefficient K. The curve spans many orders of magnitude (K = 2 when fully open, K ~ 1e20 when closed), so **logarithmic interpolation** is used between curve points rather than linear interpolation.
+
+3. **Apply to TCV** — the computed K is written to the TCV setting inside `on_event("iteration")`, so EPANET re-solves with the updated resistance and the float valve behaviour takes effect within the current timestep.
+
+The network has a reservoir feeding through the TCV into a simple pipe system with a tank and a downstream demand node with a realistic 15-minute demand pattern over 24 hours. The float valve keeps the tank level regulated within a narrow band around the control depth.
