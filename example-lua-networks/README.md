@@ -107,3 +107,41 @@ The script works in three steps:
 3. **Apply to TCV** — the computed K is written to the TCV setting inside `on_event("iteration")`, so EPANET re-solves with the updated resistance and the float valve behaviour takes effect within the current timestep.
 
 The network has a reservoir feeding through the TCV into a simple pipe system with a tank and a downstream demand node with a realistic 15-minute demand pattern over 24 hours. The float valve keeps the tank level regulated within a narrow band around the control depth.
+
+## Variable speed pump via PRV method (1-point curve)
+
+```shell
+./../build/bin/runepanet demo-vsp-prv-1pt.inp demo-vsp-prv-1pt.rpt
+```
+
+[View `demo-vsp-prv-1pt.inp` script](demo-vsp-prv-1pt.inp#L3651)
+
+This example demonstrates an alternative method for controlling a variable speed pump (VSP) using a PRV as a temporary solver constraint. Instead of iteratively searching for the correct pump speed (as in the secant-method `demo-vsp.inp` example), this approach uses the PRV to determine what operating point the pump needs to hit, then calculates the speed algebraically.
+
+The method works in two solver passes per timestep:
+
+1. **Pass 1 (PRV constraining)** — The PRV (V1) is set to the desired downstream pressure (80 m). The solver converges, establishing the flow Q through the pump and all junction heads. The script reads the pump head and PRV head drop, calculates the target pump head (what the pump would need to produce without the PRV), and solves for the pump speed algebraically. It then opens the PRV fully and sets the pump speed, triggering a re-solve.
+
+2. **Pass 2 (verification)** — The solver re-converges with the PRV open and the pump at the calculated speed. The pump naturally produces the correct operating point. No further changes are made.
+
+In the report event, the script logs the final speed and pressures, then resets the PRV to the target pressure for the next timestep. This way the final results reflect pump speed modulation rather than PRV throttling.
+
+The pump curve is a single point (1 LPS, 50 m), which EPANET interprets as H = 66.5 - 16.5·Q² (C = 2). Because the exponent C equals 2, the speed equation simplifies to N = sqrt((H\_target + B·Q²) / A), giving a direct algebraic solution with no iteration required.
+
+## Variable speed pump via PRV method (3-point curve)
+
+```shell
+./../build/bin/runepanet demo-vsp-prv-3pt.inp demo-vsp-prv-3pt.rpt
+```
+
+[View `demo-vsp-prv-3pt.inp` script](demo-vsp-prv-3pt.inp#L3653)
+
+This example extends the PRV-based VSP control method to a 3-point pump curve, where the curve exponent C ≠ 2 and the speed equation no longer has a closed-form solution.
+
+The pump curve uses three points: (0, 60), (1, 50), (2, 0), which fit to H = 60 - 10·Q^2.585. At speed N, the affinity-law-adjusted curve is H = A·N² - B·Q^C·N^(2−C). With C ≈ 2.585, the exponent (2 − C) ≈ −0.585, making N appear in two terms with different exponents. This requires Newton-Raphson iteration to solve for N:
+
+- f(N) = A·N² − B·Q^C·N^(2−C) − H\_target
+- f′(N) = 2·A·N − (2−C)·B·Q^C·N^(1−C)
+- N\_next = N − f(N)/f′(N)
+
+The overall two-pass PRV method is identical to the 1-point example — only the speed calculation differs. This demonstrates that the PRV approach works regardless of pump curve complexity, since the flow and head determination is handled by the solver, and only the final speed calculation changes.
