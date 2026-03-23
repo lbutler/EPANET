@@ -64,3 +64,26 @@ The logic uses `on_event` so that work happens at the right time:
 - **`iteration`** — After the solver converges, compares J126 pressure to the target. If the error is larger than `eps_p`, it computes a new pump speed: if the last two (speed, pressure) points are too similar (which would make the secant step undefined), it uses a simple ratio correction; otherwise it uses a secant step toward the target pressure. The new speed is clamped to [0, maxSpeed] and applied only if the change exceeds `eps_s`; when applied, the current (speed, pressure) is stored for the next secant step. Any change triggers a re-solve so the adjustment is reflected in the current timestep.
 
 So the script runs control logic after convergence (with automatic re-solving to reflect changes) and uses the report step to log and refresh the history used by that control logic.
+
+## Flow-modulating PRV
+
+```shell
+./../build/bin/runepanet demo-flow-prv.inp demo-flow-prv.rpt
+```
+
+[View `demo-flow-prv.inp` script](demo-flow-prv.inp#L2464)
+
+This example shows how to modulate a PRV's downstream pressure setpoint based on the current flow rate through the valve. A lookup table maps flow (LPS) to target pressure (m) with linear interpolation between entries. Flows outside the table range are clamped to the nearest boundary value.
+
+The table uses four points with deliberately different slopes between segments so the output clearly shows varying interpolation rates:
+
+| Flow (LPS) | Pressure (m) | Slope        |
+| ---------- | ------------ | ------------ |
+| 3.0        | 20           | —            |
+| 5.0        | 24           | 2.0 m per LPS |
+| 7.0        | 30           | 3.0 m per LPS |
+| 9.0        | 34           | 2.0 m per LPS |
+
+The observed flow range through V1 over the 24-hour demand cycle is roughly 2.5–9.6 LPS, so the table bounds (3.0–9.0) sit just inside the actual range. This lets the example demonstrate clamping at both ends — low flows hold at 20 m, high flows hold at 34 m.
+
+The script uses `on_event("iteration")` to read the flow and set the PRV after each convergence (triggering a re-solve so the new setting is reflected in the current timestep), and `on_event("report")` to print a summary line per timestep.
