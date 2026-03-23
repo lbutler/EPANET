@@ -280,6 +280,13 @@ int saveinpfile(Project *pr, const char *fname)
             strcat(s, s1);
         }
 
+        // Optional minimum speed for VSP pumps
+        if (pump->Nmin > 0.0)
+        {
+            sprintf(s1, "\tMINSPEED %.4f", pump->Nmin);
+            strcat(s, s1);
+        }
+
         fprintf(f, "\n%s", s);
         if (link->Comment) fprintf(f, "\t;%s", link->Comment);
     }

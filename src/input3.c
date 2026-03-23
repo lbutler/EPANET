@@ -514,6 +514,7 @@ int pumpdata(Project *pr)
     pump->Ecost = 0.0;
     pump->Epat = 0;
     pump->Hset = 0.0;
+    pump->Nmin = 0.0;
     if (n < 4) return 0;
 
     // Retrieve keyword/value pairs
@@ -551,6 +552,12 @@ int pumpdata(Project *pr)
             if (!getfloat(parser->Tok[m], &y) || y <= 0.0)
                 return setError(parser, m, 202);
             pump->Hset = y;
+        }
+        else if (match(parser->Tok[m - 1], w_MINSPEED))  // VSP minimum speed
+        {
+            if (!getfloat(parser->Tok[m], &y) || y < 0.0)
+                return setError(parser, m, 202);
+            pump->Nmin = y;
         }
         else return setError(parser, m-1, 201);;
         m = m + 2;  // Move to next keyword token

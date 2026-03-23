@@ -21,6 +21,7 @@
 #define DATA_PATH_NOVSP        "./pump-test-novsp.inp"
 #define DATA_PATH_3PT_VSP      "./pump-test-3pt-vsp.inp"
 #define DATA_PATH_3PT_NOVSP    "./pump-test-3pt-novsp.inp"
+#define DATA_PATH_VSP_MINSPD   "./pump-test-vsp-minspeed.inp"
 #define DATA_PATH_RPT_A        "./test_vsp_a.rpt"
 #define DATA_PATH_OUT_A        "./test_vsp_a.out"
 #define DATA_PATH_RPT_B        "./test_vsp_b.rpt"
@@ -153,6 +154,38 @@ BOOST_AUTO_TEST_CASE(test_vsp_3pt_eps)
 BOOST_AUTO_TEST_CASE(test_vsp_3pt_crossvalidation)
 {
     run_vsp_crossvalidation_test(DATA_PATH_3PT_VSP, DATA_PATH_3PT_NOVSP, 15.0);
+}
+
+// === MINSPEED test ===
+
+BOOST_AUTO_TEST_CASE(test_vsp_minspeed_closes_pump)
+/*
+    Tests that a VSP pump closes when the computed speed falls
+    below MINSPEED. Normal operating speed for this network is ~0.54,
+    so MINSPEED 0.8 should cause the pump to close.
+*/
+{
+    int error;
+    EN_Project ph = NULL;
+    int linkIndex;
+    double setting;
+
+    EN_createproject(&ph);
+    error = EN_open(ph, DATA_PATH_VSP_MINSPD, DATA_PATH_RPT_A, DATA_PATH_OUT_A);
+    BOOST_REQUIRE(error == 0);
+
+    EN_getlinkindex(ph, (char*)"PU1", &linkIndex);
+
+    error = EN_solveH(ph);
+    // May get warnings due to pump closure
+    BOOST_REQUIRE(error <= 6);
+
+    // Pump should be closed (setting = 0) since computed speed ~0.54 < MINSPEED 0.8
+    EN_getlinkvalue(ph, linkIndex, EN_SETTING, &setting);
+    BOOST_CHECK_EQUAL(setting, 0.0);
+
+    EN_close(ph);
+    EN_deleteproject(ph);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

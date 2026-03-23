@@ -175,6 +175,7 @@
 #define   w_HEAD        "HEAD"
 #define   w_POWER       "POWER"
 #define   w_SPEED       "SPEE"
+#define   w_MINSPEED    "MINSPEED"
 
 #define   w_MIXED       "MIXED"
 #define   w_2COMP       "2COMP"

@@ -291,9 +291,17 @@ int   runhyd(Project *pr, long *t)
                     }
                 }
 
-                // Clamp speed to [0.01, max_speed]
-                if (N < 0.01) N = 0.01;
+                // Clamp speed to [Nmin, max_speed]; close if below Nmin
                 if (N > max_speed) N = max_speed;
+                {
+                    double min_speed = pump->Nmin > 0.0 ? pump->Nmin : 0.01;
+                    if (N < min_speed)
+                    {
+                        hyd->LinkSetting[k] = 0.0;
+                        hyd->LinkStatus[k] = CLOSED;
+                        continue;
+                    }
+                }
                 hyd->LinkSetting[k] = N;
             }
         }
