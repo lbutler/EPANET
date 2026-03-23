@@ -220,9 +220,16 @@ int   runhyd(Project *pr, long *t)
         int luapass = 0;
         while (luascript_event(pr, "iteration") && luapass < 10)
         {
+            luapass++;
+            if (rpt->Statflag == FULL)
+            {
+                sprintf(pr->Msg,
+                    "    Lua script changed status — re-solving (pass %d)",
+                    luapass);
+                writeline(pr, pr->Msg);
+            }
             errcode = hydsolve(pr,&iter,&relerr);
             if (errcode) break;
-            luapass++;
         }
     }
 

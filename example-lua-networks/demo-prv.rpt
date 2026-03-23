@@ -1,4 +1,4 @@
-  Page 1                                    Sun Mar 22 22:24:00 2026
+  Page 1                                    Sun Mar 22 22:32:57 2026
 
   ******************************************************************
   *                           E P A N E T                          *
@@ -7,7 +7,7 @@
   *                          Version 2.3.05                        *
   ******************************************************************
   
-  Analysis begun Sun Mar 22 22:24:00 2026
+  Analysis begun Sun Mar 22 22:32:57 2026
 
    
   Hydraulic Status:
@@ -27,6 +27,7 @@
   ## Pressure at J126 is: 	33.243868987962
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	22.756131012038
+      Lua script changed status — re-solving (pass 1)
      0:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000002
@@ -48,6 +49,7 @@
   ## Pressure at J126 is: 	30.029265039732
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	22.726865972306
+      Lua script changed status — re-solving (pass 1)
      1:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -67,6 +69,7 @@
   ## Pressure at J126 is: 	30.026362014175
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	22.70050395813
+      Lua script changed status — re-solving (pass 1)
      2:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -86,6 +89,7 @@
   ## Pressure at J126 is: 	29.944373241405
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	22.756130716726
+      Lua script changed status — re-solving (pass 1)
      3:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -106,6 +110,7 @@
   ## Pressure at J126 is: 	29.81172668494
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	22.944404031786
+      Lua script changed status — re-solving (pass 1)
      4:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -126,6 +131,7 @@
   ## Pressure at J126 is: 	29.508104053732
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.436299978054
+      Lua script changed status — re-solving (pass 1)
      5:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -145,6 +151,7 @@
   ## Pressure at J126 is: 	29.537042476743
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.899257501311
+      Lua script changed status — re-solving (pass 1)
      6:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000001
@@ -164,6 +171,7 @@
   ## Pressure at J126 is: 	29.464124436151
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	24.435133065161
+      Lua script changed status — re-solving (pass 1)
      7:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -183,6 +191,7 @@
   ## Pressure at J126 is: 	30.452490498595
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.982642566566
+      Lua script changed status — re-solving (pass 1)
      8:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -218,6 +227,7 @@
   ## Pressure at J126 is: 	30.392818044751
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.589824521815
+      Lua script changed status — re-solving (pass 1)
      9:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -237,6 +247,7 @@
   ## Pressure at J126 is: 	30.331505317093
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.258319204722
+      Lua script changed status — re-solving (pass 1)
     10:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -256,6 +267,7 @@
   ## Pressure at J126 is: 	29.668494872412
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.58982433231
+      Lua script changed status — re-solving (pass 1)
     11:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -275,6 +287,7 @@
   ## Pressure at J126 is: 	29.85013160922
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.739692723091
+      Lua script changed status — re-solving (pass 1)
     12:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -294,6 +307,7 @@
   ## Pressure at J126 is: 	30.149868324608
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.589824398482
+      Lua script changed status — re-solving (pass 1)
     13:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -313,6 +327,7 @@
   ## Pressure at J126 is: 	30.331505251652
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.25831914683
+      Lua script changed status — re-solving (pass 1)
     14:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -332,6 +347,7 @@
   ## Pressure at J126 is: 	30.168637998272
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.089681148559
+      Lua script changed status — re-solving (pass 1)
     15:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -352,6 +368,7 @@
   ## Pressure at J126 is: 	29.653382808845
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.436298339713
+      Lua script changed status — re-solving (pass 1)
     16:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -371,6 +388,7 @@
   ## Pressure at J126 is: 	29.696605755342
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.739692584371
+      Lua script changed status — re-solving (pass 1)
     17:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -391,6 +409,7 @@
   ## Pressure at J126 is: 	29.304562761184
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	24.435129823187
+      Lua script changed status — re-solving (pass 1)
     18:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -411,6 +430,7 @@
   ## Pressure at J126 is: 	30.695437043986
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.739692779201
+      Lua script changed status — re-solving (pass 1)
     19:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -430,6 +450,7 @@
   ## Pressure at J126 is: 	30.149868498942
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.58982428026
+      Lua script changed status — re-solving (pass 1)
     20:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -449,6 +470,7 @@
   ## Pressure at J126 is: 	30.270200448407
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	23.319623831853
+      Lua script changed status — re-solving (pass 1)
     21:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -483,6 +505,7 @@
   ## Pressure at J126 is: 	30.329428250085
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	22.990195581768
+      Lua script changed status — re-solving (pass 1)
     22:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000004
@@ -503,6 +526,7 @@
   ## Pressure at J126 is: 	30.234064853026
   ### Adjusting PRV V1 to try to reach target pressure of 	30	m
   ### New PRV V1 setting: 	22.756130728742
+      Lua script changed status — re-solving (pass 1)
     23:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
@@ -531,7 +555,7 @@
   Flow Ratio:               1.000
   ================================
 
-  Analysis ended Sun Mar 22 22:24:00 2026
+  Analysis ended Sun Mar 22 22:32:57 2026
 
    
   Node Results at 0:00:00 hrs:

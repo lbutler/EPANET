@@ -1,4 +1,4 @@
-  Page 1                                    Sun Mar 22 22:09:45 2026
+  Page 1                                    Sun Mar 22 22:33:11 2026
 
   ******************************************************************
   *                           E P A N E T                          *
@@ -8,7 +8,7 @@
   ******************************************************************
   
   ## Simulation starting...
-  Analysis begun Sun Mar 22 22:09:45 2026
+  Analysis begun Sun Mar 22 22:33:11 2026
 
    
   Hydraulic Status:
@@ -89,8 +89,6 @@
 
               Trial  1: relative flow change = 0.187991
               Trial  2: relative flow change = 0.003451
-  ## iteration event...
-  ### Pressure at J1 is: 	39.871552228042
               Trial  3: relative flow change = 0.000002
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -104,8 +102,6 @@
 
               Trial  1: relative flow change = 0.153562
               Trial  2: relative flow change = 0.002816
-  ## iteration event...
-  ### Pressure at J1 is: 	38.666286420674
               Trial  3: relative flow change = 0.000001
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -119,8 +115,6 @@
 
               Trial  1: relative flow change = 0.146367
               Trial  2: relative flow change = 0.002694
-  ## iteration event...
-  ### Pressure at J1 is: 	39.276101615259
               Trial  3: relative flow change = 0.000001
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -134,8 +128,6 @@
 
               Trial  1: relative flow change = 0.171882
               Trial  2: relative flow change = 0.003165
-  ## iteration event...
-  ### Pressure at J1 is: 	39.814544101765
               Trial  3: relative flow change = 0.000002
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -350,6 +342,6 @@
   Flow Ratio:               1.000
   ================================
 
-  Analysis ended Sun Mar 22 22:09:45 2026
+  Analysis ended Sun Mar 22 22:33:11 2026
 
   ### Simulation finished. Cleaning up.
