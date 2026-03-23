@@ -233,16 +233,12 @@ int luascript_event(Project *pr, const char *event)
 int luascript_run(Project *pr)
 {
     lua_State *L;
-    int changed;
     if (pr->lua == NULL || pr->Script == NULL)
         return 0;
     pr->LuaChanged = 0;
     L = (lua_State *)pr->lua;
     luaL_dostring(L, pr->Script);
-    changed = pr->LuaChanged;
-    if (luascript_event(pr, "iteration"))
-        changed = 1;
-    return changed;
+    return pr->LuaChanged;
 }
 
 void luascript_close(Project *pr)

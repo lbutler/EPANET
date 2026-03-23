@@ -8,7 +8,7 @@ The goal is to make simulation behavior more programmable without changing EPANE
 
 - A built-in Lua runtime linked into EPANET.
 - A new `[SCRIPT]` section in INP files for Lua code.
-- Script execution during hydraulic solver iterations, alongside EPANET's own control checks.
+- Script execution after each hydraulic solve converges, so scripts always see stable, balanced results.
 - An event system (`on_event`) for running code at specific simulation lifecycle points.
 - A small, focused Lua API for reading selected node/link values and setting selected link controls.
 
@@ -43,20 +43,22 @@ There are two mechanisms for script execution: **top-level code** and the **`on_
 
 ### Top-level code
 
-Any code written directly in the `[SCRIPT]` section (outside of function definitions) runs during every hydraulic solver iteration, at the same points where EPANET evaluates its own controls. This is the simplest way to add reactive logic.
+Any code written directly in the `[SCRIPT]` section (outside of function definitions) runs **once after the hydraulic solver has converged** at each timestep. The script sees fully balanced, stable results (pressures, flows, etc.) rather than intermediate estimates.
+
+Any changes the script makes to link properties (e.g. `link.status = 0`) are applied and take effect on the **next timestep**. The solver does not re-run for the current timestep. This is the simplest and safest way to add reactive logic.
 
 ### The `on_event` function
 
 For finer control over _when_ code executes, define a function called `on_event(event)` in your script. EPANET calls this function at specific lifecycle points, passing a string that identifies the event:
 
-| Event         | When it fires                                                                 |
-| ------------- | ----------------------------------------------------------------------------- |
-| `"init"`      | Once, when the project is opened and the Lua state is initialized             |
-| `"iteration"` | During hydraulic solver iterations, alongside control checks                  |
-| `"report"`    | After each successful hydraulic solve, before advancing to the next time step |
-| `"term"`      | Once, when the project is closed, before the Lua state is destroyed           |
+| Event         | When it fires                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `"init"`      | Once, when the project is opened and the Lua state is initialized                                                              |
+| `"iteration"` | After the hydraulic solver converges; if it changes anything, the solver re-converges and fires again (up to 10 passes)         |
+| `"report"`    | After each successful hydraulic solve (including any iteration-event re-solves), before advancing to the next time step         |
+| `"term"`      | Once, when the project is closed, before the Lua state is destroyed                                                            |
 
-If `on_event` is not defined, EPANET silently skips the event dispatch. Top-level code still runs during iterations regardless.
+If `on_event` is not defined, EPANET silently skips the event dispatch.
 
 ### Example: using `on_event`
 
@@ -69,7 +71,7 @@ function on_event(event)
         print("Simulation starting...")
 
     elseif event == "iteration" then
-        -- Runs every hydraulic iteration
+        -- Runs after convergence; changes trigger re-solve
         if node("J1").pressure < 20 then
             link("P1").status = 0
         end
@@ -90,52 +92,32 @@ end
 1. Lua is initialized when the project is opened (`EN_open` / `EN_openX`).
 2. The script text is executed once to define `on_event` and any globals.
 3. The `"init"` event fires immediately after.
-4. During each hydraulic timestep, the solver iterates to convergence. At specific iteration points, top-level code re-executes and the `"iteration"` event fires.
-5. After each successful hydraulic solve, the `"report"` event fires.
+4. During each hydraulic timestep:
+   a. The solver iterates to convergence (no Lua code runs during iterations).
+   b. After convergence, `on_event("iteration")` fires (if defined). If it changed any link status or setting, the solver re-runs to convergence and the event fires again. This repeats until no changes are made (up to 10 passes).
+   c. Top-level script code executes once with stable results. Any changes apply to the next timestep.
+5. After the solve completes (including any iteration-event re-solves), the `"report"` event fires.
 6. When the project is closed, the `"term"` event fires, then the Lua state is destroyed.
 
-### Execution during iterations
+### Top-level code execution
 
-The hydraulic solver (`hydsolve`) iterates to find a converged solution at each timestep. During this loop, EPANET performs status checks on links (pumps, valves, pipes to tanks) and pressure-based controls. The Lua script (top-level code + `"iteration"` event) runs at the same two moments:
+Top-level code runs once after the hydraulic solver has fully converged (and after any `on_event("iteration")` re-solves). All node pressures, demands, heads, and link flows represent the balanced solution.
 
-**1. On convergence (full status check)**
+Any changes the script makes take effect on the next timestep, not the current one. The solver does not re-run. This makes top-level code safe for logging, monitoring, and making adjustments that should be applied going forward.
 
-When the solver converges, it performs a complete status sweep:
+### The `"iteration"` event
 
-- `valvestatus()` — check/update control valve states
-- `linkstatus()` — check pumps, CVs, FCVs, tank connections
-- `pswitch()` — apply pressure-based simple controls
-- **Lua script** — run top-level code and fire `on_event("iteration")`
+The `"iteration"` event runs after each successful convergence. Unlike top-level code, if the event handler modifies a link property, EPANET re-runs the hydraulic solver to convergence and fires the event again. This loop continues until the handler makes no further changes, up to a safety limit of 10 passes.
 
-If any of these (including the Lua script) changes a link status or setting, the solver marks that a state change occurred and continues iterating to re-converge with the new configuration. If nothing changes, the solver is done.
+Because the event always fires after convergence, the script sees stable, balanced values — not intermediate estimates. This avoids the risk of scripts reacting to premature values that may be far from the true solution.
 
-**2. On periodic check (non-converged iterations)**
-
-While the solver has not yet converged, periodic status checks run every `CHECKFREQ` iterations (default: 2), up to iteration `MAXCHECK` (default: 10):
-
-- `linkstatus()` — check pumps, CVs, FCVs, tank connections
-- **Lua script** — run top-level code and fire `on_event("iteration")`
-
-This prevents the script from firing on every single iteration, reducing the risk of oscillation while still giving it regular opportunities to intervene.
+Use `on_event("iteration")` when you need to make adjustments that must be reflected in the **current** timestep's results (e.g. adjusting a PRV setting to hit a target pressure at a remote node).
 
 ### Interaction with convergence
 
-If a Lua script writes to a link property (e.g. `link.status = 0`) — whether in top-level code or inside `on_event` — EPANET detects this and treats it as a status change. At the convergence check point, this forces the solver to continue iterating so the network can re-converge with the script's modifications applied. This is the same mechanism used for EPANET's own pressure-based controls (`pswitch`).
+If an `on_event("iteration")` handler writes to a link property (e.g. `link.status = 0`) EPANET detects this and re-runs the solver to convergence with the new configuration. The event fires again after re-convergence, giving the script a chance to make further adjustments or confirm the result is satisfactory. This continues until either no changes are made or 10 passes are reached.
 
-### Options that affect iteration-level script execution
-
-| Option             | Default | Effect on Lua                                                                     |
-| ------------------ | ------- | --------------------------------------------------------------------------------- |
-| `CHECKFREQ`        | 2       | Script runs every N iterations during non-converged periodic checks               |
-| `MAXCHECK`         | 10      | Periodic checks (and script execution) stop after this iteration                  |
-| `MAXITER`          | 200     | Normal iteration limit; script does not run during extra iterations               |
-| `EXTRA ITERATIONS` | -1      | If > 0, extra iterations run with all status changes frozen — Lua is not executed |
-
-### What the `"iteration"` event does NOT see
-
-- It does **not** run during extra iterations (beyond `MAXITER`), where EPANET freezes all link statuses to attempt final convergence.
-- Time-based and tank-level simple controls (`controls()`) and rule-based controls (`checkrules()`) are evaluated outside the iteration loop and are unaffected by Lua.
-- The `"report"`, `"init"`, and `"term"` events fire outside the iteration loop at their own specific points.
+Top-level code changes do not trigger re-solving — they are applied and take effect on the next timestep.
 
 ## Lua API (current scope)
 
@@ -192,21 +174,21 @@ local p = link("P1")
 print("Flow", p.flow, "Velocity", p.velocity)
 ```
 
-### 5) Change a link setting
+### 5) Change a link setting (applies next timestep)
 
 ```lua
 local v = link("V1")
 v.setting = 0.75
 ```
 
-### 6) Open/close style control by status
+### 6) Open/close style control by status (applies next timestep)
 
 ```lua
 local v = link("V1")
 v.status = 0
 ```
 
-### 7) Conditional action from pressure
+### 7) Conditional action from pressure (applies next timestep)
 
 ```lua
 if node("J1").pressure < 20 then
@@ -214,7 +196,21 @@ if node("J1").pressure < 20 then
 end
 ```
 
-### 8) Full event-driven script
+### 8) Adjust a PRV to hit a target pressure (re-solves within current timestep)
+
+```lua
+function on_event(event)
+    if event == "iteration" then
+        local target = 30
+        local diff = node("J126").pressure - target
+        if math.abs(diff) > 0.01 then
+            link("V1").setting = link("V1").setting - diff
+        end
+    end
+end
+```
+
+### 9) Full event-driven script
 
 ```lua
 function on_event(event)
@@ -237,13 +233,12 @@ end
 - The exposed Lua API is currently a focused subset, not the full Toolkit surface.
 - Node properties are currently read-only in scripting.
 - Link writes are currently limited to `status` and `setting`.
-- Top-level code runs inside the iteration loop and can execute many times per timestep (not once). Script logic should be lightweight and idempotent where possible.
-- The `"init"` and `"term"` events fire exactly once per project open/close. The `"report"` event fires once per successful hydraulic solve. The `"iteration"` event fires at the same frequency as top-level code (governed by `CHECKFREQ` and `MAXCHECK`).
-- A script that unconditionally toggles a link status may cause the solver to cycle without converging. Use the `CHECKFREQ` and `MAXCHECK` options to limit how often the script can intervene. The solver will stop trying periodic checks (including Lua) after `MAXCHECK` iterations.
-- Script execution is suppressed during extra iterations (when `EXTRA ITERATIONS > 0` and `iter > MAXITER`), matching the behavior of EPANET's own controls.
-- `DampLimit` does not currently gate Lua execution. The script runs regardless of the current convergence error level.
+- Top-level code runs once per timestep after convergence. Changes apply to the next timestep.
+- The `"iteration"` event runs after convergence; if it changes anything, the solver re-converges and fires the event again (up to 10 passes per timestep).
+- The `"init"` and `"term"` events fire exactly once per project open/close. The `"report"` event fires once per successful hydraulic solve.
+- A script that unconditionally toggles a link status in `on_event("iteration")` may cause repeated re-solves. The engine limits this to 10 passes per timestep to prevent infinite cycling.
 - This feature is actively evolving; API coverage is expected to expand over time.
 
 ## Summary
 
-Lua scripting adds a flexible way to observe and influence hydraulic behavior during simulation, directly from INP-authored script blocks. Scripts can use top-level code for simple iteration-level logic, or define an `on_event` function to respond to specific lifecycle events: `"init"`, `"iteration"`, `"report"`, and `"term"`. Iteration-level execution runs alongside EPANET's own control checks, governed by `CHECKFREQ` and `MAXCHECK`. If a script modifies a link, the solver re-converges with the change applied. The current implementation is intentionally minimal, with a clear path for expanding properties and helper functions as the feature matures.
+Lua scripting adds a flexible way to observe and influence hydraulic behavior during simulation, directly from INP-authored script blocks. All Lua code runs after the solver converges, ensuring scripts always see stable, balanced results. Top-level code runs once per timestep with changes applied to the next timestep. The `on_event("iteration")` handler provides a way to make adjustments that are re-solved within the current timestep. Other lifecycle events (`"init"`, `"report"`, `"term"`) fire at their respective points. The current implementation is intentionally minimal, with a clear path for expanding properties and helper functions as the feature matures.

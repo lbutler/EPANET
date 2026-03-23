@@ -1,4 +1,4 @@
-  Page 1                                    Sun Mar 15 13:59:42 2026
+  Page 1                                    Sun Mar 22 22:24:00 2026
 
   ******************************************************************
   *                           E P A N E T                          *
@@ -7,10 +7,7 @@
   *                          Version 2.3.05                        *
   ******************************************************************
   
-  ## Pressure at J126 is: 	-19.2
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	49.2
-  Analysis begun Sun Mar 15 13:59:42 2026
+  Analysis begun Sun Mar 22 22:24:00 2026
 
    
   Hydraulic Status:
@@ -19,139 +16,190 @@
 
               Trial  1: relative flow change = 1.431667
               Trial  2: relative flow change = 0.439075
-  ## Pressure at J126 is: 	33.2761153337
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	22.7238846663
-              Trial  3: relative flow change = 0.081742
-              Trial  4: relative flow change = 0.031132
-  ## Pressure at J126 is: 	29.967753984177
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	22.756130682123
+              Trial  3: relative flow change = 0.081741
+              Trial  4: relative flow change = 0.031131
               Trial  5: relative flow change = 0.006313
               Trial  6: relative flow change = 0.001091
               Trial  7: relative flow change = 0.000034
-                        maximum  flow change = 0.0006 for Link P62
+                        maximum  flow change = 0.0006 for Link P95
                         maximum  head error  = 0.0000 for Link P30
 
-     0:00:00: Balanced after 7 trials
+  ## Pressure at J126 is: 	33.243868987962
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	22.756131012038
+     0:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000002
+                        maximum  flow change = 0.0000 for Link P64
+                        maximum  head error  = 0.0000 for Link P143
+
+     0:00:00: Balanced after 1 trials
      0:00:00: Reservoir R2 is closed
      0:00:00: Tank T1 is emptying at 5.00 m
    
      1:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.065774
+              Trial  1: relative flow change = 0.065775
               Trial  2: relative flow change = 0.039283
-  ## Pressure at J126 is: 	30.029264711071
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	22.726865971052
               Trial  3: relative flow change = 0.000082
                         maximum  flow change = 0.0008 for Link P6
                         maximum  head error  = 0.0000 for Link P114
 
-     1:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.029265039732
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	22.726865972306
+     1:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P91
+                        maximum  head error  = 0.0000 for Link P114
+
+     1:00:00: Balanced after 1 trials
    
      2:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.072995
               Trial  2: relative flow change = 0.043784
-  ## Pressure at J126 is: 	30.026362015511
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	22.700503955541
               Trial  3: relative flow change = 0.000101
                         maximum  flow change = 0.0009 for Link P6
                         maximum  head error  = 0.0000 for Link P114
 
-     2:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.026362014175
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	22.70050395813
+     2:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P69
+                        maximum  head error  = 0.0000 for Link P114
+
+     2:00:00: Balanced after 1 trials
    
      3:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.132927
               Trial  2: relative flow change = 0.071361
-  ## Pressure at J126 is: 	29.944373278907
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	22.756130676634
               Trial  3: relative flow change = 0.000314
                         maximum  flow change = 0.0034 for Link P91
                         maximum  head error  = 0.0000 for Link P114
 
-     3:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	29.944373241405
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	22.756130716726
+     3:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P114
+                        maximum  head error  = 0.0000 for Link P114
+
+     3:00:00: Balanced after 1 trials
    
      4:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.238766
               Trial  2: relative flow change = 0.121620
-  ## Pressure at J126 is: 	29.811726862377
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	22.944403814258
               Trial  3: relative flow change = 0.001357
               Trial  4: relative flow change = 0.000005
-                        maximum  flow change = 0.0001 for Link P44
+                        maximum  flow change = 0.0001 for Link P114
                         maximum  head error  = 0.0000 for Link P114
 
-     4:00:00: Balanced after 4 trials
+  ## Pressure at J126 is: 	29.81172668494
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	22.944404031786
+     4:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+     4:00:00: Balanced after 1 trials
    
      5:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.273935
               Trial  2: relative flow change = 0.137192
-  ## Pressure at J126 is: 	29.508103971589
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.436299842669
               Trial  3: relative flow change = 0.002120
               Trial  4: relative flow change = 0.000012
                         maximum  flow change = 0.0004 for Link P44
                         maximum  head error  = 0.0000 for Link P114
 
-     5:00:00: Balanced after 4 trials
+  ## Pressure at J126 is: 	29.508104053732
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.436299978054
+     5:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P115
+                        maximum  head error  = 0.0000 for Link P143
+
+     5:00:00: Balanced after 1 trials
    
      6:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.144707
               Trial  2: relative flow change = 0.077175
-  ## Pressure at J126 is: 	29.537042352147
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.899257490522
               Trial  3: relative flow change = 0.000454
                         maximum  flow change = 0.0150 for Link P91
                         maximum  head error  = 0.0000 for Link P114
 
-     6:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	29.537042476743
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.899257501311
+     6:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000001
+                        maximum  flow change = 0.0000 for Link P44
+                        maximum  head error  = 0.0000 for Link P114
+
+     6:00:00: Balanced after 1 trials
    
      7:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.115436
               Trial  2: relative flow change = 0.062495
-  ## Pressure at J126 is: 	29.464124434742
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	24.435133055781
               Trial  3: relative flow change = 0.000254
                         maximum  flow change = 0.0108 for Link P91
                         maximum  head error  = 0.0000 for Link P114
 
-     7:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	29.464124436151
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	24.435133065161
+     7:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P114
+                        maximum  head error  = 0.0000 for Link P114
+
+     7:00:00: Balanced after 1 trials
    
      8:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.098914
               Trial  2: relative flow change = 0.060177
-  ## Pressure at J126 is: 	30.452490494814
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.982642560966
               Trial  3: relative flow change = 0.000198
                         maximum  flow change = 0.0068 for Link P6
                         maximum  head error  = 0.0000 for Link P114
 
-     8:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.452490498595
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.982642566566
+     8:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P91
+                        maximum  head error  = 0.0000 for Link P114
+
+     8:00:00: Balanced after 1 trials
    
      8:32:52: Pump PU1 changed by Tank T1 control
      8:32:52: Balancing the network:
 
-              Trial  1: relative flow change = 1.372143
+              Trial  1: relative flow change = 1.372142
               Trial  2: relative flow change = 0.284459
               Trial  3: relative flow change = 0.043354
               Trial  4: relative flow change = 0.001934
               Trial  5: relative flow change = 0.000015
-                        maximum  flow change = 0.0007 for Link P20
+                        maximum  flow change = 0.0007 for Link P21
                         maximum  head error  = 0.0000 for Link P20
 
      8:32:52: Balanced after 5 trials
@@ -163,173 +211,251 @@
 
               Trial  1: relative flow change = 0.074164
               Trial  2: relative flow change = 0.041894
-  ## Pressure at J126 is: 	30.392818037313
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.589824523653
               Trial  3: relative flow change = 0.000713
                         maximum  flow change = 0.0147 for Link P109
                         maximum  head error  = 0.0000 for Link P49
 
-     9:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.392818044751
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.589824521815
+     9:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P112
+                        maximum  head error  = 0.0000 for Link P121
+
+     9:00:00: Balanced after 1 trials
    
     10:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.070974
               Trial  2: relative flow change = 0.041166
-  ## Pressure at J126 is: 	30.331505319014
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.258319204639
               Trial  3: relative flow change = 0.000701
                         maximum  flow change = 0.0136 for Link P109
                         maximum  head error  = 0.0000 for Link P49
 
-    10:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.331505317093
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.258319204722
+    10:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P121
+                        maximum  head error  = 0.0000 for Link P49
+
+    10:00:00: Balanced after 1 trials
    
     11:00:00: Balancing the network:
 
-              Trial  1: relative flow change = 0.073501
+              Trial  1: relative flow change = 0.073500
               Trial  2: relative flow change = 0.041751
-  ## Pressure at J126 is: 	29.668494872612
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.589824332027
               Trial  3: relative flow change = 0.000751
                         maximum  flow change = 0.0148 for Link P153
                         maximum  head error  = 0.0000 for Link P49
 
-    11:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	29.668494872412
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.58982433231
+    11:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P3
+                        maximum  head error  = 0.0000 for Link P6
+
+    11:00:00: Balanced after 1 trials
    
     12:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.031483
               Trial  2: relative flow change = 0.017091
-  ## Pressure at J126 is: 	29.850131608552
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.739692723475
               Trial  3: relative flow change = 0.000117
-                        maximum  flow change = 0.0024 for Link P34
+                        maximum  flow change = 0.0024 for Link P112
                         maximum  head error  = 0.0000 for Link P6
 
-    12:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	29.85013160922
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.739692723091
+    12:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P3
+                        maximum  head error  = 0.0000 for Link PU1
+
+    12:00:00: Balanced after 1 trials
    
     13:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.028533
               Trial  2: relative flow change = 0.017031
-  ## Pressure at J126 is: 	30.149868324645
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.589824398829
               Trial  3: relative flow change = 0.000116
-                        maximum  flow change = 0.0023 for Link P149
+                        maximum  flow change = 0.0023 for Link P109
                         maximum  head error  = 0.0000 for Link P49
 
-    13:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.149868324608
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.589824398482
+    13:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    13:00:00: Balanced after 1 trials
    
     14:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.072354
               Trial  2: relative flow change = 0.041906
-  ## Pressure at J126 is: 	30.331505252057
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.258319146772
               Trial  3: relative flow change = 0.000720
-                        maximum  flow change = 0.0138 for Link P109
+                        maximum  flow change = 0.0138 for Link P149
                         maximum  head error  = 0.0000 for Link P49
 
-    14:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.331505251652
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.25831914683
+    14:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P121
+                        maximum  head error  = 0.0000 for Link P49
+
+    14:00:00: Balanced after 1 trials
    
     15:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.041695
               Trial  2: relative flow change = 0.024840
-  ## Pressure at J126 is: 	30.168637998462
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.08968114831
               Trial  3: relative flow change = 0.000316
                         maximum  flow change = 0.0073 for Link P71
                         maximum  head error  = 0.0000 for Link P49
 
-    15:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.168637998272
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.089681148559
+    15:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P24
+                        maximum  head error  = 0.0000 for Link P49
+
+    15:00:00: Balanced after 1 trials
    
     16:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.085823
               Trial  2: relative flow change = 0.048953
-  ## Pressure at J126 is: 	29.653382816522
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.436298331788
               Trial  3: relative flow change = 0.001075
               Trial  4: relative flow change = 0.000001
-                        maximum  flow change = 0.0000 for Link P91
+                        maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P6
 
-    16:00:00: Balanced after 4 trials
+  ## Pressure at J126 is: 	29.653382808845
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.436298339713
+    16:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    16:00:00: Balanced after 1 trials
    
     17:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.064857
               Trial  2: relative flow change = 0.036757
-  ## Pressure at J126 is: 	29.696605746241
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.739692585548
               Trial  3: relative flow change = 0.000546
-                        maximum  flow change = 0.0110 for Link P112
+                        maximum  flow change = 0.0110 for Link P15
                         maximum  head error  = 0.0000 for Link P6
 
-    17:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	29.696605755342
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.739692584371
+    17:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P19
+                        maximum  head error  = 0.0000 for Link P121
+
+    17:00:00: Balanced after 1 trials
    
     18:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.126451
               Trial  2: relative flow change = 0.075796
-  ## Pressure at J126 is: 	29.304562752856
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	24.435129832691
               Trial  3: relative flow change = 0.002694
               Trial  4: relative flow change = 0.000006
-                        maximum  flow change = 0.0001 for Link P34
+                        maximum  flow change = 0.0001 for Link P112
                         maximum  head error  = 0.0000 for Link P112
 
-    18:00:00: Balanced after 4 trials
+  ## Pressure at J126 is: 	29.304562761184
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	24.435129823187
+    18:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    18:00:00: Balanced after 1 trials
    
     19:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.130209
               Trial  2: relative flow change = 0.070962
-  ## Pressure at J126 is: 	30.695437047604
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.739692785087
               Trial  3: relative flow change = 0.002343
               Trial  4: relative flow change = 0.000005
-                        maximum  flow change = 0.0001 for Link P19
+                        maximum  flow change = 0.0001 for Link P112
                         maximum  head error  = 0.0000 for Link P121
 
-    19:00:00: Balanced after 4 trials
+  ## Pressure at J126 is: 	30.695437043986
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.739692779201
+    19:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    19:00:00: Balanced after 1 trials
    
     20:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.029552
               Trial  2: relative flow change = 0.017582
-  ## Pressure at J126 is: 	30.149868504464
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.589824280623
               Trial  3: relative flow change = 0.000125
-                        maximum  flow change = 0.0025 for Link P109
+                        maximum  flow change = 0.0025 for Link P149
                         maximum  head error  = 0.0000 for Link P6
 
-    20:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.149868498942
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.58982428026
+    20:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    20:00:00: Balanced after 1 trials
    
     21:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.059573
               Trial  2: relative flow change = 0.034635
-  ## Pressure at J126 is: 	30.270200448253
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	23.31962383237
               Trial  3: relative flow change = 0.000483
-                        maximum  flow change = 0.0092 for Link P109
+                        maximum  flow change = 0.0092 for Link P149
                         maximum  head error  = 0.0000 for Link P49
 
-    21:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.270200448407
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	23.319623831853
+    21:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P121
+                        maximum  head error  = 0.0000 for Link P121
+
+    21:00:00: Balanced after 1 trials
    
     21:17:57: Pump PU1 changed by Tank T1 control
     21:17:57: Balancing the network:
@@ -350,34 +476,46 @@
 
               Trial  1: relative flow change = 0.210165
               Trial  2: relative flow change = 0.136737
-  ## Pressure at J126 is: 	30.329428268334
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	22.990195564036
               Trial  3: relative flow change = 0.000952
                         maximum  flow change = 0.0135 for Link P6
                         maximum  head error  = 0.0000 for Link P114
 
-    22:00:00: Balanced after 3 trials
+  ## Pressure at J126 is: 	30.329428250085
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	22.990195581768
+    22:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000004
+                        maximum  flow change = 0.0001 for Link P69
+                        maximum  head error  = 0.0000 for Link P114
+
+    22:00:00: Balanced after 1 trials
    
     23:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.307162
               Trial  2: relative flow change = 0.212950
-  ## Pressure at J126 is: 	30.234064986914
-  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
-  ### New PRV V1 setting: 	22.756130577122
               Trial  3: relative flow change = 0.002153
               Trial  4: relative flow change = 0.000026
                         maximum  flow change = 0.0003 for Link P114
                         maximum  head error  = 0.0000 for Link P114
 
-    23:00:00: Balanced after 4 trials
+  ## Pressure at J126 is: 	30.234064853026
+  ### Adjusting PRV V1 to try to reach target pressure of 	30	m
+  ### New PRV V1 setting: 	22.756130728742
+    23:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 0.000000
+                        maximum  flow change = 0.0000 for Link P126
+                        maximum  head error  = 0.0000 for Link P143
+
+    23:00:00: Balanced after 1 trials
    
     24:00:00: Balancing the network:
 
               Trial  1: relative flow change = 0.000000
-                        maximum  flow change = 0.0000 for Link P115
-                        maximum  head error  = 0.0000 for Link P114
+                        maximum  flow change = 0.0000 for Link P64
+                        maximum  head error  = 0.0000 for Link P76
 
     24:00:00: Balanced after 1 trials
    
@@ -393,7 +531,7 @@
   Flow Ratio:               1.000
   ================================
 
-  Analysis ended Sun Mar 15 13:59:42 2026
+  Analysis ended Sun Mar 22 22:24:00 2026
 
    
   Node Results at 0:00:00 hrs:

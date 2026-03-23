@@ -3688,12 +3688,12 @@ function on_event(event)
             if math.abs(s1 - s2) < eps_s or math.abs(p2 - p1) < 1e-6 then
                 -- Kickstart with Naive Adjustment
                 new_speed = math.min(maxSpeed, s2 * (targetP / p2))
-                -- print(string.format("Action: Kickstarting Speed (Ratio) -> %.3f", new_speed))
+                print(string.format("Action: Kickstarting Speed (Ratio) -> %.3f", new_speed))
             else
                 -- Secant Search (Only works if we have two different points)
                 local ds = (s1 - s2) * (p2 - targetP) / (p2 - p1)
                 new_speed = s2 + ds
-                -- print(string.format("Action: Secant Search -> %.3f", new_speed))
+                print(string.format("Action: Secant Search -> %.3f", new_speed))
             end
             
             -- Clamp speed

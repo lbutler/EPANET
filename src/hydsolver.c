@@ -173,7 +173,6 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
             if (valveChange)    statChange = TRUE;
             if (linkstatus(pr)) statChange = TRUE;
             if (pswitch(pr))    statChange = TRUE;
-            if (luascript_run(pr)) statChange = TRUE;
             if (!statChange)    break;
 
             // We have a status change so continue the iterations
@@ -185,7 +184,6 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
         else if (*iter <= hyd->MaxCheck && *iter == nextcheck)
         {
             linkstatus(pr);
-            luascript_run(pr);
             nextcheck += hyd->CheckFreq;
         }
         (*iter)++;

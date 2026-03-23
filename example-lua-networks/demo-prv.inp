@@ -2463,16 +2463,19 @@ LINK PU1 0 IF NODE T1 ABOVE 5.2
 
 [SCRIPT]
 
-local prv_target = 30
-local diff = node("J126").pressure - prv_target
+function on_event(event)
+    if event == "iteration" then
+        local prv_target = 30
+        local diff = node("J126").pressure - prv_target
 
-
-if math.abs(diff) > 0.01 then
-    print("## Pressure at J126 is: ", node("J126").pressure)
-    print("### Adjusting PRV V1 to try to reach target pressure of ", prv_target, "m")
-    local new_setting = link("V1").setting - diff
-    link("V1").setting = new_setting
-    print("### New PRV V1 setting: ", link("V1").setting)
+        if math.abs(diff) > 0.01 then
+            print("## Pressure at J126 is: ", node("J126").pressure)
+            print("### Adjusting PRV V1 to try to reach target pressure of ", prv_target, "m")
+            local new_setting = link("V1").setting - diff
+            link("V1").setting = new_setting
+            print("### New PRV V1 setting: ", link("V1").setting)
+        end
+    end
 end
     
 

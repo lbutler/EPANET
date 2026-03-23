@@ -19,6 +19,7 @@
 #include "types.h"
 #include "funcs.h"
 #include "text.h"
+#include "luascript.h"
 
 const double QZERO = 1.e-6;  // Equivalent to zero flow in cfs
 
@@ -211,6 +212,24 @@ int   runhyd(Project *pr, long *t)
 
     // Solve network hydraulic equations
     errcode = hydsolve(pr,&iter,&relerr);
+
+    // Run on_event("iteration") after convergence.
+    // If it changes anything, re-solve and repeat until stable.
+    if (!errcode)
+    {
+        int luapass = 0;
+        while (luascript_event(pr, "iteration") && luapass < 10)
+        {
+            errcode = hydsolve(pr,&iter,&relerr);
+            if (errcode) break;
+            luapass++;
+        }
+    }
+
+    // Run top-level Lua script once. Changes apply next timestep.
+    if (!errcode)
+        luascript_run(pr);
+
     if (!errcode)
     {
         // Report new status & save results

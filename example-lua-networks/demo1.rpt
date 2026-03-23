@@ -1,4 +1,4 @@
-  Page 1                                    Sun Mar 15 13:59:38 2026
+  Page 1                                    Sun Mar 22 22:09:29 2026
 
   ******************************************************************
   *                           E P A N E T                          *
@@ -17,7 +17,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.67051626654727
+  Random number (0–1) =	0.87706199819419
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -25,7 +25,7 @@
   Iteration:	4
   Iteration:	5
   Pressure is normal:	25
-  Analysis begun Sun Mar 15 13:59:38 2026
+  Analysis begun Sun Mar 22 22:09:29 2026
 
    
   Hydraulic Status:
@@ -34,64 +34,10 @@
 
               Trial  1: relative flow change = 1.558068
               Trial  2: relative flow change = 0.953444
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.60852566167325
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.150092
               Trial  4: relative flow change = 0.042847
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.33948838747795
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  5: relative flow change = 0.013400
               Trial  6: relative flow change = 0.002364
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.061747606272954
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  7: relative flow change = 0.000591
                         maximum  flow change = 0.0140 for Link P90
                         maximum  head error  = 0.0000 for Link P30
@@ -106,7 +52,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.34693482987821
+  Random number (0–1) =	0.41167636155037
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -122,24 +68,6 @@
 
               Trial  1: relative flow change = 0.084693
               Trial  2: relative flow change = 0.001584
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.85202009410342
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000003
                         maximum  flow change = 0.0001 for Link P82
                         maximum  head error  = 0.0000 for Link P82
@@ -154,7 +82,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.46272437590139
+  Random number (0–1) =	0.80108113862549
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -168,24 +96,6 @@
 
               Trial  1: relative flow change = 0.092423
               Trial  2: relative flow change = 0.001708
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.17608254459792
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000000
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -200,7 +110,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.43476574579375
+  Random number (0–1) =	0.67536751509285
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -214,24 +124,6 @@
 
               Trial  1: relative flow change = 0.156810
               Trial  2: relative flow change = 0.003081
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.10116555461466
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000002
                         maximum  flow change = 0.0000 for Link P69
                         maximum  head error  = 0.0000 for Link P44
@@ -246,7 +138,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.014649842789088
+  Random number (0–1) =	0.76630047827
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -260,24 +152,6 @@
 
               Trial  1: relative flow change = 0.281334
               Trial  2: relative flow change = 0.005490
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.70791288128517
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000007
                         maximum  flow change = 0.0001 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -292,7 +166,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.56836989778838
+  Random number (0–1) =	0.17855191893394
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -306,24 +180,6 @@
 
               Trial  1: relative flow change = 0.330217
               Trial  2: relative flow change = 0.006210
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.81542714056639
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000006
                         maximum  flow change = 0.0001 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -338,7 +194,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.63969068741311
+  Random number (0–1) =	0.94778564629417
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -352,24 +208,6 @@
 
               Trial  1: relative flow change = 0.187991
               Trial  2: relative flow change = 0.003451
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.60361024088533
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000002
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -384,7 +222,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.39889473674671
+  Random number (0–1) =	0.35443894370873
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -398,24 +236,6 @@
 
               Trial  1: relative flow change = 0.153562
               Trial  2: relative flow change = 0.002816
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.22892816924344
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000001
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -430,7 +250,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.72304788609592
+  Random number (0–1) =	0.58551423023209
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -444,24 +264,6 @@
 
               Trial  1: relative flow change = 0.146367
               Trial  2: relative flow change = 0.002694
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.23601037426228
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000001
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -476,7 +278,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.45679134031355
+  Random number (0–1) =	0.97453801630949
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -490,24 +292,6 @@
 
               Trial  1: relative flow change = 0.171882
               Trial  2: relative flow change = 0.003165
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.37571600687139
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000002
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -522,7 +306,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.69135238174347
+  Random number (0–1) =	0.18073975442501
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -536,24 +320,6 @@
 
               Trial  1: relative flow change = 0.208156
               Trial  2: relative flow change = 0.003836
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.36497619328127
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000002
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -568,7 +334,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.93390601418633
+  Random number (0–1) =	0.32426022606648
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -583,44 +349,8 @@
 
               Trial  1: relative flow change = 1.101667
               Trial  2: relative flow change = 0.804744
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.76485704809834
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.348996
               Trial  4: relative flow change = 0.052921
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.5205561963801
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  5: relative flow change = 0.001351
               Trial  6: relative flow change = 0.000003
                         maximum  flow change = 0.0001 for Link P20
@@ -636,7 +366,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.59608761733968
+  Random number (0–1) =	0.74458181999745
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -653,24 +383,6 @@
 
               Trial  1: relative flow change = 0.056555
               Trial  2: relative flow change = 0.002052
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.84413014438431
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000003
                         maximum  flow change = 0.0001 for Link P65
                         maximum  head error  = 0.0000 for Link P122
@@ -685,7 +397,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.18712703168245
+  Random number (0–1) =	0.37951916525742
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -712,7 +424,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.20246670073111
+  Random number (0–1) =	0.84020990843012
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -739,7 +451,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.09700857161863
+  Random number (0–1) =	0.94589885793324
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -753,24 +465,6 @@
 
               Trial  1: relative flow change = 0.054844
               Trial  2: relative flow change = 0.001459
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.65877344252536
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000002
                         maximum  flow change = 0.0000 for Link P53
                         maximum  head error  = 0.0000 for Link P122
@@ -785,7 +479,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.80976882349403
+  Random number (0–1) =	0.49011453351787
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -812,7 +506,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.79100603720976
+  Random number (0–1) =	0.21250996070892
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -826,24 +520,6 @@
 
               Trial  1: relative flow change = 0.069240
               Trial  2: relative flow change = 0.002741
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.77057741149863
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000005
                         maximum  flow change = 0.0001 for Link P121
                         maximum  head error  = 0.0000 for Link P49
@@ -858,7 +534,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.79588969492059
+  Random number (0–1) =	0.55168985240801
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -872,24 +548,6 @@
 
               Trial  1: relative flow change = 0.052048
               Trial  2: relative flow change = 0.001638
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.32286815849465
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000001
                         maximum  flow change = 0.0000 for Link P121
                         maximum  head error  = 0.0000 for Link P49
@@ -904,7 +562,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.20970119689531
+  Random number (0–1) =	0.46764722421602
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -918,24 +576,6 @@
 
               Trial  1: relative flow change = 0.100662
               Trial  2: relative flow change = 0.004489
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.67600491537396
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000012
                         maximum  flow change = 0.0004 for Link P121
                         maximum  head error  = 0.0000 for Link P121
@@ -950,7 +590,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.38199763647787
+  Random number (0–1) =	0.37964503341419
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -964,24 +604,6 @@
 
               Trial  1: relative flow change = 0.095868
               Trial  2: relative flow change = 0.002759
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.17359908983053
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000005
                         maximum  flow change = 0.0001 for Link P102
                         maximum  head error  = 0.0000 for Link P122
@@ -996,7 +618,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.81968070885288
+  Random number (0–1) =	0.5327925602977
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -1023,7 +645,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.94483299606163
+  Random number (0–1) =	0.15118265827156
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -1038,24 +660,6 @@
 
               Trial  1: relative flow change = 2.861687
               Trial  2: relative flow change = 0.076389
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.91743853824269
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.005993
               Trial  4: relative flow change = 0.000141
                         maximum  flow change = 0.0018 for Link P53
@@ -1071,7 +675,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.74192833709354
+  Random number (0–1) =	0.13596219460458
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -1088,24 +692,6 @@
 
               Trial  1: relative flow change = 0.159877
               Trial  2: relative flow change = 0.002944
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.74702444572868
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000001
                         maximum  flow change = 0.0000 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -1120,7 +706,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.79397832190461
+  Random number (0–1) =	0.12588808475639
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -1134,24 +720,6 @@
 
               Trial  1: relative flow change = 0.316359
               Trial  2: relative flow change = 0.005840
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.1378359036085
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000006
                         maximum  flow change = 0.0001 for Link P6
                         maximum  head error  = 0.0000 for Link P44
@@ -1166,7 +734,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.98173270464238
+  Random number (0–1) =	0.36323120125215
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -1180,24 +748,6 @@
 
               Trial  1: relative flow change = 0.464997
               Trial  2: relative flow change = 0.008630
-  Starting Lua test script
-  Variable a:	10
-  Variable b:	3
-  a + b =	13
-  a - b =	7
-  a * b =	30
-  a / b =	3.3333333333333
-  a ^ b =	1000.0
-  Square root of	16	=	4.0
-  sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.42590716361216
-  Loop test:
-  Iteration:	1
-  Iteration:	2
-  Iteration:	3
-  Iteration:	4
-  Iteration:	5
-  Pressure is normal:	25
               Trial  3: relative flow change = 0.000009
                         maximum  flow change = 0.0000 for Link P76
                         maximum  head error  = 0.0000 for Link P93
@@ -1212,7 +762,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.48947563781086
+  Random number (0–1) =	0.081642739236347
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -1238,7 +788,7 @@
   a ^ b =	1000.0
   Square root of	16	=	4.0
   sin(90 degrees in radians) =	1.0
-  Random number (0–1) =	0.77914902021778
+  Random number (0–1) =	0.31570646462539
   Loop test:
   Iteration:	1
   Iteration:	2
@@ -1260,4 +810,4 @@
   Flow Ratio:               1.000
   ================================
 
-  Analysis ended Sun Mar 15 13:59:38 2026
+  Analysis ended Sun Mar 22 22:09:29 2026
