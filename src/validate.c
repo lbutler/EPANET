@@ -317,10 +317,10 @@ int validatepumps(Project *pr)
             errcode = 226;
         }
         
-        // VSP pump requires a power function curve (1-point or 3-point)
+        // VSP pump requires a power function or custom pump curve
         if (!errcode && pump->Hset > 0.0)
         {
-            if (pump->Ptype != POWER_FUNC)
+            if (pump->Ptype != POWER_FUNC && pump->Ptype != CUSTOM)
                 errcode = 226;
         }
 

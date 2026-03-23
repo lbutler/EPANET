@@ -248,46 +248,87 @@ int   runhyd(Project *pr, long *t)
                 q = ABS(hyd->LinkFlow[k]);
                 max_speed = net->Link[k].InitSetting;
 
-                // Pump curve coefficients:
-                // A = shutoff head, B = flow coefficient, C = exponent
-                A = -pump->H0;
-                B = pump->R;
-                C = pump->N;
-
-                if (ABS(C - 2.0) < 1.0e-6)
+                if (pump->Ptype == CUSTOM)
                 {
-                    // 1-point curve (C=2): algebraic solution
-                    // Head gain = A*N^2 - B*Q^2
-                    disc = (h_target + B * q * q) / A;
-                    if (disc > 0.0)
-                        N = sqrt(disc);
-                    else
-                        N = 0.0;
+                    // CUSTOM multipoint curve: bisection method
+                    // Head gain g(N) = N^2 * H_curve(Q/N) is monotonically
+                    // increasing with N. Find N where g(N) = h_target.
+                    Scurve *curve = &net->Curve[pump->Hcurve];
+                    double q_user = q * pr->Ucf[FLOW];
+                    double h_tgt_user = h_target * pr->Ucf[HEAD];
+                    double N_lo = 0.001, N_hi = max_speed;
+                    int ki;
+
+                    N = 0.5 * (N_lo + N_hi);
+                    for (int iter = 0; iter < 50; iter++)
+                    {
+                        // Interpolate pump curve at speed-adjusted flow
+                        double q_adj = q_user / N;
+                        ki = 0;
+                        while (ki < curve->Npts && curve->X[ki] < q_adj) ki++;
+                        if (ki == 0) ki = 1;
+                        else if (ki == curve->Npts) ki = curve->Npts - 1;
+                        double slope = (curve->Y[ki] - curve->Y[ki - 1]) /
+                                       (curve->X[ki] - curve->X[ki - 1]);
+                        double H_at_q = curve->Y[ki - 1] +
+                                        slope * (q_adj - curve->X[ki - 1]);
+
+                        double head = N * N * H_at_q;
+
+                        if (fabs(head - h_tgt_user) / (h_tgt_user + 1.0e-6) < 1.0e-6)
+                            break;
+
+                        if (head < h_tgt_user)
+                            N_lo = N;
+                        else
+                            N_hi = N;
+
+                        N = 0.5 * (N_lo + N_hi);
+                    }
                 }
                 else
                 {
-                    // 3-point curve (C!=2): Newton-Raphson
-                    // Head gain = A*N^2 - B*Q^C*N^(2-C)
-                    // f(N)  = A*N^2 - B*QC*N^exp - h_target
-                    // f'(N) = 2*A*N - exp*B*QC*N^(exp-1)
-                    QC = pow(q, C);
-                    expn = 2.0 - C;
+                    // POWER_FUNC curve coefficients:
+                    // A = shutoff head, B = flow coefficient, C = exponent
+                    A = -pump->H0;
+                    B = pump->R;
+                    C = pump->N;
 
-                    N = 1.0;  // initial guess
-                    for (int iter = 0; iter < 20; iter++)
+                    if (ABS(C - 2.0) < 1.0e-6)
                     {
-                        f = A * N * N - B * QC * pow(N, expn) - h_target;
-                        fp = 2.0 * A * N - expn * B * QC * pow(N, expn - 1.0);
+                        // 1-point curve (C=2): algebraic solution
+                        // Head gain = A*N^2 - B*Q^2
+                        disc = (h_target + B * q * q) / A;
+                        if (disc > 0.0)
+                            N = sqrt(disc);
+                        else
+                            N = 0.0;
+                    }
+                    else
+                    {
+                        // 3-point curve (C!=2): Newton-Raphson
+                        // Head gain = A*N^2 - B*Q^C*N^(2-C)
+                        // f(N)  = A*N^2 - B*QC*N^exp - h_target
+                        // f'(N) = 2*A*N - exp*B*QC*N^(exp-1)
+                        QC = pow(q, C);
+                        expn = 2.0 - C;
 
-                        if (fabs(fp) < 1.0e-12) break;
+                        N = 1.0;
+                        for (int iter = 0; iter < 20; iter++)
+                        {
+                            f = A * N * N - B * QC * pow(N, expn) - h_target;
+                            fp = 2.0 * A * N - expn * B * QC * pow(N, expn - 1.0);
 
-                        dN = f / fp;
-                        N = N - dN;
+                            if (fabs(fp) < 1.0e-12) break;
 
-                        if (N < 0.001) N = 0.001;
-                        if (N > 5.0)   N = 5.0;
+                            dN = f / fp;
+                            N = N - dN;
 
-                        if (fabs(dN) < 1.0e-6) break;
+                            if (N < 0.001) N = 0.001;
+                            if (N > 5.0)   N = 5.0;
+
+                            if (fabs(dN) < 1.0e-6) break;
+                        }
                     }
                 }
 

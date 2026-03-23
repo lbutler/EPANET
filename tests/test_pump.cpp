@@ -21,6 +21,8 @@
 #define DATA_PATH_NOVSP        "./pump-test-novsp.inp"
 #define DATA_PATH_3PT_VSP      "./pump-test-3pt-vsp.inp"
 #define DATA_PATH_3PT_NOVSP    "./pump-test-3pt-novsp.inp"
+#define DATA_PATH_MULTI_VSP    "./pump-test-multi-vsp.inp"
+#define DATA_PATH_MULTI_NOVSP  "./pump-test-multi-novsp.inp"
 #define DATA_PATH_VSP_MINSPD   "./pump-test-vsp-minspeed.inp"
 #define DATA_PATH_RPT_A        "./test_vsp_a.rpt"
 #define DATA_PATH_OUT_A        "./test_vsp_a.out"
@@ -154,6 +156,18 @@ BOOST_AUTO_TEST_CASE(test_vsp_3pt_eps)
 BOOST_AUTO_TEST_CASE(test_vsp_3pt_crossvalidation)
 {
     run_vsp_crossvalidation_test(DATA_PATH_3PT_VSP, DATA_PATH_3PT_NOVSP, 15.0);
+}
+
+// === Multipoint curve tests ===
+
+BOOST_AUTO_TEST_CASE(test_vsp_multi_eps)
+{
+    run_vsp_eps_test(DATA_PATH_MULTI_VSP, 15.0);
+}
+
+BOOST_AUTO_TEST_CASE(test_vsp_multi_crossvalidation)
+{
+    run_vsp_crossvalidation_test(DATA_PATH_MULTI_VSP, DATA_PATH_MULTI_NOVSP, 15.0);
 }
 
 // === MINSPEED test ===
