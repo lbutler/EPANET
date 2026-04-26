@@ -627,6 +627,9 @@ void convertunits(Project *pr)
                 case PBV:
                   link->Kc /= pr->Ucf[PRESSURE];
                   break;
+                case FLV:
+                  link->Kc /= pr->Ucf[ELEV];
+                  break;
                 default:
                   break;
             }
@@ -664,6 +667,10 @@ void convertunits(Project *pr)
                 break;
               case FCV:
                 control->Setting /= pr->Ucf[FLOW];
+                break;
+              case FLV:
+                control->Setting /= pr->Ucf[ELEV];
+                break;
               default:
                 break;
             }

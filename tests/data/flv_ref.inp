@@ -1,0 +1,37 @@
+[TITLE]
+FLV reference network
+
+[JUNCTIONS]
+;ID    Elev   Demand
+ J1    100    0
+
+[RESERVOIRS]
+;ID    Head
+ R1    150
+
+[TANKS]
+;ID    Elev   InitLvl  MinLvl  MaxLvl  Diam   Volume
+ T1    100    4.0      0.0     5.0     11.28  0
+
+[PIPES]
+;ID    Node1  Node2  Length  Diam   Roughness  Mloss  Status
+ P1    R1     J1     1000    300    130        0      OPEN
+
+[VALVES]
+;ID    Node1  Node2  Diameter  Type  Setting  MinorLoss
+ FV1   J1     T1     200       FLV   0.5      5
+
+[OPTIONS]
+ Units              LPS
+ Headloss           H-W
+ Quality            None
+
+[TIMES]
+ Duration           24:00
+ Hydraulic Timestep 0:05
+ Pattern Timestep   1:00
+
+[REPORT]
+ Status             Full
+
+[END]

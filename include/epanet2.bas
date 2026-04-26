@@ -128,6 +128,7 @@ Public Const EN_FCV = 6
 Public Const EN_TCV = 7
 Public Const EN_GPV = 8
 Public Const EN_PCV = 9
+Public Const EN_FLV = 10
 
 Public Const EN_CLOSED = 0        ' Link status types
 Public Const EN_OPEN = 1

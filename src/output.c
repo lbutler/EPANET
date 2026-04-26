@@ -569,6 +569,8 @@ int linkoutput(Project *pr, int j, REAL4 *x, double ucf)
               case TCV:
               case PCV:
                 x[i] = (REAL4)setting; break;
+              case FLV:
+                x[i] = (REAL4)(setting * pr->Ucf[ELEV]); break;
               default: x[i] = 0.0f;
             }
             else x[i] = 0.0f;

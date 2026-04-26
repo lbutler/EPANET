@@ -595,6 +595,7 @@ int valvedata(Project *pr)
     else if (match(parser->Tok[4], w_TCV)) type = TCV;
     else if (match(parser->Tok[4], w_GPV)) type = GPV;
     else if (match(parser->Tok[4], w_PCV)) type = PCV;
+    else if (match(parser->Tok[4], w_FLV)) type = FLV;
     else return setError(parser, 4, 213);
     
     // Check for illegal connections
@@ -660,14 +661,21 @@ int valvedata(Project *pr)
             return setError(parser, 6, 202);
         link->Km = x;
     }
-    if (n > 7 && type == PCV)
-    {        
-        // Find loss coeff. curve for PCV
+    if (n > 7 && (type == PCV || type == FLV))
+    {
+        // Find loss coeff. curve for PCV / FLV
         c = findcurve(net, parser->Tok[7]);
         if (c == 0) return setError(parser, 7, 206);
         net->Valve[net->Nvalves].Curve = c;
         net->Curve[c].Type = VALVE_CURVE;
-        if (link->Kc > 100.0) link->Kc = 100.0;
+        if (type == PCV && link->Kc > 100.0) link->Kc = 100.0;
+    }
+    if (type == FLV)
+    {
+        Stank *t = &net->Tank[j2 - net->Njuncs];
+        double range = t->Hmax - t->Hmin;
+        if (link->Kc <= 0.0 || link->Kc > range)
+            return setError(parser, 5, 202);
     }
     link->InitSetting = link->Kc;
     return 0;
@@ -2259,6 +2267,7 @@ void changestatus(Network *net, int j, StatusType status, double y)
     else if (link->Type >= PRV)
     {
         if (status == ACTIVE) link->Kc = y;
+        else if (link->Type == FLV) link->Kc = MISSING;
         link->InitStatus = status;
         link->InitSetting = link->Kc;
     }

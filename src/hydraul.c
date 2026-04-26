@@ -209,6 +209,9 @@ int   runhyd(Project *pr, long *t)
     demands(pr);
     controls(pr);
 
+    // Update any float valves based on tank level
+    flvstatus(pr);
+
     // Solve network hydraulic equations
     errcode = hydsolve(pr,&iter,&relerr);
     if (!errcode)
@@ -457,8 +460,8 @@ void  setlinksetting(Project *pr, int index, double value, StatusType *s,
         if (value == 0 && *s > CLOSED) *s = CLOSED;
     }
 
-    // For FCV, activate it
-    else if (t == FCV)
+    // For FCV / FLV, activate it
+    else if (t == FCV || t == FLV)
     {
         *k = value;
         *s = ACTIVE;
@@ -635,6 +638,62 @@ int  controls(Project *pr)
         }
     }
     return setsum;
+}
+
+
+void  flvstatus(Project *pr)
+/*
+**---------------------------------------------------------------------
+**  Input:   none
+**  Output:  none
+**  Purpose: updates float valve status, setting and loss coefficient
+**           based on the current depth of the controlling tank.
+**---------------------------------------------------------------------
+*/
+{
+    Network *net = &pr->network;
+    Hydraul *hyd = &pr->hydraul;
+
+    int i, k, n;
+    double top, bot, h, range, pctOpen;
+    Slink *link;
+    Stank *tank;
+
+    for (i = 1; i <= net->Nvalves; i++)
+    {
+        k = net->Valve[i].Link;
+        link = &net->Link[k];
+        if (link->Type != FLV) continue;
+
+        // User-locked OPEN or CLOSED -- leave alone
+        if (hyd->LinkSetting[k] == MISSING) continue;
+
+        n = link->N2;
+        tank = &net->Tank[n - net->Njuncs];
+        top = tank->Hmax;
+        range = hyd->LinkSetting[k];
+        bot = top - range;
+        h = hyd->NodeHead[n];
+
+        if (h >= top)
+        {
+            // Tank full -- natural closure (do not clear setting)
+            hyd->LinkStatus[k] = CLOSED;
+        }
+        else if (h <= bot)
+        {
+            // Below band -- fully open
+            hyd->LinkStatus[k] = ACTIVE;
+            link->R = link->Km;
+        }
+        else
+        {
+            // Within band -- modulate
+            hyd->LinkStatus[k] = ACTIVE;
+            pctOpen = (top - h) / range * 100.0;
+            link->R = pcvlosscoeff(pr, k, pctOpen);
+        }
+    }
 }
 
 

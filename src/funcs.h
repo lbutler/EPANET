@@ -162,6 +162,7 @@ int     nexthyd(Project *, long *);
 void    closehyd(Project *);
 void    setlinkstatus(Project *, int, char, StatusType *, double *);
 void    setlinksetting(Project *, int, double, StatusType *, double *);
+void    flvstatus(Project *);
 int     tanktimestep(Project *, long *);
 int     controltimestep(Project *, long *);
 void    getenergy(Project *, int, double *, double *);

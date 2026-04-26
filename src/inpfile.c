@@ -300,6 +300,9 @@ int saveinpfile(Project *pr, const char *fname)
           case PBV:
             kc *= pr->Ucf[PRESSURE];
             break;
+          case FLV:
+            kc *= pr->Ucf[ELEV];
+            break;
           default:
             break;
         }
@@ -315,8 +318,9 @@ int saveinpfile(Project *pr, const char *fname)
         {
             sprintf(s1, "%-31s\t%-12.4f", net->Curve[j].ID, km);
         }
-        // For PCV add loss curve if present
-        else if (link->Type == PCV && (j = net->Valve[i].Curve) > 0)
+        // For PCV / FLV add loss curve if present
+        else if ((link->Type == PCV || link->Type == FLV) &&
+                 (j = net->Valve[i].Curve) > 0)
         {
             sprintf(s1, "%-12.4f\t%-12.4f\t%-31s", kc, km, net->Curve[j].ID);
         }
@@ -484,6 +488,9 @@ int saveinpfile(Project *pr, const char *fname)
                 break;
               case FCV:
                 kc *= pr->Ucf[FLOW];
+                break;
+              case FLV:
+                kc *= pr->Ucf[ELEV];
                 break;
               default:
                 break;

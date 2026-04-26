@@ -16,6 +16,7 @@
 */
 
 #include <boost/test/unit_test.hpp>
+#include <cmath>
 
 #include "test_toolkit.hpp"
 

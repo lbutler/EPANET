@@ -151,7 +151,8 @@ typedef enum {
   FCV,           // flow control valve
   TCV,           // throttle control valve
   GPV,           // general purpose valve
-  PCV            // positional control valve
+  PCV,           // positional control valve
+  FLV            // float valve
 } LinkType;
 
 typedef enum {

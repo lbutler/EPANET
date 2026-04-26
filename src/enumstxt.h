@@ -28,7 +28,8 @@ char *LinkTxt[]         = {w_CV,
                            w_FCV,
                            w_TCV,
                            w_GPV,
-                           w_PCV};
+                           w_PCV,
+                           w_FLV};
 
 char *StatTxt[]         = {t_XHEAD,
                            t_TEMPCLOSED,

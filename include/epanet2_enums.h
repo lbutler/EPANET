@@ -212,7 +212,8 @@ typedef enum {
   EN_FCV          = 6,  //!< Flow control valve
   EN_TCV          = 7,  //!< Throttle control valve
   EN_GPV          = 8,  //!< General purpose valve
-  EN_PCV          = 9   //!< Positional control valve
+  EN_PCV          = 9,  //!< Positional control valve
+  EN_FLV          = 10  //!< Float valve
 } EN_LinkType;
 
 /// Link status

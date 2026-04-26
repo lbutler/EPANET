@@ -41,6 +41,7 @@
 #define   w_TCV         "TCV"
 #define   w_GPV         "GPV"
 #define   w_PCV         "PCV"
+#define   w_FLV         "FLV"
 
 #define   w_OPEN        "OPEN"
 #define   w_CLOSED      "CLOSED"

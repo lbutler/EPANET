@@ -140,6 +140,7 @@ namespace EpanetCSharpLibrary
         public const int EN_TCV = 7;
         public const int EN_GPV = 8;
         public const int EN_PCV = 9;
+        public const int EN_FLV = 10;
 
         public const int EN_NONE = 0;          //Quality analysis types
         public const int EN_CHEM = 1;

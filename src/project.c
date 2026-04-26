@@ -874,6 +874,9 @@ int changevalvetype(Project *pr, int index, int type)
         case PBV:
             setting *= pr->Ucf[PRESSURE];
             break;
+        case FLV:
+            setting *= pr->Ucf[ELEV];
+            break;
         case GPV:
             setting = 0.0;
             break;
@@ -888,11 +891,20 @@ int changevalvetype(Project *pr, int index, int type)
         case PBV:
             setting /= pr->Ucf[PRESSURE];
             break;
+        case FLV:
+            setting /= pr->Ucf[ELEV];
+            break;
     }
-    
+
     // Save setting
     if (type == GPV) setting = 0.0;
     if (type == PCV) setting = MIN(setting, 100.0);
+    if (type == FLV)
+    {
+        Stank *t = &net->Tank[link->N2 - net->Njuncs];
+        double range = t->Hmax - t->Hmin;
+        if (setting <= 0.0 || setting > range) return 211;
+    }
     link->Kc = setting;
     link->InitSetting = setting;
     
@@ -919,6 +931,13 @@ int valvecheck(Project *pr, int index, int type, int j1, int j2)
     LinkType vtype;
     Slink *link;
     Svalve *valve;
+
+    // FLV's downstream node must be a tank (not a junction or reservoir)
+    if (type == FLV)
+    {
+        if (j2 <= net->Njuncs) return 219;
+        if (net->Tank[j2 - net->Njuncs].A == 0.0) return 219;
+    }
 
     if (type == PRV || type == PSV || type == FCV)
     {
@@ -1141,7 +1160,7 @@ void assigncurvetypes(Network *network)
         Slink* link = &network->Link[valve->Link];
 
         int j;
-        if (link->Type == PCV) {
+        if (link->Type == PCV || link->Type == FLV) {
             if((j = valve->Curve) > 0) {
                 network->Curve[j].Type = VALVE_CURVE;
             }
@@ -1236,17 +1255,17 @@ void adjustcurves(Network *network, int index)
         adjustcurve(&network->Pump[j].Ecurve, index);
     }
 
-    // Adjust PCV & GPV curves
+    // Adjust PCV / FLV & GPV curves
     for (j = 1; j <= network->Nvalves; j++)
     {
         k = network->Valve[j].Link;
-        if (network->Link[k].Type == PCV)
+        if (network->Link[k].Type == PCV || network->Link[k].Type == FLV)
         {
             if ((curve = network->Valve[j].Curve) > 0)
             {
                 adjustcurve(&curve, index);
                 network->Valve[j].Curve = curve;
-                if (curve == 0)
+                if (network->Link[k].Type == PCV && curve == 0)
                     network->Link[k].Kc = 0.0;
             }
         }

@@ -149,6 +149,10 @@ void  resistcoeff(Project *pr, int k)
         link->R = pcvlosscoeff(pr, k, link->Kc);
         break;
 
+    case FLV:
+        link->R = link->Km;
+        break;
+
     // ... For all other links (e.g. valves) use a small resistance
     default:
         link->R = CSMALL;
@@ -271,6 +275,7 @@ void headlosscoeffs(Project *pr)
             tcvcoeff(pr, k);
             break;
         case PCV:
+        case FLV:
             pcvcoeff(pr, k);
             break;
         case GPV:

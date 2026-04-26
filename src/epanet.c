@@ -3388,7 +3388,7 @@ int DLLEXPORT EN_addlink(EN_Project p, const char *id, int linkType,
     if (EN_getlinkindex(p, id, &i) == 0) return 215;
 
     // Check for valid link type
-    if (linkType < CVPIPE || linkType > PCV) return 251;
+    if (linkType < CVPIPE || linkType > FLV) return 251;
 
     // Lookup the link's from and to nodes
     n1 = hashtable_find(net->NodeHashTable, fromNode);
@@ -3719,7 +3719,7 @@ int DLLEXPORT EN_setlinktype(EN_Project p, int *index, int linkType, int actionC
     if (p->hydraul.OpenHflag || p->quality.OpenQflag) return 262;
 
     // Check for valid input parameters
-    if (linkType < 0 || linkType > PCV || actionCode < EN_UNCONDITIONAL ||
+    if (linkType < 0 || linkType > FLV || actionCode < EN_UNCONDITIONAL ||
         actionCode > EN_CONDITIONAL)
     {
         return 251;
@@ -3903,6 +3903,10 @@ int DLLEXPORT EN_getlinkvalue(EN_Project p, int index, int property, double *val
             break;
         case FCV:
             v *= Ucf[FLOW];
+            break;
+        case FLV:
+            v *= Ucf[ELEV];
+            break;
         default:
             break;
         }
@@ -3965,6 +3969,10 @@ int DLLEXPORT EN_getlinkvalue(EN_Project p, int index, int property, double *val
             break;
         case FCV:
             v *= Ucf[FLOW];
+            break;
+        case FLV:
+            v *= Ucf[ELEV];
+            break;
         default:
             break;
         }
@@ -4044,7 +4052,7 @@ int DLLEXPORT EN_getlinkvalue(EN_Project p, int index, int property, double *val
         break;
         
     case EN_PCV_CURVE:
-        if (Link[index].Type == PCV)
+        if (Link[index].Type == PCV || Link[index].Type == FLV)
         {
             v = net->Valve[findvalve(&p->network, index)].Curve;
         }
@@ -4212,6 +4220,16 @@ int DLLEXPORT EN_setlinkvalue(EN_Project p, int index, int property, double valu
             case FCV:
                 value /= Ucf[FLOW];
                 break;
+            case FLV:
+            {
+                Stank *t;
+                double range;
+                value /= Ucf[ELEV];
+                t = &net->Tank[Link[index].N2 - net->Njuncs];
+                range = t->Hmax - t->Hmin;
+                if (value <= 0.0 || value > range) return 211;
+                break;
+            }
             case TCV:
             case PCV:
                 break;
@@ -4311,7 +4329,7 @@ int DLLEXPORT EN_setlinkvalue(EN_Project p, int index, int property, double valu
         break;
         
     case EN_PCV_CURVE:
-        if (Link[index].Type == PCV)
+        if (Link[index].Type == PCV || Link[index].Type == FLV)
         {
             curveIndex = ROUND(value);
             if (curveIndex < 0 || curveIndex > net->Ncurves) return 206;
@@ -4343,7 +4361,7 @@ int DLLEXPORT EN_setlinkvalue(EN_Project p, int index, int property, double valu
         if (hyd->OpenHflag || qual->OpenQflag) return 262;  //Solver is running
         if (Link[index].Type <= PUMP) return 264;           //Link not a valve
         valveType = ROUND(value);
-        if (valveType < PRV || valveType > PCV) return 213; //Invalid valve type
+        if (valveType < PRV || valveType > FLV) return 213; //Invalid valve type
         if (valveType == Link[index].Type) return 0;        //No type change
         return changevalvetype(p, index, valveType);        //See project.c
 
