@@ -144,11 +144,11 @@ BOOST_AUTO_TEST_CASE(test_FLV_P01_parse_minimal)
     closeflv(ph);
 }
 
-// --- P-02: 8-token FLV with a curve ------------------------------------
+// --- P-02: 9-token FLV with InletHeight + curve -------------------------
 BOOST_AUTO_TEST_CASE(test_FLV_P02_parse_with_curve)
 {
     std::string s = flv_header
-        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 VC1\n\n"
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 0 VC1\n\n"
         + "[CURVES]\n VC1 0 0\n VC1 25 10\n VC1 50 40\n VC1 75 75\n VC1 100 100\n"
         + flv_footer;
     writeflv(s);
@@ -235,7 +235,7 @@ BOOST_AUTO_TEST_CASE(test_FLV_P08_boundary_setting)
 BOOST_AUTO_TEST_CASE(test_FLV_P09_missing_curve)
 {
     std::string s = flv_header
-        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 NOSUCH\n\n"
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 0 NOSUCH\n\n"
         + flv_footer;
     writeflv(s);
 
@@ -562,11 +562,293 @@ BOOST_AUTO_TEST_CASE(test_FLV_R02_save_no_curve)
     std::remove(FLV_OUT_INP);
 }
 
-// --- R-03: 8-token round-trip preserves curve -------------------------
+// --- R-03: 9-token round-trip preserves curve (InletHeight = 0) --------
 BOOST_AUTO_TEST_CASE(test_FLV_R03_save_with_curve)
 {
     std::string s = flv_header
-        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 VC1\n\n"
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 0 VC1\n\n"
+        + "[CURVES]\n VC1 0 0\n VC1 50 40\n VC1 100 100\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    BOOST_REQUIRE(openflv(&ph, FLV_TMP_INP) == 0);
+    BOOST_REQUIRE_EQUAL(EN_saveinpfile(ph, FLV_OUT_INP), 0);
+    closeflv(ph);
+
+    BOOST_REQUIRE(openflv(&ph, FLV_OUT_INP) == 0);
+    int idx, cidx;
+    EN_getlinkindex(ph, (char *)"FV1", &idx);
+    EN_getcurveindex(ph, (char *)"VC1", &cidx);
+    double curve;
+    EN_getlinkvalue(ph, idx, EN_PCV_CURVE, &curve);
+    BOOST_CHECK_EQUAL((int)curve, cidx);
+
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+    std::remove(FLV_OUT_INP);
+}
+
+
+// ---- InletHeight tests (flv-inlet-specification.md) ------------------
+
+// --- PI-02: 8-token FLV with InletHeight, no curve --------------------
+BOOST_AUTO_TEST_CASE(test_FLV_PI02_parse_inlet_no_curve)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.4 5 2.0\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    int error = openflv(&ph, FLV_TMP_INP);
+    BOOST_CHECK_EQUAL(error, 0);
+
+    int idx, t;
+    EN_getlinkindex(ph, (char *)"FV1", &idx);
+    EN_getlinktype(ph, idx, &t);
+    BOOST_CHECK_EQUAL(t, EN_FLV);
+
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+}
+
+// --- PI-04: negative InletHeight -> error -----------------------------
+BOOST_AUTO_TEST_CASE(test_FLV_PI04_parse_negative_inlet)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.4 5 -1.0\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    int error = openflv(&ph, FLV_TMP_INP);
+    BOOST_CHECK(error != 0);
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+}
+
+// --- PI-06: InletHeight above MaxLevel parses (cascade-only config) ---
+BOOST_AUTO_TEST_CASE(test_FLV_PI06_parse_inlet_above_max)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 6.0\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    int error = openflv(&ph, FLV_TMP_INP);
+    BOOST_CHECK_EQUAL(error, 0);
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+}
+
+// --- PI-07: InletHeight == MaxLevel boundary parses -------------------
+BOOST_AUTO_TEST_CASE(test_FLV_PI07_parse_inlet_at_max)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 5.0\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    int error = openflv(&ph, FLV_TMP_INP);
+    BOOST_CHECK_EQUAL(error, 0);
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+}
+
+// --- PI-08: Setting larger than reg_height - MinLevel -> error --------
+//   InletHeight=2.0, MinLevel=0 -> reg_height-MinLevel = 2.0; Setting=3 fails
+BOOST_AUTO_TEST_CASE(test_FLV_PI08_setting_exceeds_band)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 3.0 5 2.0\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    int error = openflv(&ph, FLV_TMP_INP);
+    BOOST_CHECK(error != 0);
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+}
+
+// --- HI-02: InletHeight inside tank, depth below band -> ACTIVE -------
+BOOST_AUTO_TEST_CASE(test_FLV_HI02_cascade_active)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 4.5\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    BOOST_REQUIRE(openflv(&ph, FLV_TMP_INP) == 0);
+
+    int tidx, vidx;
+    EN_getnodeindex(ph, (char *)"T1", &tidx);
+    EN_getlinkindex(ph, (char *)"FV1", &vidx);
+    EN_setnodevalue(ph, tidx, EN_TANKLEVEL, 4.0);
+
+    long t, tstep;
+    EN_openH(ph);
+    EN_initH(ph, EN_NOSAVE);
+    EN_runH(ph, &t);
+    EN_nextH(ph, &tstep);
+
+    double status, flow;
+    EN_getlinkvalue(ph, vidx, EN_STATUS, &status);
+    EN_getlinkvalue(ph, vidx, EN_FLOW, &flow);
+    BOOST_CHECK(status >= 1.0);   // ACTIVE / OPEN
+    BOOST_CHECK(flow > 0.0);      // J1 -> tank
+
+    EN_closeH(ph);
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+}
+
+// --- HI-10: regulating band shifts to inlet (band 2.0-3.0) ------------
+//   With InletHeight=3, Setting=1, depth 4 > top -> natural closure.
+BOOST_AUTO_TEST_CASE(test_FLV_HI10_band_at_inlet_closed_above)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 1.0 5 3.0\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    BOOST_REQUIRE(openflv(&ph, FLV_TMP_INP) == 0);
+
+    int tidx, vidx;
+    EN_getnodeindex(ph, (char *)"T1", &tidx);
+    EN_getlinkindex(ph, (char *)"FV1", &vidx);
+    EN_setnodevalue(ph, tidx, EN_TANKLEVEL, 4.0);   // above top=3 -> closed
+
+    long t, tstep;
+    EN_openH(ph);
+    EN_initH(ph, EN_NOSAVE);
+    EN_runH(ph, &t);
+    EN_nextH(ph, &tstep);
+
+    double status, flow;
+    EN_getlinkvalue(ph, vidx, EN_STATUS, &status);
+    EN_getlinkvalue(ph, vidx, EN_FLOW, &flow);
+    BOOST_CHECK_EQUAL(status, 0.0);
+    BOOST_CHECK(fabs(flow) < 1e-6);
+
+    EN_closeH(ph);
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+}
+
+// --- HI-10b: same valve, depth at bot (2.0) -> fully open -------------
+BOOST_AUTO_TEST_CASE(test_FLV_HI10b_band_at_inlet_open_below)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 1.0 5 3.0\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    BOOST_REQUIRE(openflv(&ph, FLV_TMP_INP) == 0);
+
+    int tidx, vidx;
+    EN_getnodeindex(ph, (char *)"T1", &tidx);
+    EN_getlinkindex(ph, (char *)"FV1", &vidx);
+    EN_setnodevalue(ph, tidx, EN_TANKLEVEL, 1.5);   // below band -> ACTIVE open
+
+    long t, tstep;
+    EN_openH(ph);
+    EN_initH(ph, EN_NOSAVE);
+    EN_runH(ph, &t);
+    EN_nextH(ph, &tstep);
+
+    double status, flow;
+    EN_getlinkvalue(ph, vidx, EN_STATUS, &status);
+    EN_getlinkvalue(ph, vidx, EN_FLOW, &flow);
+    BOOST_CHECK(status >= 1.0);
+    BOOST_CHECK(flow > 0.0);
+
+    EN_closeH(ph);
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+}
+
+// --- HI-12: InletHeight above MaxLevel -> reg_height falls back to TWL
+//   InletHeight=6, MaxLevel=5, Setting=0.5 -> band 4.5-5.0 (legacy form).
+BOOST_AUTO_TEST_CASE(test_FLV_HI12_inlet_above_max_falls_back)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 6.0\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    BOOST_REQUIRE(openflv(&ph, FLV_TMP_INP) == 0);
+
+    int tidx, vidx;
+    EN_getnodeindex(ph, (char *)"T1", &tidx);
+    EN_getlinkindex(ph, (char *)"FV1", &vidx);
+    EN_setnodevalue(ph, tidx, EN_TANKLEVEL, 4.75);  // mid-band of TWL fallback
+
+    long t, tstep;
+    EN_openH(ph);
+    EN_initH(ph, EN_NOSAVE);
+    EN_runH(ph, &t);
+    EN_nextH(ph, &tstep);
+
+    double status;
+    EN_getlinkvalue(ph, vidx, EN_STATUS, &status);
+    BOOST_CHECK_EQUAL(status, 2.0);   // ACTIVE -- band is 4.5-5.0
+
+    EN_closeH(ph);
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+}
+
+// --- RI-02: 8-token round-trip preserves InletHeight (no curve) -------
+//   Verify by writing 8-token, reparsing, then triggering InletHeight-
+//   dependent natural closure (depth above shifted band).
+BOOST_AUTO_TEST_CASE(test_FLV_RI02_roundtrip_inlet_no_curve)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 1.0 5 3.0\n\n"
+        + flv_footer;
+    writeflv(s);
+
+    EN_Project ph;
+    BOOST_REQUIRE(openflv(&ph, FLV_TMP_INP) == 0);
+    BOOST_REQUIRE_EQUAL(EN_saveinpfile(ph, FLV_OUT_INP), 0);
+    closeflv(ph);
+
+    BOOST_REQUIRE(openflv(&ph, FLV_OUT_INP) == 0);
+
+    int tidx, vidx;
+    EN_getnodeindex(ph, (char *)"T1", &tidx);
+    EN_getlinkindex(ph, (char *)"FV1", &vidx);
+    EN_setnodevalue(ph, tidx, EN_TANKLEVEL, 4.0);   // > shifted top=3 -> closed
+
+    long t, tstep;
+    EN_openH(ph);
+    EN_initH(ph, EN_NOSAVE);
+    EN_runH(ph, &t);
+    EN_nextH(ph, &tstep);
+
+    double status;
+    EN_getlinkvalue(ph, vidx, EN_STATUS, &status);
+    BOOST_CHECK_EQUAL(status, 0.0);   // CLOSED -- proves InletHeight survived
+
+    EN_closeH(ph);
+    closeflv(ph);
+    std::remove(FLV_TMP_INP);
+    std::remove(FLV_OUT_INP);
+}
+
+// --- RI-04: 9-token round-trip with InletHeight=0 + curve --------------
+BOOST_AUTO_TEST_CASE(test_FLV_RI04_roundtrip_zero_inlet_with_curve)
+{
+    std::string s = flv_header
+        + "[VALVES]\n FV1 J1 T1 200 FLV 0.5 5 0 VC1\n\n"
         + "[CURVES]\n VC1 0 0\n VC1 50 40\n VC1 100 100\n"
         + flv_footer;
     writeflv(s);

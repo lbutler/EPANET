@@ -4223,10 +4223,15 @@ int DLLEXPORT EN_setlinkvalue(EN_Project p, int index, int property, double valu
             case FLV:
             {
                 Stank *t;
-                double range;
+                double tankEl, maxlvl, reg_height, range;
                 value /= Ucf[ELEV];
                 t = &net->Tank[Link[index].N2 - net->Njuncs];
-                range = t->Hmax - t->Hmin;
+                tankEl = net->Node[t->Node].El;
+                maxlvl = t->Hmax - tankEl;
+                reg_height = (Link[index].InletHeight > 0.0
+                              && Link[index].InletHeight <= maxlvl)
+                           ? Link[index].InletHeight : maxlvl;
+                range = reg_height - (t->Hmin - tankEl);
                 if (value <= 0.0 || value > range) return 211;
                 break;
             }

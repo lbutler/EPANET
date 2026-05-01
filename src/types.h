@@ -156,6 +156,11 @@ typedef enum {
 } LinkType;
 
 typedef enum {
+  SUBMERGED,     // tank surface at or above FLV inlet
+  CASCADE        // tank surface below FLV inlet (free-discharge)
+} FlvMode;
+
+typedef enum {
   USE,           // use hydraulics file from previous run
   SAVE,          // save hydraulics file after current run
   SCRATCH        // use temporary hydraulics file
@@ -424,11 +429,13 @@ typedef struct             // Link Object
   LinkType Type;           // link type
   StatusType InitStatus;   // initial status
   double     InitSetting;  // initial setting
+  double     InletHeight;  // FLV inlet height above tank floor
+  FlvMode    Mode;         // FLV submerged / cascade mode
   Pvertices  Vertices;     // internal vertex coordinates
   int      Rpt;            // reporting flag
   int      ResultIndex;    // saved result index
   char     *Comment;       // link comment
-  char     *Tag;           // optional category tag                                                   
+  char     *Tag;           // optional category tag
 } Slink;
 
 typedef struct             // Tank Object

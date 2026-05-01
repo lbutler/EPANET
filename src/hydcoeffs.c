@@ -379,7 +379,16 @@ void  linkcoeffs(Project *pr)
         }
 
         // ... node n2 is a tank/reservoir
-        else sm->F[sm->Row[n1]] += (hyd->P[k] * hyd->NodeHead[n2]);
+        else
+        {
+            // FLV in cascade mode discharges to atmosphere at the inlet
+            // pipe outlet, so its downstream boundary is inlet_elev rather
+            // than the tank's hydraulic head.
+            double h_dn = hyd->NodeHead[n2];
+            if (link->Type == FLV && link->Mode == CASCADE)
+                h_dn = net->Node[n2].El + link->InletHeight;
+            sm->F[sm->Row[n1]] += (hyd->P[k] * h_dn);
+        }
     }
 }
 

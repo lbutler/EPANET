@@ -154,6 +154,15 @@ int  linkstatus(Project *pr)
                                            hyd->NodeHead[n2]);
         }
 
+        // Cascade-mode FLV is one-way: a free-discharge inlet cannot draw
+        // water back out of the tank, so reverse flow forces CLOSED for
+        // the rest of the iteration loop (re-evaluated next step).
+        if (link->Type == FLV && link->Mode == CASCADE
+            && hyd->LinkFlow[k] < -hyd->Qtol)
+        {
+            hyd->LinkStatus[k] = CLOSED;
+        }
+
         // Check for flow into (out of) full (empty) tanks
         if (n1 > net->Njuncs) tankstatus(pr, k, n1, hyd->LinkFlow[k]);
         if (n2 > net->Njuncs) tankstatus(pr, k, n2, -hyd->LinkFlow[k]);

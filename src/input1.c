@@ -629,6 +629,7 @@ void convertunits(Project *pr)
                   break;
                 case FLV:
                   link->Kc /= pr->Ucf[ELEV];
+                  link->InletHeight /= pr->Ucf[ELEV];
                   break;
                 default:
                   break;

@@ -655,6 +655,7 @@ void  flvstatus(Project *pr)
     Hydraul *hyd = &pr->hydraul;
 
     int i, k, n;
+    double tankEl, maxlvl, inlet_elev, reg_height;
     double top, bot, h, range, pctOpen;
     Slink *link;
     Stank *tank;
@@ -665,15 +666,27 @@ void  flvstatus(Project *pr)
         link = &net->Link[k];
         if (link->Type != FLV) continue;
 
-        // User-locked OPEN or CLOSED -- leave alone
-        if (hyd->LinkSetting[k] == MISSING) continue;
-
         n = link->N2;
         tank = &net->Tank[n - net->Njuncs];
-        top = tank->Hmax;
+        tankEl = net->Node[n].El;
+        h = hyd->NodeHead[n];
+
+        // Mode reflects physical water level vs. inlet, regardless of
+        // user-locked status -- matrix assembly needs it in all cases.
+        inlet_elev = tankEl + link->InletHeight;
+        link->Mode = (h >= inlet_elev) ? SUBMERGED : CASCADE;
+
+        // User-locked OPEN or CLOSED -- leave status/setting alone
+        if (hyd->LinkSetting[k] == MISSING) continue;
+
+        // Regulating band hugs the inlet when the inlet is inside the tank;
+        // otherwise (legacy 0, or inlet above rim) it stays at MaxLevel.
+        maxlvl = tank->Hmax - tankEl;
+        reg_height = (link->InletHeight > 0.0 && link->InletHeight <= maxlvl)
+                   ? link->InletHeight : maxlvl;
+        top = tankEl + reg_height;
         range = hyd->LinkSetting[k];
         bot = top - range;
-        h = hyd->NodeHead[n];
 
         if (h >= top)
         {

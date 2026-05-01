@@ -628,6 +628,8 @@ int valvedata(Project *pr)
     link->Type = type;
     link->InitStatus = ACTIVE;
     link->InitSetting = 0.0;
+    link->InletHeight = 0.0;
+    link->Mode = SUBMERGED;
     link->Rpt = 0;
     link->ResultIndex = 0;
     link->Comment = xstrcpy(&link->Comment, parser->Comment, MAXMSG);
@@ -661,19 +663,39 @@ int valvedata(Project *pr)
             return setError(parser, 6, 202);
         link->Km = x;
     }
-    if (n > 7 && (type == PCV || type == FLV))
+    if (n > 7 && type == PCV)
     {
-        // Find loss coeff. curve for PCV / FLV
+        // Find loss coeff. curve for PCV (slot 7)
         c = findcurve(net, parser->Tok[7]);
         if (c == 0) return setError(parser, 7, 206);
         net->Valve[net->Nvalves].Curve = c;
         net->Curve[c].Type = VALVE_CURVE;
-        if (type == PCV && link->Kc > 100.0) link->Kc = 100.0;
+        if (link->Kc > 100.0) link->Kc = 100.0;
+    }
+    if (n > 7 && type == FLV)
+    {
+        // Slot 7 is inlet height (display units; converted in initunits)
+        if (!getfloat(parser->Tok[7], &x)) return setError(parser, 7, 202);
+        link->InletHeight = x;
+    }
+    if (n > 8 && type == FLV)
+    {
+        // Find loss coeff. curve for FLV (slot 8)
+        c = findcurve(net, parser->Tok[8]);
+        if (c == 0) return setError(parser, 8, 206);
+        net->Valve[net->Nvalves].Curve = c;
+        net->Curve[c].Type = VALVE_CURVE;
     }
     if (type == FLV)
     {
         Stank *t = &net->Tank[j2 - net->Njuncs];
-        double range = t->Hmax - t->Hmin;
+        double maxlvl, reg_height, range;
+        if (link->InletHeight < 0.0)
+            return setError(parser, 7, 202);
+        maxlvl = t->Hmax;
+        reg_height = (link->InletHeight > 0.0 && link->InletHeight <= maxlvl)
+                   ? link->InletHeight : maxlvl;
+        range = reg_height - t->Hmin;
         if (link->Kc <= 0.0 || link->Kc > range)
             return setError(parser, 5, 202);
     }

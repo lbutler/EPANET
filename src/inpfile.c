@@ -280,8 +280,9 @@ int saveinpfile(Project *pr, const char *fname)
     // Write [VALVES] section
     fprintf(f, "\n\n");
     fprintf(f, s_VALVES);
-    fprintf(f, "\n;;%-31s\t%-31s\t%-31s\t%-12s\t%-6s\t%-12s\t%-12s",
-        "ID", "Node1", "Node2", "Diameter", "Type", "Setting", "MinorLoss");
+    fprintf(f, "\n;;%-31s\t%-31s\t%-31s\t%-12s\t%-6s\t%-12s\t%-12s\t%-12s\t%-31s",
+        "ID", "Node1", "Node2", "Diameter", "Type", "Setting", "MinorLoss",
+        "InletHeight", "Curve");
     for (i = 1; i <= net->Nvalves; i++)
     {
         n = net->Valve[i].Link;
@@ -318,11 +319,23 @@ int saveinpfile(Project *pr, const char *fname)
         {
             sprintf(s1, "%-31s\t%-12.4f", net->Curve[j].ID, km);
         }
-        // For PCV / FLV add loss curve if present
-        else if ((link->Type == PCV || link->Type == FLV) &&
-                 (j = net->Valve[i].Curve) > 0)
+        // For PCV add loss curve if present
+        else if (link->Type == PCV && (j = net->Valve[i].Curve) > 0)
         {
             sprintf(s1, "%-12.4f\t%-12.4f\t%-31s", kc, km, net->Curve[j].ID);
+        }
+        // For FLV emit 7/8/9 tokens depending on InletHeight + curve
+        else if (link->Type == FLV)
+        {
+            double inletH = link->InletHeight * pr->Ucf[ELEV];
+            j = net->Valve[i].Curve;
+            if (j > 0)
+                sprintf(s1, "%-12.4f\t%-12.4f\t%-12.4f\t%-31s",
+                        kc, km, inletH, net->Curve[j].ID);
+            else if (inletH != 0.0)
+                sprintf(s1, "%-12.4f\t%-12.4f\t%-12.4f", kc, km, inletH);
+            else
+                sprintf(s1, "%-12.4f\t%-12.4f", kc, km);
         }
         else sprintf(s1, "%-12.4f\t%-12.4f", kc, km);
         fprintf(f, "\n%s\t%s", s, s1);
