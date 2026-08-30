@@ -41,6 +41,7 @@ option(BUILD_COVERAGE "Build library for coverage" OFF)
   add_subdirectory(run)
 #ENDIF (NOT BUILD_PY_LIB)
 add_subdirectory(src/outfile)
+add_subdirectory(tools/report-replication)
 
 IF (BUILD_TESTS)
     #Prep ourselves for compiling with boost
