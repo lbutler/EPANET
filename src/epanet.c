@@ -1255,6 +1255,9 @@ int DLLEXPORT EN_getoption(EN_Project p, int option, double *value)
     case EN_STATUS_REPORT:
         v = (double)( p->report.Statflag);
         break;        
+    case EN_ISOLATION:
+        v = hyd->Isolation;
+        break;
     default:
         return 251;
     }
@@ -1428,6 +1431,11 @@ int DLLEXPORT EN_setoption(EN_Project p, int option, double value)
 
     case EN_EMITBACKFLOW:
         if (value == 0.0 || value == 1.0) hyd->EmitBackFlag = (int)value;
+        else return 213;
+        break;
+
+    case EN_ISOLATION:
+        if (value == 0.0 || value == 1.0) hyd->Isolation = (int)value;
         else return 213;
         break;
 
@@ -2465,6 +2473,12 @@ int DLLEXPORT EN_getnodevalue(EN_Project p, int index, int property, double *val
         
     case EN_FULLDEMAND:  // Consumer demand requested
         v = hyd->FullDemand[index] * Ucf[FLOW];
+        break;
+
+    case EN_ISOLATED:    // Node taken out of service as disconnected
+        v = 0.0;
+        if (hyd->Isolation && hyd->Connected != NULL &&
+            !hyd->Connected[index]) v = 1.0;
         break;
         
     default:

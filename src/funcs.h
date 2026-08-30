@@ -27,6 +27,9 @@ void    closeoutfile(Project *);
 
 int     buildadjlists(Network *);
 int     findconnected(Project *);
+int     linkpassable(Project *, int);
+int     marksources(Project *, int *, char *);
+void    marknodes(Project *, int, int *, char *);
 void    freeadjlists(Network *);
 
 int     incontrols(Project *, int, int);

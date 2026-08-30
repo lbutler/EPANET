@@ -66,7 +66,9 @@ typedef enum {
   EN_EMITTERFLOW    = 29, //!< Current emitter flow (read only)
   EN_LEAKAGEFLOW    = 30, //!< Current leakage flow (read only)
   EN_DEMANDFLOW     = 31, //!< Current consumer demand delivered (read only)
-  EN_FULLDEMAND     = 32  //!< Current consumer demand requested (read only)
+  EN_FULLDEMAND     = 32, //!< Current consumer demand requested (read only)
+  EN_ISOLATED       = 33  //!< `EN_TRUE` (= 1) if the node was taken out of service
+                          //!< as disconnected, `EN_FALSE` (= 0) if not (read only)
 } EN_NodeProperty;
 
 /// Link properties
@@ -377,7 +379,9 @@ typedef enum {
   EN_DEMANDPATTERN  = 23, //!< Name of default demand pattern
   EN_EMITBACKFLOW   = 24, //!< `EN_TRUE` (= 1) if emitters can backflow, `EN_FALSE` (= 0) if not
   EN_PRESS_UNITS    = 25, //!< Pressure units (see @ref EN_PressUnits)
-  EN_STATUS_REPORT  = 26  //!< Type of status report to produce (see @ref EN_StatusReport)
+  EN_STATUS_REPORT  = 26, //!< Type of status report to produce (see @ref EN_StatusReport)
+  EN_ISOLATION      = 27  //!< `EN_TRUE` (= 1) to take junctions disconnected from all
+                          //!< tanks & reservoirs out of service, `EN_FALSE` (= 0) if not
 } EN_Option;
 
 /// Simple control types

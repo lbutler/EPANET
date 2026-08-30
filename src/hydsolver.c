@@ -52,6 +52,8 @@ static void   newleakageflows(Project *, Hydbalance *, double *, double *);
 static void   checkhydbalance(Project *, Hydbalance *);
 static int    hasconverged(Project *, double *, Hydbalance *);
 static int    pdaconverged(Project *);
+static int    remark(Project *);
+static void   demanddeficit(Project *, double *, double *);
 static void   reporthydbal(Project *, Hydbalance *);
 
 
@@ -91,6 +93,8 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
     int    nextcheck;             // Next status check trial
     int    maxtrials;             // Max. trials for convergence
     double newerr;                // New convergence error
+    double lostDemand;            // Demand of out of service junctions
+    double lostReduction;         // Amount of it not delivered
     int    valveChange;           // Valve status change flag
     int    statChange;            // Non-valve status change flag
     Hydbalance hydbal;            // Hydraulic balance errors
@@ -114,8 +118,11 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
     hyd->HydErrNode = 0;
     hyd->HydErrLink = 0;
     hyd->DisconnectedNodes = 0;
-    hyd->DisconRemark = TRUE;
-    hyd->DisconPinned = FALSE;
+    hyd->DisconRemark = hyd->Isolation;
+    // With isolation off no junction is ever taken out of service, so
+    // the mid-trial re-checks below are switched off by declaring the
+    // treatment already applied
+    hyd->DisconPinned = !hyd->Isolation;
 
     // Repeat iterations until convergence or trial limit is exceeded.
     // (ExtraIter used to increase trials in case of status cycling.)
@@ -143,10 +150,8 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
             // If mid-trial status changes have cut off junctions not yet
             // taken out of service, re-mark connectivity & retry with
             // them treated (see findconnected() in hydcoeffs.c)
-            if (!hyd->DisconPinned &&
-                findconnected(pr) != hyd->DisconnectedNodes)
+            if (!hyd->DisconPinned && remark(pr))
             {
-                hyd->DisconPinned = TRUE;
                 continue;
             }
             break;
@@ -192,9 +197,7 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
             // re-balance with the current set taken out of service)
             if (*iter > hyd->MaxIter)
             {
-                if (hyd->DisconPinned ||
-                    findconnected(pr) == hyd->DisconnectedNodes) break;
-                hyd->DisconPinned = TRUE;
+                if (hyd->DisconPinned || !remark(pr)) break;
                 maxtrials += hyd->MaxIter;
             }
             else
@@ -207,9 +210,7 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
                 if (pswitch(pr))    statChange = TRUE;
                 if (!statChange)
                 {
-                    if (hyd->DisconPinned ||
-                        findconnected(pr) == hyd->DisconnectedNodes) break;
-                    hyd->DisconPinned = TRUE;
+                    if (hyd->DisconPinned || !remark(pr)) break;
                     maxtrials += hyd->MaxIter;
                 }
 
@@ -230,10 +231,8 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
         // The final trial is about to end without a balanced network -
         // if mid-trial status changes have cut off junctions not yet
         // taken out of service, treat them & grant more trials
-        if (*iter == maxtrials && !hyd->DisconPinned &&
-            findconnected(pr) != hyd->DisconnectedNodes)
+        if (*iter == maxtrials && !hyd->DisconPinned && remark(pr))
         {
-            hyd->DisconPinned = TRUE;
             maxtrials += hyd->MaxIter;
         }
         (*iter)++;
@@ -252,6 +251,15 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
         hyd->NodeDemand[i] = hyd->DemandFlow[i] +
                              hyd->EmitterFlow[i] +
                              hyd->LeakageFlow[i];
+    }
+
+    // Report the demand that isolation took out of service (under PDA
+    // pdaconverged() has already folded it into the same totals)
+    if (hyd->DemandModel == DDA)
+    {
+        demanddeficit(pr, &lostDemand, &lostReduction);
+        if (lostDemand > 0.0)
+            hyd->DemandReduction = lostReduction / lostDemand * 100.0;
     }
 
     // Save convergence info
@@ -766,8 +774,7 @@ int pdaconverged(Project *pr)
     double dp = hyd->Preq - hyd->Pmin;
     double p, q, r;
 
-    hyd->DeficientNodes = 0;
-    hyd->DemandReduction = 0.0;
+    demanddeficit(pr, &totalDemand, &totalReduction);
        
     // Examine each network junction
     for (i = 1; i <= pr->network.Njuncs; i++)
@@ -775,15 +782,9 @@ int pdaconverged(Project *pr)
         // Skip nodes whose required demand is non-positive
         if (hyd->FullDemand[i] <= 0.0) continue;
 
-        // A node out of service delivers nothing - count its
-        // deficit but exempt it from the convergence test
-        if (!hyd->Connected[i])
-        {
-            hyd->DeficientNodes++;
-            totalDemand += hyd->FullDemand[i];
-            totalReduction += hyd->FullDemand[i];
-            continue;
-        }
+        // A node out of service delivers nothing - demanddeficit()
+        // has counted it & it is exempt from the convergence test
+        if (!hyd->Connected[i]) continue;
  
        // Evaluate demand equation at current pressure solution
         p = hyd->NodeHead[i] - pr->network.Node[i].El;
@@ -812,6 +813,65 @@ int pdaconverged(Project *pr)
     if (totalDemand > 0.0)
         hyd->DemandReduction = totalReduction / totalDemand * 100.0;
     return converged;
+}
+
+
+int remark(Project *pr)
+/*
+**--------------------------------------------------------------
+**   Input:   none
+**   Output:  returns TRUE if the set of junctions with no supply
+**            has changed
+**   Purpose: re-marks junction connectivity part way through a
+**            time step, after status changes may have cut
+**            junctions off. The new set holds for the rest of the
+**            time step: re-marking at every trial instead lets the
+**            set follow the status logic's own cycling and the
+**            network then never balances.
+**--------------------------------------------------------------
+*/
+{
+    Hydraul *hyd = &pr->hydraul;
+    int n = findconnected(pr);
+
+    if (n == hyd->DisconnectedNodes) return FALSE;
+    hyd->DisconnectedNodes = n;
+    hyd->DisconPinned = TRUE;
+    return TRUE;
+}
+
+
+void demanddeficit(Project *pr, double *totalDemand, double *totalReduction)
+/*
+**--------------------------------------------------------------
+**   Input:   none
+**   Output:  totalDemand = demand of the nodes not fully served
+**            totalReduction = the amount by which they fall short
+**   Purpose: starts the pressure deficient node accounting off
+**            with the junctions that isolation took out of
+**            service, which deliver none of their demand. Doing
+**            it here reports demand lost to a disconnection
+**            through the same statistics, status report line and
+**            flow balance as demand lost to low pressure.
+**--------------------------------------------------------------
+*/
+{
+    Hydraul *hyd = &pr->hydraul;
+    int i;
+
+    hyd->DeficientNodes = 0;
+    hyd->DemandReduction = 0.0;
+    *totalDemand = 0.0;
+    *totalReduction = 0.0;
+    if (hyd->DisconnectedNodes == 0) return;
+
+    for (i = 1; i <= pr->network.Njuncs; i++)
+    {
+        if (hyd->Connected[i] || hyd->FullDemand[i] <= 0.0) continue;
+        hyd->DeficientNodes++;
+        *totalDemand += hyd->FullDemand[i];
+        *totalReduction += hyd->FullDemand[i];
+    }
 }
 
 

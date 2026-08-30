@@ -53,6 +53,7 @@ namespace EpanetCSharpLibrary
         public const int EN_LEAKAGEFLOW = 30;
         public const int EN_DEMANDFLOW = 31;
         public const int EN_FULLDEMAND = 32;
+        public const int EN_ISOLATED = 33;
 
         public const int EN_DIAMETER = 0;      //Link parameters
         public const int EN_LENGTH = 1;
@@ -212,6 +213,7 @@ namespace EpanetCSharpLibrary
         public const int EN_EMITBACKFLOW = 24;
         public const int EN_PRESS_UNITS = 25;
         public const int EN_STATUS_REPORT = 26;
+        public const int EN_ISOLATION = 27;
 
         public const int EN_LOWLEVEL = 0;      //Control types
         public const int EN_HILEVEL = 1;

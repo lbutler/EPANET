@@ -129,6 +129,7 @@ void setdefaults(Project *pr)
     hyd->Emax = 0.0;            // Zero peak energy usage
     hyd->Qexp = 2.0;            // Flow exponent for emitters
     hyd->EmitBackFlag = 1;      // Allow emitter backflow
+    hyd->Isolation = 0;         // Don't take disconnected junctions out of service
     hyd->DefPat = 0;            // Default demand pattern index
     hyd->Dmult = 1.0;           // Demand multiplier
     hyd->RQtol = RQTOL;         // Default hydraulics parameters

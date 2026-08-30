@@ -369,4 +369,106 @@ BOOST_FIXTURE_TEST_CASE(test_hyderr_none, FixtureOpenClose)
     BOOST_REQUIRE(value == 0);
 }
 
+BOOST_AUTO_TEST_CASE(test_isolation_off_by_default)
+{
+    // Isolation is off unless asked for: the same island model then
+    // behaves exactly as it did before the option existed - the matrix
+    // is ill-conditioned and the run fails - while the failure is still
+    // diagnosed as a disconnection
+    EN_Project ph = NULL;
+    double value;
+    int error = EN_createproject(&ph);
+    BOOST_REQUIRE(error == 0);
+    error = EN_open(ph, "./test_hyderr_island2.inp", DATA_PATH_RPT, "");
+    BOOST_REQUIRE(error == 0);
+
+    error = EN_getoption(ph, EN_ISOLATION, &value);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(value == 1);          // this fixture asks for it
+
+    error = EN_setoption(ph, EN_ISOLATION, 0);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(EN_solveH(ph) == 110);
+    BOOST_REQUIRE(statistic(ph, EN_HYDERRCAUSE) == EN_HYDERR_DISCONNECTED);
+    BOOST_REQUIRE(statistic(ph, EN_DISCONNECTEDNODES) == 2);
+    BOOST_REQUIRE(nodevalue(ph, "J3", EN_ISOLATED) == 0);
+
+    // Turning it on solves the same network with the island out of service
+    error = EN_setoption(ph, EN_ISOLATION, 1);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(EN_solveH(ph) == 3);
+    BOOST_REQUIRE(nodevalue(ph, "J3", EN_ISOLATED) == 1);
+
+    // Only the two flag values are accepted
+    BOOST_REQUIRE(EN_setoption(ph, EN_ISOLATION, 2) == 213);
+
+    closeproject(ph);
+}
+
+BOOST_AUTO_TEST_CASE(test_isolation_inflow_source)
+{
+    // A junction with a negative demand injects water, so it supplies
+    // the area around it: the group it belongs to keeps its demand and
+    // is never taken out of service, even though no tank can reach it
+    EN_Project ph = NULL;
+    int error = solve(ph, "./test_hyderr_inflow.inp");
+    BOOST_REQUIRE(error == 0);
+
+    BOOST_REQUIRE(statistic(ph, EN_DISCONNECTEDNODES) == 0);
+    BOOST_REQUIRE(nodevalue(ph, "J3", EN_ISOLATED) == 0);
+    BOOST_REQUIRE(nodevalue(ph, "J4", EN_ISOLATED) == 0);
+    BOOST_REQUIRE(abs(nodevalue(ph, "J4", EN_DEMAND) - 5.0) < 1e-6);
+    BOOST_REQUIRE(nodevalue(ph, "J4", EN_PRESSURE) > 0.0);
+
+    closeproject(ph);
+}
+
+BOOST_AUTO_TEST_CASE(test_isolation_follows_asset_direction)
+{
+    // A check valve only conveys flow from its upstream to its
+    // downstream node: J2 beyond CV1's outlet is supplied, while J3
+    // behind CV2's inlet cannot be reached through it
+    EN_Project ph = NULL;
+    int error = solve(ph, "./test_hyderr_direction.inp");
+    BOOST_REQUIRE(error == 3);
+
+    BOOST_REQUIRE(statistic(ph, EN_DISCONNECTEDNODES) == 1);
+    BOOST_REQUIRE(nodevalue(ph, "J2", EN_ISOLATED) == 0);
+    BOOST_REQUIRE(nodevalue(ph, "J3", EN_ISOLATED) == 1);
+    BOOST_REQUIRE(abs(nodevalue(ph, "J2", EN_DEMAND) - 10.0) < 1e-6);
+    BOOST_REQUIRE(nodevalue(ph, "J3", EN_DEMAND) == 0.0);
+
+    closeproject(ph);
+}
+
+BOOST_AUTO_TEST_CASE(test_isolation_reports_lost_demand)
+{
+    // Demand lost to a disconnection is reported through the same
+    // statistics as demand lost to low pressure under PDA, and each
+    // node's share is retrievable individually
+    EN_Project ph = NULL;
+    int error = solve(ph, "./test_hyderr_ky3.inp");
+    BOOST_REQUIRE(error == 3);
+
+    BOOST_REQUIRE(statistic(ph, EN_DEFICIENTNODES) == 3);
+    BOOST_REQUIRE(abs(statistic(ph, EN_DEMANDREDUCTION) - 100.0) < 1e-6);
+
+    // Each isolated node reports the whole of its requested demand as
+    // undelivered, and they sum to the shortfall in delivered demand
+    const char *isolated[] = {"J-134", "J-256", "J-275"};
+    double lost = 0.0;
+    for (int i = 0; i < 3; i++)
+    {
+        BOOST_REQUIRE(nodevalue(ph, isolated[i], EN_ISOLATED) == 1);
+        double full = nodevalue(ph, isolated[i], EN_FULLDEMAND);
+        BOOST_REQUIRE(full > 0.0);
+        BOOST_REQUIRE(nodevalue(ph, isolated[i], EN_DEMANDFLOW) == 0.0);
+        BOOST_REQUIRE(abs(nodevalue(ph, isolated[i], EN_DEMANDDEFICIT) - full) < 1e-6);
+        lost += full;
+    }
+    BOOST_REQUIRE(abs(lost - 7.88) < 0.01);
+
+    closeproject(ph);
+}
+
 BOOST_AUTO_TEST_SUITE_END()

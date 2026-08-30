@@ -49,6 +49,7 @@ const
  EN_LEAKAGEFLOW = 30;
  EN_DEMANDFLOW  = 31;
  EN_FULLDEMAND  = 32;
+ EN_ISOLATED    = 33;
 
  EN_DIAMETER    = 0;    { Link parameters }
  EN_LENGTH      = 1;
@@ -216,6 +217,7 @@ const
  EN_EMITBACKFLOW  = 24;
  EN_PRESS_UNITS   = 25;
  EN_STATUS_REPORT = 26;
+ EN_ISOLATION     = 27;
 
  EN_LOWLEVEL   = 0;   { Control types }
  EN_HILEVEL    = 1;

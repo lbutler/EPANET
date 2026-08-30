@@ -45,6 +45,7 @@ Public Const EN_EMITTERFLOW = 29
 Public Const EN_LEAKAGEFLOW = 30
 Public Const EN_DEMANDFLOW = 31
 Public Const EN_FULLDEMAND = 32
+Public Const EN_ISOLATED = 33
 
 Public Const EN_DIAMETER = 0      ' Link parameters
 Public Const EN_LENGTH = 1
@@ -203,6 +204,7 @@ Public Const EN_DEMANDPATTERN = 23
 Public Const EN_EMITBACKFLOW = 24
 Public Const EN_PRESS_UNITS = 25
 Public Const EN_STATUS_REPORT = 26
+Public Const EN_ISOLATION = 27
 
 Public Const EN_LOWLEVEL = 0      ' Control types
 Public Const EN_HILEVEL = 1

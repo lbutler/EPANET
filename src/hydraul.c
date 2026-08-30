@@ -64,6 +64,10 @@ int  openhyd(Project *pr)
 
     // Allocate memory for hydraulic variables
     ERRCODE(allocmatrix(pr));
+
+    // Every junction is in service until findconnected() says otherwise
+    memset(pr->hydraul.Connected, 1,
+           (pr->network.Nnodes + 1) * sizeof(char));
     
     // Check for unconnected nodes
     ERRCODE(unlinked(pr));
@@ -333,14 +337,10 @@ int  allocmatrix(Project *pr)
                                    sizeof(double));
     hyd->OldStatus = (StatusType *) calloc(net->Nlinks+net->Ntanks+1,
                                            sizeof(StatusType));
-    hyd->Connected = (char *) calloc(net->Nnodes+1, sizeof(char));
-    hyd->ConnNodeList = (int *) calloc(net->Nnodes+1, sizeof(int));
     ERRCODE(MEMCHECK(hyd->P));
     ERRCODE(MEMCHECK(hyd->Y));
     ERRCODE(MEMCHECK(hyd->Xflow));
     ERRCODE(MEMCHECK(hyd->OldStatus));
-    ERRCODE(MEMCHECK(hyd->Connected));
-    ERRCODE(MEMCHECK(hyd->ConnNodeList));
     return errcode;
 }
 
@@ -360,8 +360,6 @@ void  freematrix(Project *pr)
     free(hyd->Y);
     free(hyd->Xflow);
     free(hyd->OldStatus);
-    free(hyd->Connected);
-    free(hyd->ConnNodeList);
 }
 
 

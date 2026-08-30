@@ -330,6 +330,8 @@ void initpointers(Project *pr)
     pr->hydraul.Xflow = NULL;
     pr->hydraul.FullDemand = NULL;
     pr->hydraul.DemandFlow = NULL;
+    pr->hydraul.Connected = NULL;
+    pr->hydraul.ConnNodeList = NULL;
     pr->hydraul.EmitterFlow = NULL;
     pr->hydraul.LeakageFlow = NULL;
     pr->hydraul.Leakage = NULL;
@@ -399,6 +401,8 @@ int allocdata(Project *pr)
         pr->hydraul.DemandFlow  = (double *)calloc(n, sizeof(double));
         pr->hydraul.EmitterFlow = (double *)calloc(n, sizeof(double));
         pr->hydraul.LeakageFlow = (double *)calloc(n, sizeof(double));
+        pr->hydraul.Connected   = (char *)calloc(n, sizeof(char));
+        pr->hydraul.ConnNodeList = (int *)calloc(n, sizeof(int));
         ERRCODE(MEMCHECK(pr->network.Node));
         ERRCODE(MEMCHECK(pr->hydraul.NodeDemand));
         ERRCODE(MEMCHECK(pr->hydraul.NodeHead));
@@ -407,6 +411,8 @@ int allocdata(Project *pr)
         ERRCODE(MEMCHECK(pr->hydraul.DemandFlow));
         ERRCODE(MEMCHECK(pr->hydraul.EmitterFlow));
         ERRCODE(MEMCHECK(pr->hydraul.LeakageFlow));
+        ERRCODE(MEMCHECK(pr->hydraul.Connected));
+        ERRCODE(MEMCHECK(pr->hydraul.ConnNodeList));
     }
 
     // Allocate memory for network links
@@ -482,6 +488,8 @@ void freedata(Project *pr)
     free(pr->hydraul.LinkStatus);
     free(pr->hydraul.FullDemand);
     free(pr->hydraul.DemandFlow);
+    free(pr->hydraul.Connected);
+    free(pr->hydraul.ConnNodeList);
     free(pr->hydraul.EmitterFlow);
     free(pr->hydraul.LeakageFlow);
     free(pr->quality.NodeQual);

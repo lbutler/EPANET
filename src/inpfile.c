@@ -729,6 +729,7 @@ int saveinpfile(Project *pr, const char *fname)
     fprintf(f, "\n DEMAND MULTIPLIER   %-.4f", hyd->Dmult);
     fprintf(f, "\n EMITTER EXPONENT    %-.4f", 1.0 / hyd->Qexp);
     fprintf(f, "\n BACKFLOW ALLOWED    %s", BackflowTxt[hyd->EmitBackFlag]);
+    fprintf(f, "\n ISOLATION           %s", BackflowTxt[hyd->Isolation]);
     fprintf(f, "\n VISCOSITY           %-.6f", hyd->Viscos / VISCOS);
     fprintf(f, "\n DIFFUSIVITY         %-.6f", qual->Diffus / DIFFUS);
     fprintf(f, "\n SPECIFIC GRAVITY    %-.6f", hyd->SpGrav);

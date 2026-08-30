@@ -25,6 +25,7 @@ leave this network entirely alone (rule: active FCVs are passable).
  Messages  Yes
 
 [OPTIONS]
+ Isolation Yes
  Units     GPM
  Headloss  H-W
 

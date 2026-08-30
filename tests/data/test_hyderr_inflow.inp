@@ -1,0 +1,43 @@
+; A junction with a net inflow supplies the area around it, so the
+; group it belongs to is not taken out of service. J3 injects 5 gpm
+; and feeds J4 through PI1; closed pipes PC1 & PC2 cut both off from
+; the reservoir.
+
+[TITLE]
+Inflow junction as a supply source
+
+[JUNCTIONS]
+;ID    Elev    Demand
+ J1    100     50
+ J2    100     50
+ J3    100     -5
+ J4    90      5
+
+[RESERVOIRS]
+;ID    Head
+ R1    200
+
+[PIPES]
+;ID    Node1  Node2  Length  Diam  Rough  Mloss  Status
+ P1    R1     J1     1000    12    100    0      OPEN
+ P2    J1     J2     1000    12    100    0      OPEN
+ PC1   J2     J3     1000    12    100    0      CLOSED
+ PC2   J1     J4     1000    12    100    0      CLOSED
+ PI1   J3     J4     1000    12    100    0      OPEN
+
+[OPTIONS]
+ Isolation Yes
+ Units     GPM
+ Headloss  H-W
+ Trials    40
+ Accuracy  0.001
+
+[TIMES]
+ Duration  0
+
+[REPORT]
+ Status    No
+ Summary   No
+ Page      0
+
+[END]

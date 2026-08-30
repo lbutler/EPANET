@@ -132,6 +132,7 @@
 #define   w_TOLERANCE   "TOLER"
 #define   w_EMITTER     "EMIT"
 #define   w_BACKFLOW    "BACK"
+#define   w_ISOLATION   "ISOL"
 #define   w_ALLOWED     "ALLOW"
 
 #define   w_PRICE       "PRICE"

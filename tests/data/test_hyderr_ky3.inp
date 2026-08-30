@@ -750,6 +750,7 @@ LINK ~@Pump-4  CLOSED  IF NODE T-2         ABOVE  167.244
  Page               	0
 
 [OPTIONS]
+ Isolation Yes
  Units              	GPM
  Headloss           	H-W
  Specific Gravity   	1

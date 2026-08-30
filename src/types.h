@@ -798,6 +798,7 @@ typedef struct {
     DemandModel,           // Fixed or pressure dependent
     Formflag,              // Head loss formula flag
     EmitBackFlag,          // Emitter backflow flag
+    Isolation,             // TRUE if disconnected junctions are taken out of service
     Iterations,            // Number of hydraulic trials taken
     MaxIter,               // Max. hydraulic trials allowed
     ExtraIter,             // Extra hydraulic trials

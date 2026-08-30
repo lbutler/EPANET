@@ -2031,6 +2031,15 @@ int optionchoice(Project *pr, int n)
         hyd->EmitBackFlag = choice;
     }
 
+    // ISOLATION of disconnected junctions
+    else if (match(parser->Tok[0], w_ISOLATION))
+    {
+        if (n < 1) return 0;
+        choice = findmatch(parser->Tok[1], BackflowTxt);
+        if (choice < 0) return setError(parser, 1, 213);
+        hyd->Isolation = choice;
+    }
+
     // Return -1 if keyword did not match any option
     else return -1;
     return 0;

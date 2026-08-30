@@ -26,6 +26,7 @@ walking an adjacency that drops parallel links).
  Messages  Yes
 
 [OPTIONS]
+ Isolation Yes
  Units     GPM
  Headloss  H-W
 

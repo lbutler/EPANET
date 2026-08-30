@@ -43,7 +43,6 @@ const double CBIG   = 1.e8;
 //void   demandheadloss(Project *, int, double, double, double *, double *);
 
 // Local functions
-static int     linkpassable(Project *pr, int k);
 static void    disconflows(Project *pr);
 static double  islandhead(Project *pr, int *nodelist, int m);
 static void    linkcoeffs(Project *pr);
@@ -301,8 +300,6 @@ void   matrixcoeffs(Project *pr)
     Hydraul *hyd = &pr->hydraul;
     Smatrix *sm = &hyd->smatrix;
 
-    int i;
-
     // Reset values of all diagonal coeffs. (Aii), off-diagonal
     // coeffs. (Aij), r.h.s. coeffs. (F) and node excess flow (Xflow)
     memset(sm->Aii, 0, (net->Nnodes + 1) * sizeof(double));
@@ -310,17 +307,27 @@ void   matrixcoeffs(Project *pr)
     memset(sm->F, 0, (net->Nnodes + 1) * sizeof(double));
     memset(hyd->Xflow, 0, (net->Nnodes + 1) * sizeof(double));
 
-    // Mark the junctions that have an open path to a tank or
-    // reservoir - at the first trial of a time step and, once
-    // hydsolve() finds that mid-trial status changes have cut
-    // junctions off, at every trial - & keep those junctions
-    // out of service
-    if (hyd->DisconRemark || hyd->DisconPinned)
+    // Mark the junctions that have a path to a supply source - at the
+    // first trial of a time step and, once hydsolve() finds that
+    // mid-trial status changes have cut junctions off, at every trial -
+    // & keep the junctions without one out of service
+    if (hyd->Isolation)
     {
-        hyd->DisconnectedNodes = findconnected(pr);
-        hyd->DisconRemark = FALSE;
+        if (hyd->DisconRemark)
+        {
+            hyd->DisconnectedNodes = findconnected(pr);
+            hyd->DisconRemark = FALSE;
+        }
+        disconflows(pr);
     }
-    disconflows(pr);
+
+    // Isolation off: every junction stays in service. (Marks left behind
+    // by a failure diagnosis in findhyderrcause() are cleared here.)
+    else if (hyd->DisconnectedNodes > 0)
+    {
+        memset(hyd->Connected, 1, (net->Nnodes + 1) * sizeof(char));
+        hyd->DisconnectedNodes = 0;
+    }
 
     // Compute matrix coeffs. from links, emitters, and nodal demands
     linkcoeffs(pr);
@@ -344,71 +351,28 @@ int findconnected(Project *pr)
 /*
 **--------------------------------------------------------------
 **  Input:   none
-**  Output:  returns the number of disconnected junctions
-**  Purpose: marks junctions that have a path to a tank or
-**           reservoir through passable links. A junction without
-**           one stays in the equation matrix coupled only through
-**           the 1/CBIG conductance placeholder that impassable
-**           links retain, so its rows either make the matrix
-**           ill-conditioned or let its demand "leak" through
-**           closed links at absurd heads. Such junctions are
-**           taken out of service by disconflows()/disconcoeffs().
-**
-**  Note:    the head-setting node of an ACTIVE PRV or PSV counts
-**           as a source since prvcoeff()/psvcoeff() fix its head
-**           the same way a fixed grade node's is.
+**  Output:  returns the number of junctions with no supply
+**  Purpose: marks the junctions that have a path to a supply
+**           source through passable links, using the same source
+**           marking & tracing that the status report uses. A
+**           junction without such a path stays in the equation
+**           matrix coupled only through the 1/CBIG conductance
+**           placeholder that impassable links retain, so its row
+**           either makes the matrix ill-conditioned or lets its
+**           demand "leak" through closed links at absurd heads.
+**           Such junctions are taken out of service by
+**           disconflows() & disconcoeffs().
 **--------------------------------------------------------------
 */
 {
     Network *net = &pr->network;
     Hydraul *hyd = &pr->hydraul;
 
-    int i, j, k, m, n;
-    int *nodelist = hyd->ConnNodeList;
-    Slink *link;
-    Padjlist alink;
+    int i, m, n;
 
-    // Place all fixed grade nodes on the node list & mark them
     memset(hyd->Connected, 0, (net->Nnodes + 1) * sizeof(char));
-    m = 0;
-    for (i = net->Njuncs + 1; i <= net->Nnodes; i++)
-    {
-        hyd->Connected[i] = 1;
-        nodelist[++m] = i;
-    }
-
-    // Do the same for the head-setting node of each active PRV & PSV
-    for (i = 1; i <= net->Nvalves; i++)
-    {
-        k = net->Valve[i].Link;
-        link = &net->Link[k];
-        if (hyd->LinkStatus[k] != ACTIVE) continue;
-        if (link->Type == PRV) j = link->N2;
-        else if (link->Type == PSV) j = link->N1;
-        else continue;
-        if (!hyd->Connected[j])
-        {
-            hyd->Connected[j] = 1;
-            nodelist[++m] = j;
-        }
-    }
-
-    // Mark every node connected to those on the list through
-    // passable links
-    n = 1;
-    while (n <= m)
-    {
-        i = nodelist[n];
-        for (alink = net->Adjlist[i]; alink != NULL; alink = alink->next)
-        {
-            j = alink->node;
-            if (hyd->Connected[j]) continue;
-            if (!linkpassable(pr, alink->link)) continue;
-            hyd->Connected[j] = 1;
-            nodelist[++m] = j;
-        }
-        n++;
-    }
+    m = marksources(pr, hyd->ConnNodeList, hyd->Connected);
+    marknodes(pr, m, hyd->ConnNodeList, hyd->Connected);
 
     // Count the junctions left unmarked
     n = 0;

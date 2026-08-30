@@ -133,6 +133,7 @@ wall reactions are included.
  Page               	0
 
 [OPTIONS]
+ Isolation Yes
  Units              	GPM
  Headloss           	H-W
  Specific Gravity   	1.0

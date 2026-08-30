@@ -97,7 +97,7 @@ void updateflowbalance(Project *pr, long hstep)
         flowBalance.totalOutflow += v;
 
         // Accumulate demand deficit flow
-        if (hyd->DemandModel == PDA && hyd->FullDemand[i] > 0.0)
+        if (hyd->FullDemand[i] > 0.0)
         {
             deficit = hyd->FullDemand[i] - hyd->DemandFlow[i];
             if (deficit > 0.0)
