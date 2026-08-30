@@ -36,6 +36,8 @@ static const double FLOW_PER_CFS[] = {
     0.028317  /* EN_CMS  */
 };
 #define QZERO_CFS 1.e-6   /* zero-flow threshold used by the engine */
+#define PI_CONST  3.141592654
+#define RD_MISSING_SET (-1.e10)   /* the engine's MISSING link setting */
 #define LPSperCFS 28.317
 #define GPMperCFS 448.831
 
@@ -505,6 +507,402 @@ static int collectStatic(EN_Project ph, RD_ReportData *rd,
     return 0;
 }
 
+/* --------------------------------------------------------------------------
+   Hydraulic status report (STATUS YES / FULL)
+
+   The engine writes these lines from inside the solver:
+     runhyd()  -> controls()      : FMT54/55 control actions  (BEFORE the solve)
+               -> writehydstat()  : FMT58/59, FMT69a/b, FMT50/51, FMT52/53
+               -> writehydwarn()  : WARN01..WARN06
+     nexthyd() -> writeflowbalance() at the end of the run
+   A stepwise API caller has no observation point between controls() and the
+   solve, so control actions are PREDICTED from the previous step's cached
+   state (mirroring controls() in src/hydraul.c); everything else is probed
+   after EN_runH.  See MISSING_API.md.
+   ------------------------------------------------------------------------ */
+
+/* Per-run state carried between steps by the status report */
+typedef struct {
+    double  hcf;            /* internal ft -> user head units (1 or 0.3048)  */
+    double  qcf;            /* user flow units per cfs                       */
+    long    startTime;      /* EN_STARTTIME, for time-of-day controls        */
+    int    *oldLinkStatus;  /* [nLinks] mirrors hyd->OldStatus for links     */
+    int    *curLinkStatus;  /* [nLinks] mirrors hyd->LinkStatus during
+                               control evaluation within one step          */
+    int    *oldTankStatus;  /* [nNodes] mirrors hyd->OldStatus for tanks     */
+    double *prevHead;       /* [nNodes] head after the previous solve        */
+    double *prevDemand;     /* [nNodes] demand after the previous solve      */
+    double *prevSetting;    /* [nLinks] setting after the previous solve     */
+    /* flow balance accumulators (flow units x seconds) */
+    double  fbInflow, fbOutflow, fbConsumer, fbEmitter, fbLeakage,
+            fbDeficit, fbStorage;
+    /* components of the solve just completed, awaiting a time weight */
+    double  pendInflow, pendOutflow, pendConsumer, pendEmitter, pendLeakage,
+            pendDeficit, pendStorage;
+} RD_RunState;
+
+static RD_StatusEvent *newEvent(RD_ReportData *rd, int type, long t)
+{
+    RD_StatusEvent *ev;
+    if (rd->nEvents >= rd->nAllocEvents)
+    {
+        int n = rd->nAllocEvents ? rd->nAllocEvents * 2 : 64;
+        RD_StatusEvent *e = realloc(rd->events, n * sizeof(RD_StatusEvent));
+        if (!e) return NULL;
+        rd->events = e;
+        rd->nAllocEvents = n;
+    }
+    ev = &rd->events[rd->nEvents++];
+    memset(ev, 0, sizeof(*ev));
+    ev->type = type;
+    ev->time = t;
+    return ev;
+}
+
+/* Recover a link's RAW internal status code (StatusType), which is what the
+   status report prints.  EN_getlinkvalue(EN_STATUS) collapses everything to
+   closed/open/active, so it cannot be used.  EN_PUMP_STATE returns the raw
+   hyd->LinkStatus for non-pump links (src/epanet.c refines it only for
+   pumps); for a pump the refinement replaces a raw OPEN with XFLOW/XHEAD,
+   so an open pump is mapped back to OPEN.  See MISSING_API.md gap #3.     */
+static int rawLinkStatus(EN_Project ph, int linkIndex, int linkType)
+{
+    double v = 0.0, st = 0.0;
+    EN_getlinkvalue(ph, linkIndex, EN_PUMP_STATE, &v);
+    if (linkType == EN_PUMP)
+    {
+        EN_getlinkvalue(ph, linkIndex, EN_STATUS, &st);
+        if (st >= 1.0) return RD_OPEN;
+    }
+    return (int)v;
+}
+
+/* Cache the state that the next step's control evaluation and status
+   comparison need (mirrors what the engine keeps in hyd->...).           */
+static void cacheState(EN_Project ph, RD_ReportData *rd, RD_RunState *rs)
+{
+    int i;
+    for (i = 0; i < rd->nNodes; i++)
+    {
+        EN_getnodevalue(ph, i + 1, EN_HEAD, &rs->prevHead[i]);
+        EN_getnodevalue(ph, i + 1, EN_DEMAND, &rs->prevDemand[i]);
+    }
+    for (i = 0; i < rd->nLinks; i++)
+        EN_getlinkvalue(ph, i + 1, EN_SETTING, &rs->prevSetting[i]);
+}
+
+/* Seed the status memories the way inithyd() does (src/hydraul.c:95-160):
+   tanks start at TEMPCLOSED, links at their post-initialization status.  */
+static void seedStatus(EN_Project ph, RD_ReportData *rd, RD_RunState *rs)
+{
+    int i;
+    for (i = 0; i < rd->nNodes; i++)
+        rs->oldTankStatus[i] = RD_TEMPCLOSED;
+    for (i = 0; i < rd->nLinks; i++)
+        rs->oldLinkStatus[i] = rawLinkStatus(ph, i + 1, rd->linkType[i]);
+    cacheState(ph, rd, rs);
+}
+
+/* tankvolume() from src/hydraul.c, in internal units, rebuilt from the API */
+static double tankVolume(EN_Project ph, RD_ReportData *rd, RD_RunState *rs,
+                         int nodeIndex, double headInternal)
+{
+    double vcurve = 0.0, elev = 0.0, minvol = 0.0, minlevel = 0.0, diam = 0.0;
+    double vcf = rs->hcf * rs->hcf * rs->hcf;   /* Ucf[VOLUME] */
+
+    EN_getnodevalue(ph, nodeIndex, EN_VOLCURVE, &vcurve);
+    EN_getnodevalue(ph, nodeIndex, EN_ELEVATION, &elev);
+
+    if ((int)vcurve == 0)
+    {
+        double area;
+        EN_getnodevalue(ph, nodeIndex, EN_MINVOLUME, &minvol);
+        EN_getnodevalue(ph, nodeIndex, EN_MINLEVEL, &minlevel);
+        EN_getnodevalue(ph, nodeIndex, EN_TANKDIAM, &diam);
+        area = PI_CONST * (diam / rs->hcf) * (diam / rs->hcf) / 4.0;
+        return minvol / vcf +
+               (headInternal - (elev / rs->hcf + minlevel / rs->hcf)) * area;
+    }
+    else
+    {
+        /* interpolate the volume curve on the water level in user units */
+        int npts = 0, k;
+        double y = (headInternal - elev / rs->hcf) * rs->hcf;
+        double x0 = 0, y0 = 0, x1 = 0, y1 = 0, v;
+        EN_getcurvelen(ph, (int)vcurve, &npts);
+        if (npts <= 0) return 0.0;
+        EN_getcurvevalue(ph, (int)vcurve, 1, &x0, &y0);
+        if (y <= x0) return y0 / vcf;
+        for (k = 2; k <= npts; k++)
+        {
+            EN_getcurvevalue(ph, (int)vcurve, k, &x1, &y1);
+            if (y <= x1)
+            {
+                if (x1 == x0) v = y1;
+                else v = y0 + (y - x0) / (x1 - x0) * (y1 - y0);
+                return v / vcf;
+            }
+            x0 = x1; y0 = y1;
+        }
+        return y1 / vcf;
+    }
+}
+
+/* Predict the simple-control actions the engine took at the start of this
+   step, mirroring controls() in src/hydraul.c using the cached previous
+   state.  Emits the FMT54/FMT55 lines.                                    */
+static void probeControls(EN_Project ph, RD_ReportData *rd, RD_RunState *rs,
+                          long t)
+{
+    int nControls = 0, i;
+
+    EN_getcount(ph, EN_CONTROLCOUNT, &nControls);
+    if (nControls <= 0) return;
+    /* the engine evaluates controls against link state that earlier
+       controls in the same step may already have changed              */
+    memcpy(rs->curLinkStatus, rs->oldLinkStatus, rd->nLinks * sizeof(int));
+    for (i = 1; i <= nControls; i++)
+    {
+        int type = 0, link = 0, node = 0, enabled = 1, reset = 0, ctlStatus;
+        double setting = 0.0, level = 0.0, ctlSetting;
+        int s1, s2;
+        double k1, k2;
+
+        if (EN_getcontrolenabled(ph, i, &enabled) == 0 && !enabled) continue;
+        if (EN_getcontrol(ph, i, &type, &link, &setting, &node, &level) > 0)
+            continue;
+        if (link <= 0) continue;
+
+        /* control status / setting as controldata() stored them */
+        if (setting == EN_SET_OPEN)        { ctlStatus = RD_OPEN;   ctlSetting = RD_MISSING_SET; }
+        else if (setting == EN_SET_CLOSED) { ctlStatus = RD_CLOSED; ctlSetting = RD_MISSING_SET; }
+        else
+        {
+            ctlSetting = setting;
+            if (rd->linkType[link - 1] == EN_PUMP ||
+                rd->linkType[link - 1] == EN_PIPE)
+                ctlStatus = (setting == 0.0) ? RD_CLOSED : RD_OPEN;
+            else ctlStatus = RD_ACTIVE;
+        }
+
+        /* tank-level control: the engine only tests nodes above the last
+           junction, so junction (pressure) controls never fire here       */
+        if (node > 0 && rd->nodeType[node - 1] != EN_JUNCTION)
+        {
+            double h = rs->prevHead[node - 1] / rs->hcf;
+            double vplus = fabs(rs->prevDemand[node - 1]) / rs->qcf;
+            double elev = 0.0, grade, v1, v2;
+            EN_getnodevalue(ph, node, EN_ELEVATION, &elev);
+            grade = elev / rs->hcf + level / rs->hcf;
+            v1 = tankVolume(ph, rd, rs, node, h);
+            v2 = tankVolume(ph, rd, rs, node, grade);
+            if (type == EN_LOWLEVEL && v1 <= v2 + vplus) reset = 1;
+            if (type == EN_HILEVEL  && v1 >= v2 - vplus) reset = 1;
+        }
+        if (type == EN_TIMER && (long)level == t) reset = 1;
+        if (type == EN_TIMEOFDAY &&
+            (t + rs->startTime) % 86400L == (long)level) reset = 1;
+        if (!reset) continue;
+
+        s1 = (rs->curLinkStatus[link - 1] <= RD_CLOSED) ? RD_CLOSED : RD_OPEN;
+        s2 = ctlStatus;
+        k1 = rs->prevSetting[link - 1];
+        k2 = (rd->linkType[link - 1] > EN_PIPE) ? ctlSetting : k1;
+        if (s1 != s2 || k1 != k2)
+        {
+            RD_StatusEvent *ev = newEvent(rd, RD_EV_CONTROL, t);
+            if (!ev) return;
+            ev->index = link - 1;
+            ev->nodeIndex = node - 1;
+            ev->isTimerControl = (type == EN_TIMER || type == EN_TIMEOFDAY);
+            /* the engine applies the change now; the cached state must
+               follow so a later control in the same step sees it        */
+            rs->curLinkStatus[link - 1] = s2;
+            rs->prevSetting[link - 1] = k2;
+        }
+    }
+}
+
+/* writehydstat() replica: emitted after the solve for the step at time t */
+static void probeStatus(EN_Project ph, RD_ReportData *rd, RD_RunState *rs,
+                        long t)
+{
+    double iters = 0.0, relerr = 0.0, v;
+    int i;
+
+    EN_getstatistic(ph, EN_ITERATIONS, &iters);
+    EN_getstatistic(ph, EN_RELATIVEERROR, &relerr);
+
+    if (iters > 0)
+    {
+        RD_StatusEvent *ev = newEvent(rd, RD_EV_BALANCE, t);
+        if (ev)
+        {
+            ev->iters = (int)iters;
+            ev->relerr = relerr;
+            ev->balanced = (relerr <= rd->accuracy);
+        }
+        if (rd->demandModel == EN_PDA)
+        {
+            double deficient = 0.0, reduction = 0.0;
+            EN_getstatistic(ph, EN_DEFICIENTNODES, &deficient);
+            EN_getstatistic(ph, EN_DEMANDREDUCTION, &reduction);
+            if (deficient > 0)
+            {
+                ev = newEvent(rd, RD_EV_DEFICIENT, t);
+                if (ev)
+                {
+                    ev->count = (int)deficient;
+                    ev->reduction = reduction;
+                }
+            }
+        }
+    }
+
+    /* tank / reservoir status transitions */
+    for (i = 0; i < rd->nNodes; i++)
+    {
+        int newstat;
+        double demand = 0.0, head = 0.0, elev = 0.0, maxlevel = 0.0;
+        if (rd->nodeType[i] == EN_JUNCTION) continue;
+        EN_getnodevalue(ph, i + 1, EN_DEMAND, &demand);
+        demand /= rs->qcf;                       /* back to internal cfs */
+        EN_getnodevalue(ph, i + 1, EN_HEAD, &head);
+        EN_getnodevalue(ph, i + 1, EN_ELEVATION, &elev);
+        if (fabs(demand) < 0.001) newstat = RD_CLOSED;
+        else if (demand < 0.0)    newstat = RD_EMPTYING;
+        else
+        {
+            newstat = RD_FILLING;
+            if (rd->nodeType[i] == EN_TANK)
+            {
+                EN_getnodevalue(ph, i + 1, EN_MAXLEVEL, &maxlevel);
+                if (fabs(head - (elev + maxlevel)) / rs->hcf < 0.001)
+                    newstat = RD_OVERFLOWING;
+            }
+        }
+        if (newstat != rs->oldTankStatus[i])
+        {
+            RD_StatusEvent *ev = newEvent(rd, RD_EV_TANK, t);
+            if (ev)
+            {
+                ev->nodeIndex = i;
+                ev->newStatus = newstat;
+                ev->level = head - elev;
+            }
+            rs->oldTankStatus[i] = newstat;
+        }
+    }
+
+    /* link status transitions */
+    for (i = 0; i < rd->nLinks; i++)
+    {
+        int newstat = rawLinkStatus(ph, i + 1, rd->linkType[i]);
+        if (newstat != rs->oldLinkStatus[i])
+        {
+            RD_StatusEvent *ev = newEvent(rd, RD_EV_LINK, t);
+            if (ev)
+            {
+                ev->index = i;
+                ev->oldStatus = rs->oldLinkStatus[i];
+                ev->newStatus = newstat;
+            }
+            rs->oldLinkStatus[i] = newstat;
+        }
+    }
+    (void)v;
+    newEvent(rd, RD_EV_BLANK, t);
+}
+
+/* updateflowbalance() from src/flowbalance.c.  The engine accumulates the
+   flows of the solve just completed weighted by the NEXT time step, so the
+   components are probed before EN_nextH and weighted afterwards.        */
+static void probeFlowBalance(EN_Project ph, RD_ReportData *rd, RD_RunState *rs)
+{
+    int i;
+    rs->pendInflow = rs->pendOutflow = rs->pendConsumer = 0.0;
+    rs->pendEmitter = rs->pendLeakage = rs->pendDeficit = rs->pendStorage = 0.0;
+
+    for (i = 0; i < rd->nNodes; i++)
+    {
+        double v = 0.0;
+        if (rd->nodeType[i] != EN_JUNCTION) continue;
+        EN_getnodevalue(ph, i + 1, EN_DEMANDFLOW, &v);
+        if (v < 0.0) rs->pendInflow += -v;
+        else { rs->pendConsumer += v; rs->pendOutflow += v; }
+        EN_getnodevalue(ph, i + 1, EN_EMITTERFLOW, &v);
+        rs->pendEmitter += v; rs->pendOutflow += v;
+        EN_getnodevalue(ph, i + 1, EN_LEAKAGEFLOW, &v);
+        rs->pendLeakage += v; rs->pendOutflow += v;
+        if (rd->demandModel == EN_PDA)
+        {
+            double full = 0.0, delivered = 0.0;
+            EN_getnodevalue(ph, i + 1, EN_FULLDEMAND, &full);
+            if (full > 0.0)
+            {
+                EN_getnodevalue(ph, i + 1, EN_DEMANDFLOW, &delivered);
+                if (full - delivered > 0.0) rs->pendDeficit += full - delivered;
+            }
+        }
+    }
+    for (i = 0; i < rd->nNodes; i++)
+    {
+        double v = 0.0;
+        if (rd->nodeType[i] == EN_JUNCTION) continue;
+        EN_getnodevalue(ph, i + 1, EN_DEMAND, &v);
+        if (rd->nodeType[i] == EN_RESERVOIR)
+        {
+            if (v >= 0.0) rs->pendOutflow += v;
+            else          rs->pendInflow += -v;
+        }
+        else rs->pendStorage += v;
+    }
+}
+
+static void accumulateFlowBalance(RD_ReportData *rd, RD_RunState *rs,
+                                  long t, long tstep)
+{
+    double dt;
+    if (rd->duration == 0) dt = 1.0;
+    else if (t < rd->duration) dt = (double)tstep;
+    else return;
+
+    rs->fbInflow   += rs->pendInflow * dt;
+    rs->fbOutflow  += rs->pendOutflow * dt;
+    rs->fbConsumer += rs->pendConsumer * dt;
+    rs->fbEmitter  += rs->pendEmitter * dt;
+    rs->fbLeakage  += rs->pendLeakage * dt;
+    rs->fbDeficit  += rs->pendDeficit * dt;
+    rs->fbStorage  += rs->pendStorage * dt;
+}
+
+/* endflowbalance() from src/flowbalance.c */
+static void finalizeFlowBalance(RD_ReportData *rd, RD_RunState *rs, long tFinal)
+{
+    double seconds = (tFinal > 0) ? (double)tFinal : 1.0;
+    double qin, qout, qstor, r;
+    RD_FlowBalance *fb = &rd->flowBalance;
+
+    fb->totalInflow    = rs->fbInflow / seconds;
+    fb->totalOutflow   = rs->fbOutflow / seconds;
+    fb->consumerDemand = rs->fbConsumer / seconds;
+    fb->emitterDemand  = rs->fbEmitter / seconds;
+    fb->leakageDemand  = rs->fbLeakage / seconds;
+    fb->deficitDemand  = rs->fbDeficit / seconds;
+    fb->storageDemand  = rs->fbStorage / seconds;
+
+    qin = fb->totalInflow;
+    qout = fb->totalOutflow;
+    qstor = fb->storageDemand;
+    if (qstor > 0.0) qout += qstor;
+    else             qin -= qstor;
+    if (qin == qout)     r = 1.0;
+    else if (qin > 0.0)  r = qout / qin;
+    else                 r = 0.0;
+    fb->ratio = r;
+    fb->valid = 1;
+}
+
 static void recordWarning(RD_ReportData *rd, long t, int code)
 {
     RD_Warning *w = realloc(rd->warnings,
@@ -517,111 +915,84 @@ static void recordWarning(RD_ReportData *rd, long t, int code)
     if (code > rd->warnflag) rd->warnflag = code;
 }
 
-static void addWarnLine(RD_ReportData *rd, const char *line)
-{
-    char **lines = realloc(rd->warnLines,
-                           (rd->nWarnLines + 1) * sizeof(char *));
-    if (!lines) return;
-    rd->warnLines = lines;
-    rd->warnLines[rd->nWarnLines] = strdup(line);
-    if (rd->warnLines[rd->nWarnLines]) rd->nWarnLines++;
-}
-
-static char *clockTimeStr(char *buf, long seconds)
-{
-    long h = seconds / 3600;
-    long m = seconds % 3600 / 60;
-    long s = seconds - 3600 * h - 60 * m;
-    sprintf(buf, "%01d:%02d:%02d", (int)h, (int)m, (int)s);
-    return buf;
-}
-
 /* Best-effort reconstruction of the WARNING lines writehydwarn() (in
-   src/report.c) writes to the report after a warned hydraulic step, by
-   probing solver state through the API.  Checks run in the same order as
-   the engine's.  What CANNOT be reconstructed (see MISSING_API.md):
-     - WARN05: a valve stuck in an abnormal state (XFCV/XPRESSURE) - the
-       API collapses valve status to closed/open/active;
-     - WARN03a/b/c: disconnected-node details - no connectivity API.      */
+   src/report.c) writes after a warned hydraulic step, by probing solver
+   state through the API.  Checks run in the engine's order.  What CANNOT
+   be reconstructed (see MISSING_API.md): WARN03a/b/c disconnected-node
+   details, which need the engine's connectivity walk.                    */
 static void probeWarnings(EN_Project ph, RD_ReportData *rd,
                           const EnergyAcc *acc, long t, int unbalancedOpt)
 {
     double iters = 0, relerr = 0, v;
-    char atime[16], line[256];
     int i, fired = 0;
+    RD_StatusEvent *ev;
 
-    clockTimeStr(atime, t);
     EN_getstatistic(ph, EN_ITERATIONS, &iters);
     EN_getstatistic(ph, EN_RELATIVEERROR, &relerr);
 
-    /* WARN02: converged but only after exceeding the trial limit */
+    /* WARN02: converged, but only after exceeding the trial limit */
     if (iters > rd->maxIter && relerr <= rd->accuracy)
     {
-        sprintf(line, "WARNING: Maximum trials exceeded at %s hrs. "
-                      "System may be unstable.", atime);
-        addWarnLine(rd, line);
+        ev = newEvent(rd, RD_EV_WARNING, t);
+        if (ev) ev->warnKind = RD_WARN_UNSTABLE;
         fired = 1;
     }
 
-    /* WARN06: negative pressures at demand nodes (DDA only; engine tests
-       NodeHead < Elev && NodeDemand > 0, i.e. pressure < 0)              */
-    if (rd->demandModel == 0)
+    /* WARN06: negative pressures at demand nodes (DDA only) */
+    if (rd->demandModel == EN_DDA)
     {
-        int deficient = 0;
         for (i = 0; i < rd->nNodes; i++)
         {
             double press = 0, dem = 0;
-            if (rd->nodeType[i] != 0) continue;
+            if (rd->nodeType[i] != EN_JUNCTION) continue;
             EN_getnodevalue(ph, i + 1, EN_PRESSURE, &press);
             EN_getnodevalue(ph, i + 1, EN_DEMAND, &dem);
-            if (press < 0.0 && dem > 0.0) { deficient = 1; break; }
-        }
-        if (deficient)
-        {
-            sprintf(line, "WARNING: Negative pressures at %s hrs.", atime);
-            addWarnLine(rd, line);
-            fired = 1;
+            if (press < 0.0 && dem > 0.0)
+            {
+                ev = newEvent(rd, RD_EV_WARNING, t);
+                if (ev) ev->warnKind = RD_WARN_NEGPRESSURE;
+                fired = 1;
+                break;
+            }
         }
     }
 
-    /* WARN05: valves stuck in an abnormal state (XFCV/XPRESSURE).
-       EN_getlinkvalue(EN_STATUS) collapses these to "active", but
-       EN_PUMP_STATE - undocumented for non-pumps - returns the raw
-       internal status code (src/epanet.c), exposing XFCV(6)/XPRESSURE(7).
-       An official EN_VALVE_STATE would be cleaner - see MISSING_API.md.  */
+    /* WARN05: valves stuck in an abnormal state (XFCV / XPRESSURE).
+       EN_getlinkvalue(EN_STATUS) collapses these to "active"; the raw
+       internal code comes from EN_PUMP_STATE, which is undocumented for
+       non-pump links - see MISSING_API.md gap #3.                        */
     for (i = 0; i < rd->nLinks; i++)
     {
-        static const char *LINK_TXT[] =
-            { "CV", "Pipe", "Pump", "PRV", "PSV", "PBV", "FCV", "TCV",
-              "GPV", "PCV" };
-        if (rd->linkType[i] < 3) continue;   /* valves only */
+        if (rd->linkType[i] < EN_PRV) continue;      /* valves only */
         EN_getlinkvalue(ph, i + 1, EN_PUMP_STATE, &v);
-        if (v >= 6.0)
+        if (v >= RD_XFCV)
         {
-            sprintf(line, "WARNING: %s %s %s at %s hrs.",
-                    LINK_TXT[rd->linkType[i]], rd->linkId[i],
-                    v == 6.0 ? "open but cannot deliver flow"
-                             : "open but cannot deliver pressure",
-                    atime);
-            addWarnLine(rd, line);
+            ev = newEvent(rd, RD_EV_WARNING, t);
+            if (ev)
+            {
+                ev->warnKind = RD_WARN_VALVE;
+                ev->index = i;
+                ev->warnStatus = (int)v;
+            }
             fired = 1;
         }
     }
 
     /* WARN04: pumps that cannot deliver head (XHEAD) or exceed their
-       maximum flow (XFLOW), exposed through EN_PUMP_STATE               */
+       maximum flow (XFLOW), as refined by EN_PUMP_STATE               */
     for (i = 0; i < rd->nPumps; i++)
     {
         int link = acc[i].linkIndex;
         EN_getlinkvalue(ph, link, EN_PUMP_STATE, &v);
-        if (v == 0.0 || v == 5.0)
+        if (v == RD_XHEAD || v == RD_XFLOW)
         {
-            sprintf(line, "WARNING: Pump %s %s at %s hrs.",
-                    rd->linkId[link - 1],
-                    v == 0.0 ? "closed because cannot deliver head"
-                             : "open but exceeds maximum flow",
-                    atime);
-            addWarnLine(rd, line);
+            ev = newEvent(rd, RD_EV_WARNING, t);
+            if (ev)
+            {
+                ev->warnKind = RD_WARN_PUMP;
+                ev->index = link - 1;
+                ev->warnStatus = (int)v;
+            }
             fired = 1;
         }
     }
@@ -629,15 +1000,18 @@ static void probeWarnings(EN_Project ph, RD_ReportData *rd,
     /* WARN01: failed to converge within the trial limit */
     if (iters > rd->maxIter && relerr > rd->accuracy)
     {
-        sprintf(line, "WARNING: System unbalanced at %s hrs.%s", atime,
-                unbalancedOpt == -1 ? " EXECUTION HALTED." : "");
-        addWarnLine(rd, line);
+        ev = newEvent(rd, RD_EV_WARNING, t);
+        if (ev)
+        {
+            ev->warnKind = RD_WARN_UNBALANCED;
+            ev->count = (unbalancedOpt == -1);   /* "EXECUTION HALTED." */
+        }
         fired = 1;
     }
 
-    /* WARN03a/b/c (disconnected nodes) would be written here - GAP       */
+    /* WARN03a/b/c (disconnected nodes) would be written here - GAP */
 
-    if (fired) addWarnLine(rd, " ");
+    if (fired) newEvent(rd, RD_EV_BLANK, t);
 }
 
 /* --------------------------------------------------------------------------
@@ -658,8 +1032,10 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
     long nextRptTime;
     long enginePeriods = 0;
     int unbalancedOpt = 0;
+    RD_RunState rs;
 
     memset(rd, 0, sizeof(*rd));
+    memset(&rs, 0, sizeof(rs));
     snprintf(rd->inpFname, sizeof(rd->inpFname), "%s", inpFile);
     errmsg[0] = '\0';
 
@@ -754,19 +1130,55 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
         EN_getoption(ph, EN_UNBALANCED, &v);
         unbalancedOpt = (int)v;
     }
+
+    /* status-report state: the engine seeds its status memories in
+       inithyd(), so mirror that right after EN_initH                     */
+    rs.hcf = rd->usUnits ? 1.0 : 0.3048;
+    rs.qcf = FLOW_PER_CFS[rd->flowUnits];
+    EN_gettimeparam(ph, EN_STARTTIME, &rs.startTime);
+    rs.oldLinkStatus = calloc(rd->nLinks > 0 ? rd->nLinks : 1, sizeof(int));
+    rs.curLinkStatus = calloc(rd->nLinks > 0 ? rd->nLinks : 1, sizeof(int));
+    rs.oldTankStatus = calloc(rd->nNodes, sizeof(int));
+    rs.prevHead = calloc(rd->nNodes, sizeof(double));
+    rs.prevDemand = calloc(rd->nNodes, sizeof(double));
+    rs.prevSetting = calloc(rd->nLinks > 0 ? rd->nLinks : 1, sizeof(double));
+    if (!rs.oldLinkStatus || !rs.curLinkStatus || !rs.oldTankStatus || !rs.prevHead ||
+        !rs.prevDemand || !rs.prevSetting)
+    {
+        err = 101;
+        snprintf(errmsg, errlen, "out of memory");
+        goto fail;
+    }
+    seedStatus(ph, rd, &rs);
+
     do
     {
         err = EN_runH(ph, &t);
         if (err > 100) goto fail;
+
+        /* control actions fire inside EN_runH BEFORE the solve, so they
+           are predicted from the cached previous state (see
+           probeControls) and must be recorded before the status lines   */
+        if (rd->statusLevel > RD_STATUS_NO) probeControls(ph, rd, &rs, t);
+        if (rd->statusLevel > RD_STATUS_NO) probeStatus(ph, rd, &rs, t);
+
         if (err > 0 && err < 100)
         {
             recordWarning(rd, t, err);
             probeWarnings(ph, rd, acc, t, unbalancedOpt);
         }
+        probeFlowBalance(ph, rd, &rs);
+
         err = EN_nextH(ph, &tstep);
         if (err > 100) goto fail;
+        /* EN_nextH advances tank levels, so the state the NEXT step's
+           controls() will see is only complete now (see tanklevels() in
+           src/hydraul.c)                                                */
+        cacheState(ph, rd, &rs);
         accumulateEnergy(ph, rd, acc, &emax, t, tstep,
                          globalPrice, globalPat, pstart, pstep);
+        accumulateFlowBalance(rd, &rs, t, tstep);
+        if (tstep == 0) finalizeFlowBalance(rd, &rs, t);
     } while (tstep > 0);
     err = EN_closeH(ph);
     if (err > 100) goto fail;
@@ -792,6 +1204,17 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
         err = EN_nextQ(ph, &tstep);
         if (err > 100) goto fail;
     } while (tstep > 0);
+    /* the water quality mass balance ratio is the only part of that block
+       the API exposes; the mass terms live inside the quality solver     */
+    if (rd->qualType != EN_NONE && rd->statusLevel > RD_STATUS_NO)
+    {
+        double ratio = 0.0;
+        EN_getstatistic(ph, EN_MASSBALANCE, &ratio);
+        rd->massBalance.ratio = ratio;
+        rd->massBalance.haveMasses = 0;   /* GAP - see MISSING_API.md */
+        rd->massBalance.valid = 1;
+    }
+
     err = EN_closeQ(ph);
     if (err > 100) goto fail;
 
@@ -814,14 +1237,19 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
     EN_close(ph);
     EN_deleteproject(ph);
     free(acc);
+    free(rs.oldLinkStatus); free(rs.curLinkStatus); free(rs.oldTankStatus);
+    free(rs.prevHead); free(rs.prevDemand); free(rs.prevSetting);
     (void)warncode;
     return rd->warnflag;
 
 fail:
-    snprintf(errmsg, errlen, "API error %d during simulation", err);
+    if (!errmsg[0])
+        snprintf(errmsg, errlen, "API error %d during simulation", err);
     EN_close(ph);
     EN_deleteproject(ph);
     free(acc);
+    free(rs.oldLinkStatus); free(rs.curLinkStatus); free(rs.oldTankStatus);
+    free(rs.prevHead); free(rs.prevDemand); free(rs.prevSetting);
     return err;
 }
 
@@ -830,6 +1258,7 @@ void rd_free(RD_ReportData *rd)
     int p;
     for (p = 0; p < rd->nWarnLines; p++) free(rd->warnLines[p]);
     free(rd->warnLines);
+    free(rd->events);
     for (p = 0; p < rd->nPeriods; p++)
     {
         if (rd->nodeRes) free(rd->nodeRes[p]);

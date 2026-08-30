@@ -37,9 +37,12 @@ via `EN_setreport` *and* mirrored into the replica model, so both reports
 reflect them - useful to force the result tables and energy table on for
 networks whose INP files don't request them.
 
-`--status yes|full` is plumbed through for the next pass (replicating the
-hydraulic status report); the replica does not reproduce those sections yet
-and says so.
+`--status yes` replicates the hydraulic status report as well: the
+"Hydraulic Status:" header, per-period Balanced/Unbalanced lines, PDA
+demand-reduction lines, tank/reservoir and link status transitions, simple
+control actions, the warning lines, and the end-of-run Hydraulic Flow
+Balance and Water Quality Mass Balance blocks.  `--status full` runs but
+does not yet reproduce FULL's per-trial solver trace (MISSING_API.md #12).
 
 ## Comparing across a corpus
 
@@ -61,36 +64,37 @@ The script masks the wall-clock timestamp lines (`Page 1` datestamp,
 lines the API cannot reproduce - MISSING_API.md #3/#4), *mismatched*, or
 *errored*.
 
-## Current results (first pass, STATUS NO)
+## Current results
 
 Against the 3 bundled example networks plus the 56 networks of
 [epanet-example-networks](https://github.com/OpenWaterAnalytics/epanet-example-networks)
-(`epanet-tests`, `msx-examples`), in both as-is and forced-full-tables
-modes, **all 59 networks replicate byte-for-byte**:
+(`epanet-tests`, `msx-examples`):
 
-```
- identical:          59
- warning-gap only:   0
- mismatched:         0
- errored:            0
-```
+| Mode | identical | api-gap only | mismatched |
+|------|-----------|--------------|------------|
+| `--status no` | **59** | 0 | 0 |
+| `--status no` + `NODES ALL`/`LINKS ALL`/`ENERGY YES` | **59** | 0 | 0 |
+| `--status no` on the 63-network `make-variants.sh` corpus | **63** | 0 | 0 |
+| `--status yes` | **46** | 13 | 0 |
+| as-is (each INP's own setting; 32 request `STATUS FULL`) | 20 | 7 | 32 |
 
-A third sweep over a 63-network variant corpus (`make-variants.sh`: every
-network's `SUMMARY` forced on so the summary block is exercised everywhere,
-plus `PAGE 55` pagination, AGE quality, and priced-energy variants) passes
-63/63 the same way.
+"api-gap only" means every remaining difference is a line the API provably
+cannot supply - at `STATUS YES` that is exclusively the six water quality
+mass-balance lines (MISSING_API.md #11).  The 32 as-is mismatches are the
+`STATUS FULL` networks, whose per-trial solver trace is the next pass
+(MISSING_API.md #12).
 
-Covered and verified byte-identical: logo/banner, input summary (all option
+Verified byte-identical so far: logo/banner; input summary (all option
 lines, minutes-vs-hours time units, quality variants incl. TRACE headers,
-reporting criteria), energy usage table (re-integrated to the cent, incl.
-prices, price patterns, pump efficiency curves and demand charges), node
+reporting criteria); energy usage table (re-integrated to the cent, incl.
+prices, price patterns, pump efficiency curves and demand charges); node
 and link result tables at every reporting period (incl. `STATISTIC AVERAGE`
-post-processing, tank/reservoir/valve/pump row suffixes, closed/open/active
-status text), pagination with page headers, and the warning lines
-(WARN01/02/04/05/06 - WARN05 only via an undocumented API quirk; see
-MISSING_API.md #3).
+post-processing, row suffixes, status text); pagination with page headers;
+the warning lines (WARN01/02/04/05/06); and, at `STATUS YES`, the full
+hydraulic status stream - Balanced/Unbalanced lines, tank and link status
+transitions, simple control actions and the Hydraulic Flow Balance block.
 
 The replication succeeding does not mean the API is complete - it means
-every gap in MISSING_API.md now has either a workaround that duplicates
-engine internals or relies on undocumented behavior.  The log is the list
-of what the API should add to make this possible cleanly.
+every gap in MISSING_API.md has either a workaround that duplicates engine
+internals or relies on undocumented behavior.  The log is the list of what
+the API should add to make this possible cleanly.

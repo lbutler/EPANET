@@ -537,6 +537,193 @@ static void renderResults(const RD_ReportData *rd, Sink *sk)
     }
 }
 
+
+/* ---- hydraulic status report (STATUS YES / FULL) ---------------------- */
+static void renderStatusHeader(Sink *sk)
+{
+    /* mirrors writeheader(STATHDR) in src/report.c, emitted by EN_initH */
+    headerBreak(sk);
+    wline(sk, "Hydraulic Status:");
+    wfill(sk, '-', 70);
+}
+
+static void renderWarning(const RD_ReportData *rd, Sink *sk,
+                          const RD_StatusEvent *ev, const char *atime)
+{
+    char s[RD_MAXLINE];
+    switch (ev->warnKind)
+    {
+      case RD_WARN_UNSTABLE:
+        sprintf(s, "WARNING: Maximum trials exceeded at %s hrs. "
+                   "System may be unstable.", atime);
+        break;
+      case RD_WARN_NEGPRESSURE:
+        sprintf(s, "WARNING: Negative pressures at %s hrs.", atime);
+        break;
+      case RD_WARN_VALVE:
+        sprintf(s, "WARNING: %s %s %s at %s hrs.",
+                LINK_TYPE_TXT[rd->linkType[ev->index]], rd->linkId[ev->index],
+                STAT_TXT[ev->warnStatus], atime);
+        break;
+      case RD_WARN_PUMP:
+        sprintf(s, "WARNING: Pump %s %s at %s hrs.", rd->linkId[ev->index],
+                STAT_TXT[ev->warnStatus], atime);
+        break;
+      case RD_WARN_UNBALANCED:
+        sprintf(s, "WARNING: System unbalanced at %s hrs.%s", atime,
+                ev->count ? " EXECUTION HALTED." : "");
+        break;
+      default:
+        return;
+    }
+    wline(sk, s);
+}
+
+static void renderStatusEvents(const RD_ReportData *rd, Sink *sk)
+{
+    char s[RD_MAXLINE], atime[16];
+    int i;
+
+    for (i = 0; i < rd->nEvents; i++)
+    {
+        const RD_StatusEvent *ev = &rd->events[i];
+        clockTime(atime, ev->time);
+        switch (ev->type)
+        {
+          case RD_EV_CONTROL:
+            if (ev->isTimerControl)
+                sprintf(s, "%10s: %s %s changed by timer control", atime,
+                        LINK_TYPE_TXT[rd->linkType[ev->index]],
+                        rd->linkId[ev->index]);
+            else
+                sprintf(s, "%10s: %s %s changed by %s %s control", atime,
+                        LINK_TYPE_TXT[rd->linkType[ev->index]],
+                        rd->linkId[ev->index],
+                        NODE_TYPE_TXT[rd->nodeType[ev->nodeIndex]],
+                        rd->nodeId[ev->nodeIndex]);
+            wline(sk, s);
+            break;
+
+          case RD_EV_RULE:
+            sprintf(s, "%10s: %s %s changed by rule %s", atime,
+                    LINK_TYPE_TXT[rd->linkType[ev->index]],
+                    rd->linkId[ev->index], ev->text);
+            wline(sk, s);
+            break;
+
+          case RD_EV_BALANCE:
+            if (ev->balanced)
+                sprintf(s, "%10s: Balanced after %-d trials", atime, ev->iters);
+            else
+                sprintf(s, "%10s: Unbalanced after %-d trials "
+                           "(flow change = %-.6f)", atime, ev->iters,
+                        ev->relerr);
+            wline(sk, s);
+            break;
+
+          case RD_EV_DEFICIENT:
+            if (ev->count == 1)
+                sprintf(s, "            1 node had its demand reduced by a "
+                           "total of %.2f%%", ev->reduction);
+            else
+                sprintf(s, "            %-d nodes had demands reduced by a "
+                           "total of %.2f%%", ev->count, ev->reduction);
+            wline(sk, s);
+            break;
+
+          case RD_EV_TANK:
+            if (rd->nodeType[ev->nodeIndex] == 2)   /* EN_TANK */
+                sprintf(s, "%10s: Tank %s is %s at %-.2f %s", atime,
+                        rd->nodeId[ev->nodeIndex], STAT_TXT[ev->newStatus],
+                        ev->level, rd->nodeField[RD_NF_HEAD].units);
+            else
+                sprintf(s, "%10s: Reservoir %s is %s", atime,
+                        rd->nodeId[ev->nodeIndex], STAT_TXT[ev->newStatus]);
+            wline(sk, s);
+            break;
+
+          case RD_EV_LINK:
+            if (ev->time == 0)
+                sprintf(s, "%10s: %s %s %s", atime,
+                        LINK_TYPE_TXT[rd->linkType[ev->index]],
+                        rd->linkId[ev->index], STAT_TXT[ev->newStatus]);
+            else
+                sprintf(s, "%10s: %s %s changed from %s to %s", atime,
+                        LINK_TYPE_TXT[rd->linkType[ev->index]],
+                        rd->linkId[ev->index], STAT_TXT[ev->oldStatus],
+                        STAT_TXT[ev->newStatus]);
+            wline(sk, s);
+            break;
+
+          case RD_EV_WARNING:
+            renderWarning(rd, sk, ev, atime);
+            break;
+
+          case RD_EV_BLANK:
+            wline(sk, " ");
+            break;
+        }
+    }
+}
+
+static void renderFlowBalance(const RD_ReportData *rd, Sink *sk)
+{
+    /* mirrors writeflowbalance() in src/report.c */
+    const RD_FlowBalance *fb = &rd->flowBalance;
+    char s[RD_MAXLINE];
+
+    if (!fb->valid) return;
+    sprintf(s, "Hydraulic Flow Balance (%s)",
+            rd->nodeField[RD_NF_DEMAND].units);
+    wline(sk, s);
+    wline(sk, "================================");
+    sprintf(s, "Total Inflow:      %12.3f", fb->totalInflow);   wline(sk, s);
+    sprintf(s, "Consumer Demand:   %12.3f", fb->consumerDemand); wline(sk, s);
+    sprintf(s, "Demand Deficit:    %12.3f", fb->deficitDemand);  wline(sk, s);
+    sprintf(s, "Emitter Flow:      %12.3f", fb->emitterDemand);  wline(sk, s);
+    sprintf(s, "Leakage Flow:      %12.3f", fb->leakageDemand);  wline(sk, s);
+    sprintf(s, "Total Outflow:     %12.3f", fb->totalOutflow);   wline(sk, s);
+    sprintf(s, "Storage Flow:      %12.3f", fb->storageDemand);  wline(sk, s);
+    sprintf(s, "Flow Ratio:        %12.3f", fb->ratio);          wline(sk, s);
+    wline(sk, "================================\n");
+}
+
+static void renderMassBalance(const RD_ReportData *rd, Sink *sk)
+{
+    /* mirrors writemassbalance() in src/report.c.
+       GAP: only `ratio` is available through the API - the mass terms and
+       segment count live inside the quality solver (MISSING_API.md).     */
+    const RD_MassBalance *mb = &rd->massBalance;
+    const char *units = "";
+    char s[RD_MAXLINE];
+
+    if (!mb->valid) return;
+    if (rd->qualType == 3) units = " (mg)";            /* TRACE */
+    else if (rd->qualType == 2) units = " (hrs)";      /* AGE   */
+    else if (strncmp(rd->chemUnits, "mg", 2) == 0) units = " (mg)";
+    else if (strncmp(rd->chemUnits, "ug", 2) == 0) units = " (ug)";
+
+    sprintf(s, "Water Quality Mass Balance%s", units);
+    wline(sk, s);
+    wline(sk, "================================");
+    if (mb->haveMasses)
+    {
+        sprintf(s, "Initial Mass:      %12.5e", mb->initial); wline(sk, s);
+        sprintf(s, "Mass Inflow:       %12.5e", mb->inflow);  wline(sk, s);
+        sprintf(s, "Mass Outflow:      %12.5e", mb->outflow); wline(sk, s);
+        sprintf(s, "Mass Reacted:      %12.5e", mb->reacted); wline(sk, s);
+        sprintf(s, "Final Mass:        %12.5e", mb->final);   wline(sk, s);
+    }
+    sprintf(s, "Mass Ratio:         %-.5f", mb->ratio);
+    wline(sk, s);
+    if (mb->haveMasses)
+    {
+        sprintf(s, "Total Segments:     %d", mb->segCount);
+        wline(sk, s);
+    }
+    wline(sk, "================================\n");
+}
+
 int rd_render_text(const RD_ReportData *rd, FILE *f)
 {
     Sink sk;
@@ -550,18 +737,16 @@ int rd_render_text(const RD_ReportData *rd, FILE *f)
     if (rd->summaryFlag) renderSummary(rd, &sk);
     renderTimestamp(&sk, "Analysis begun %s");
 
-    /* Hydraulic status report (STATUS YES/FULL) would be rendered here.
-       Not implemented yet - the first pass covers STATUS NO only.  See
-       MISSING_API.md for the API gaps that block replicating it, and
-       this spot as the future extension point.                          */
-
-    /* Warning lines reconstructed by probing the API after each warned
-       hydraulic step (see probeWarnings() in collect.c).  GAP: abnormal
-       valve states (WARN05) and disconnected-node details (WARN03) are
-       not reconstructable and will be missing here.                     */
+    /* The hydraulic status report header is written by EN_initH, then the
+       solver interleaves control actions, status transitions and warnings
+       as the run proceeds (see collect.c); the end of the hydraulic run
+       adds the flow balance and the quality run the mass balance.        */
+    if (rd->statusLevel > RD_STATUS_NO) renderStatusHeader(&sk);
+    renderStatusEvents(rd, &sk);
+    if (rd->statusLevel > RD_STATUS_NO)
     {
-        int i;
-        for (i = 0; i < rd->nWarnLines; i++) wline(&sk, rd->warnLines[i]);
+        renderFlowBalance(rd, &sk);
+        renderMassBalance(rd, &sk);
     }
 
     renderTimestamp(&sk, "Analysis ended %s");

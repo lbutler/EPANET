@@ -96,13 +96,12 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (statusLevel > RD_STATUS_NO)
+    if (statusLevel == RD_STATUS_FULL)
     {
         fprintf(stderr,
-            "repgen: note: STATUS %s requested - the replica does not "
-            "reproduce the hydraulic status report yet (first pass covers "
-            "STATUS NO); expect differences.\n",
-            statusLevel == RD_STATUS_YES ? "YES" : "FULL");
+            "repgen: note: STATUS FULL requested - the replica reproduces "
+            "the STATUS YES content but not the extra per-trial solver "
+            "trace; expect differences.\n");
     }
 
     err = rd_collect(&rd, inpFile, nativeRpt, statusLevel,
@@ -112,13 +111,6 @@ int main(int argc, char *argv[])
         fprintf(stderr, "repgen: %s (%s)\n", errmsg, inpFile);
         rd_free(&rd);
         return 1;
-    }
-    if (err > 0)
-    {
-        fprintf(stderr,
-            "repgen: engine reported warnings (worst code %d); the native "
-            "report will contain WARNING lines the replica cannot "
-            "reproduce (see MISSING_API.md)\n", err);
     }
 
     f = fopen(replicaRpt, "wt");

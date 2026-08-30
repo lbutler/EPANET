@@ -25,7 +25,7 @@ fi
 REPGEN=$1
 OUTDIR=$2
 shift 2
-ARGS=${REPGEN_ARGS:---status no}
+ARGS=${REPGEN_ARGS---status no}
 
 mkdir -p "$OUTDIR"
 
@@ -71,11 +71,13 @@ for inp in "${INPS[@]}"; do
         pass=$((pass+1))
         rm -f "$OUTDIR/$name.diff"
     else
-        # classify: a diff whose native-only lines are all WARNING/blank
-        # lines is the documented warning-replication gap
+        # classify: a diff whose native-only lines are all lines the API
+        # provably cannot supply (WARNING lines, water quality mass balance
+        # mass terms - see MISSING_API.md) is a documented gap, not a bug
         if awk '/^-/ && !/^---/ { line=substr($0,2);
                  gsub(/^[[:space:]]+|[[:space:]]+$/, "", line);
-                 if (line != "" && line !~ /^WARNING:/) exit 1 }
+                 if (line != "" && line !~ /^WARNING:/ &&
+                     line !~ /^(Initial Mass|Mass Inflow|Mass Outflow|Mass Reacted|Final Mass|Total Segments):/) exit 1 }
                /^\+/ && !/^\+\+\+/ { line=substr($0,2);
                  gsub(/^[[:space:]]+|[[:space:]]+$/, "", line);
                  if (line != "") exit 1 }' "$OUTDIR/$name.diff"; then
@@ -90,10 +92,10 @@ echo "=============================================================="
 echo " repgen report comparison  (args: $ARGS)"
 echo "=============================================================="
 echo " identical:          $pass"
-echo " warning-gap only:   $gap   (documented gap: WARNING lines)"
+echo " api-gap only:       $gap   (only lines the API cannot supply)"
 echo " mismatched:         $fail"
 echo " errored:            $error"
-[ $gap -gt 0 ]   && printf ' warning-gap: %s\n' "${GAPPED[*]}"
+[ $gap -gt 0 ]   && printf ' api-gap:     %s\n' "${GAPPED[*]}"
 [ $fail -gt 0 ]  && printf ' mismatched:  %s\n' "${FAILED[*]}"
 [ $error -gt 0 ] && printf ' errored:     %s\n' "${ERRORED[*]}"
 echo " details: $OUTDIR/<name>.diff"

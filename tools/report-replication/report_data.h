@@ -87,6 +87,72 @@ typedef struct {
     int   code;           /* EN_runH return code (1..6)                      */
 } RD_Warning;
 
+/* ---- hydraulic status report (STATUS YES / FULL) --------------------- */
+
+/* Engine-internal link/tank status codes (StatusType in src/types.h), used
+   verbatim by the status report's text (StatTxt in src/enumstxt.h).       */
+enum { RD_XHEAD = 0, RD_TEMPCLOSED, RD_CLOSED, RD_OPEN, RD_ACTIVE, RD_XFLOW,
+       RD_XFCV, RD_XPRESSURE, RD_FILLING, RD_EMPTYING, RD_OVERFLOWING };
+
+/* One line of the hydraulic status report, kept as structured data rather
+   than text so any renderer can present it its own way.                   */
+enum {
+    RD_EV_CONTROL = 0,  /* FMT54/55  simple control changed a link         */
+    RD_EV_RULE,         /* FMT63     rule changed a link                   */
+    RD_EV_BALANCE,      /* FMT58/59  balanced / unbalanced after N trials  */
+    RD_EV_DEFICIENT,    /* FMT69a/b  PDA demand reduction                  */
+    RD_EV_TANK,         /* FMT50/51  tank / reservoir status transition    */
+    RD_EV_LINK,         /* FMT52/53  link status transition                */
+    RD_EV_WARNING,      /* WARN01..WARN06                                  */
+    RD_EV_BLANK         /* the " " line that closes each status block      */
+};
+
+/* Warning kinds, so a renderer can format them without parsing text */
+enum {
+    RD_WARN_UNBALANCED = 1,  /* WARN01 */
+    RD_WARN_UNSTABLE,        /* WARN02 */
+    RD_WARN_PUMP,            /* WARN04 */
+    RD_WARN_VALVE,           /* WARN05 */
+    RD_WARN_NEGPRESSURE      /* WARN06 */
+};
+
+typedef struct {
+    int    type;          /* RD_EV_*                                       */
+    long   time;          /* simulation time, seconds                      */
+    int    index;         /* link index (0-based) for link/control events  */
+    int    nodeIndex;     /* controlling / affected node (0-based)         */
+    int    oldStatus;     /* engine status code before the change          */
+    int    newStatus;     /* engine status code after the change           */
+    int    isTimerControl;/* control event: timer/time-of-day rather than
+                             a node-level control                          */
+    int    iters;         /* balance event: trials taken                   */
+    double relerr;        /* balance event: relative flow change           */
+    int    balanced;      /* balance event: converged within accuracy      */
+    double level;         /* tank event: water level in head units         */
+    int    count;         /* deficient nodes, or warning element index     */
+    double reduction;     /* PDA demand reduction, percent                 */
+    int    warnKind;      /* RD_WARN_*                                     */
+    int    warnStatus;    /* pump/valve status code behind a warning       */
+    char   text[RD_MAXID];/* rule ID                                       */
+} RD_StatusEvent;
+
+/* End-of-run hydraulic flow balance block (flow units) */
+typedef struct {
+    int    valid;
+    double totalInflow, consumerDemand, deficitDemand, emitterDemand;
+    double leakageDemand, totalOutflow, storageDemand, ratio;
+} RD_FlowBalance;
+
+/* End-of-run water quality mass balance block.
+   GAP: only `ratio` is obtainable through the public API - see
+   MISSING_API.md; the mass terms live inside the quality solver.          */
+typedef struct {
+    int    valid;
+    int    haveMasses;    /* 0 = mass terms unavailable through the API    */
+    double initial, inflow, outflow, reacted, final, ratio;
+    int    segCount;
+} RD_MassBalance;
+
 typedef struct RD_ReportData {
 
     /* ---- program information -------------------------------------- */
@@ -183,6 +249,13 @@ typedef struct RD_ReportData {
        MISSING_API.md.                                                     */
     char **warnLines;
     int    nWarnLines;
+
+    /* ---- hydraulic status report (STATUS YES / FULL) ---------------- */
+    RD_StatusEvent *events;
+    int    nEvents;
+    int    nAllocEvents;
+    RD_FlowBalance flowBalance;
+    RD_MassBalance massBalance;
 } RD_ReportData;
 
 /* collect.c */
