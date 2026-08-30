@@ -26,8 +26,9 @@ either invisible today or reachable only by duplicating solver logic.
 ### 1. Control and rule action events
 Report which control or rule changed which link, when, and to what.
 **Importance** critical · **Complexity** moderate
-*Why:* the only alternative is re-implementing `controls()` and the entire
-rule premise evaluator, including tank volume-curve interpolation.
+*Why:* the only alternative is re-implementing `controls()` **and** `pswitch()`
+— junction pressure controls fire inside the solver, after the solution, and
+are reported only at STATUS FULL — plus the entire rule premise evaluator.
 
 ```c
 typedef enum {
@@ -89,8 +90,10 @@ EN_TANK_STATE = 33
 Name the elements behind the convergence statistics and a failed solve.
 **Importance** high · **Complexity** trivial
 *Why:* the engine already computes these indexes each trial and keeps the
-values; only the identities are withheld, so a caller sees *how bad* the
-error is but never *where*.
+values; only the identities are withheld, so a caller sees *how bad* the error
+is but never *where*. The same blind spot hides `badvalve()`, which resolves an
+ill-conditioned matrix by **forcing** a control valve's status — a state change
+the engine makes on the caller's behalf and never reports.
 
 ```c
 // new EN_AnalysisStatistic codes for EN_getstatistic
@@ -100,7 +103,24 @@ EN_MAXFLOWCHANGENODE  = 10,  //!< node with the largest flow change
 EN_ILLCONDITIONEDNODE = 11   //!< node that made the solve fail (error 110)
 ```
 
-### 5. Solver iteration callback
+### 5. Time step attribution
+Say what ended the hydraulic step that just finished.
+**Importance** high · **Complexity** small
+*Why:* `EN_timetonextevent` predicts from only three of the six determinants
+`timestep()` applies — it ignores pattern-period and report-time truncation and
+rule evaluation — so it can promise a longer step than the engine then takes,
+and never reports the report-time or rule causes its own enum already defines.
+
+```c
+// what ended the step just taken, read after EN_nextH
+int EN_getstepcause(EN_Project ph, int *out_eventType, int *out_elementIndex);
+
+// EN_TimestepEvent gains the causes timestep() can actually apply
+EN_STEP_PATTERN = 5,   //!< a demand pattern period boundary
+EN_STEP_RULE    = 6    //!< a rule-based control fired
+```
+
+### 6. Solver iteration callback
 Observe convergence trial by trial instead of only the final result.
 **Importance** medium · **Complexity** moderate
 *Why:* nothing inside a hydraulic solve is observable — a caller cannot tell
@@ -119,7 +139,7 @@ int EN_setsolvercallback(EN_Project ph,
 Raised during a run or when opening a project. Each is currently either
 unnamed, or reported as a single code that says nothing about the element.
 
-### 6. Per-step warnings
+### 7. Per-step warnings
 List every warning condition raised by a hydraulic step, with the element.
 **Importance** high · **Complexity** moderate
 *Why:* `EN_runH` returns one code even when several conditions fire, and
@@ -131,7 +151,7 @@ int EN_getwarning(EN_Project ph, int index, int *out_code,
                   int *out_objectType, int *out_objectIndex);
 ```
 
-### 7. Disconnected nodes
+### 8. Disconnected nodes
 Name the nodes cut off from any source, and the link responsible.
 **Importance** medium · **Complexity** small
 *Why:* rebuilding this means copying the seeding rule, the one-way test on
@@ -144,7 +164,7 @@ int EN_getdisconnectednode(EN_Project ph, int index, int *out_nodeIndex);
 int EN_getdisconnectinglink(EN_Project ph, int *out_linkIndex);
 ```
 
-### 8. Validation errors naming their elements
+### 9. Validation errors naming their elements
 Say which tank, pump, pattern or curve failed validation.
 **Importance** medium · **Complexity** moderate
 *Why:* `EN_openH` returns a single code for the whole network; recovering the
@@ -156,7 +176,7 @@ int EN_getvalidationerror(EN_Project ph, int index, int *out_code,
                           int *out_objectType, int *out_objectIndex);
 ```
 
-### 9. Non-fatal open warnings
+### 10. Non-fatal open warnings
 Surface problems that `EN_open` currently swallows.
 **Importance** medium · **Complexity** trivial
 *Why:* a missing saved-hydraulics file is written into the report, silently
@@ -168,7 +188,7 @@ int EN_getopenwarningcount(EN_Project ph, int *out_count);
 int EN_getopenwarning(EN_Project ph, int index, int *out_code);
 ```
 
-### 10. Input and rule parse diagnostics
+### 11. Input and rule parse diagnostics
 Report which line of the input file failed to parse and why.
 **Importance** low · **Complexity** moderate
 *Why:* `EN_open` returns only "one or more errors in input file" and leaves
@@ -189,7 +209,7 @@ Lower priority: these are summaries produced once the run finishes, not
 runtime behaviour. Listed because each is either impossible to reconstruct
 or requires copying the engine's accumulation exactly.
 
-### 11. Cumulative pump energy
+### 12. Cumulative pump energy
 Return each pump's end-of-run energy statistics and the system peak demand.
 **Importance** low · **Complexity** small
 *Why:* the API exposes only instantaneous kW, so the totals must be
@@ -215,7 +235,7 @@ EN_PEAKENERGY   = 12,  //!< peak total pumping power, kW
 EN_ENERGYCHARGE = 13   //!< demand charge for that peak
 ```
 
-### 12. System flow balance
+### 13. System flow balance
 Return where the water went over the run: inflow, demand, leakage, storage.
 **Importance** low · **Complexity** trivial
 *Why:* the engine already keeps this as a finalized struct; a caller can only
@@ -237,7 +257,7 @@ typedef enum {
 int EN_getflowbalance(EN_Project ph, int property, double *out_value);
 ```
 
-### 13. Water quality mass balance
+### 14. Water quality mass balance
 Return the mass accounting for a quality run, not just its ratio.
 **Importance** low · **Complexity** trivial
 *Why:* the mass terms are sums over the solver's internal pipe-segment lists,
@@ -257,7 +277,7 @@ typedef enum {
 int EN_getmassbalance(EN_Project ph, int property, double *out_value);
 ```
 
-### 14. Per-link reaction rate
+### 15. Per-link reaction rate
 Return each link's average reaction rate during a quality run.
 **Importance** low · **Complexity** trivial
 *Why:* the engine computes and stores it per link, but no property code
