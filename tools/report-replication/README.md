@@ -66,24 +66,31 @@ lines the API cannot reproduce - MISSING_API.md #3/#4), *mismatched*, or
 Against the 3 bundled example networks plus the 56 networks of
 [epanet-example-networks](https://github.com/OpenWaterAnalytics/epanet-example-networks)
 (`epanet-tests`, `msx-examples`), in both as-is and forced-full-tables
-modes:
+modes, **all 59 networks replicate byte-for-byte**:
 
 ```
- identical:          55
- warning-gap only:   4     (FCV WARN05 - no valve-state API)
+ identical:          59
+ warning-gap only:   0
  mismatched:         0
  errored:            0
 ```
 
-A third sweep over a variant corpus (every network's `SUMMARY` forced on in
-the INP so the summary block is exercised everywhere, plus a `PAGE 55`
-variant to exercise pagination) passes the same way: 56 of 60 identical, 4
-blocked by the valve-state gap.
+A third sweep over a 63-network variant corpus (`make-variants.sh`: every
+network's `SUMMARY` forced on so the summary block is exercised everywhere,
+plus `PAGE 55` pagination, AGE quality, and priced-energy variants) passes
+63/63 the same way.
 
 Covered and verified byte-identical: logo/banner, input summary (all option
 lines, minutes-vs-hours time units, quality variants incl. TRACE headers,
-reporting criteria), energy usage table (re-integrated to the cent), node
+reporting criteria), energy usage table (re-integrated to the cent, incl.
+prices, price patterns, pump efficiency curves and demand charges), node
 and link result tables at every reporting period (incl. `STATISTIC AVERAGE`
 post-processing, tank/reservoir/valve/pump row suffixes, closed/open/active
-status text), pagination with page headers, and the reconstructable
-warnings (WARN01/02/04/06).
+status text), pagination with page headers, and the warning lines
+(WARN01/02/04/05/06 - WARN05 only via an undocumented API quirk; see
+MISSING_API.md #3).
+
+The replication succeeding does not mean the API is complete - it means
+every gap in MISSING_API.md now has either a workaround that duplicates
+engine internals or relies on undocumented behavior.  The log is the list
+of what the API should add to make this possible cleanly.

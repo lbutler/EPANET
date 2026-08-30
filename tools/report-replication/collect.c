@@ -584,7 +584,29 @@ static void probeWarnings(EN_Project ph, RD_ReportData *rd,
         }
     }
 
-    /* WARN05 (abnormal valve states) would be checked here - GAP         */
+    /* WARN05: valves stuck in an abnormal state (XFCV/XPRESSURE).
+       EN_getlinkvalue(EN_STATUS) collapses these to "active", but
+       EN_PUMP_STATE - undocumented for non-pumps - returns the raw
+       internal status code (src/epanet.c), exposing XFCV(6)/XPRESSURE(7).
+       An official EN_VALVE_STATE would be cleaner - see MISSING_API.md.  */
+    for (i = 0; i < rd->nLinks; i++)
+    {
+        static const char *LINK_TXT[] =
+            { "CV", "Pipe", "Pump", "PRV", "PSV", "PBV", "FCV", "TCV",
+              "GPV", "PCV" };
+        if (rd->linkType[i] < 3) continue;   /* valves only */
+        EN_getlinkvalue(ph, i + 1, EN_PUMP_STATE, &v);
+        if (v >= 6.0)
+        {
+            sprintf(line, "WARNING: %s %s %s at %s hrs.",
+                    LINK_TXT[rd->linkType[i]], rd->linkId[i],
+                    v == 6.0 ? "open but cannot deliver flow"
+                             : "open but cannot deliver pressure",
+                    atime);
+            addWarnLine(rd, line);
+            fired = 1;
+        }
+    }
 
     /* WARN04: pumps that cannot deliver head (XHEAD) or exceed their
        maximum flow (XFLOW), exposed through EN_PUMP_STATE               */
