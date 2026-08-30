@@ -1,14 +1,13 @@
 [TITLE]
-Disconnected island -> Error 110 (all-default hydraulic options)
-Island = J3,J4 (ZERO demand), joined by 12 parallel OPEN pipes, cut off from
-the reservoir by CLOSED pipes PC1,PC2. At trial 2 the island pipes carry
-near-zero flow so each gets conductance capped at Hexp/RQtol ~ 1.852e7;
-12 in parallel ~ 2.22e8, while the closed pipes couple the island to the
-rest at only 1/CBIG = 1e-8. The exact Schur-complement pivot for the second
-island node is ~2e-8, below one ulp of 2.22e8 (~3e-8), so floating-point
-cancellation in sparse Cholesky drives it non-positive -> linsolve reports
-ill-conditioning -> Error 110. (A single internal open pipe does NOT fail:
-its pivot residual 2e-8 exceeds the ~2e-9 rounding at the 1.852e7 scale.)
+Island of junctions J3-J4 cut off from the reservoir by CLOSED pipes -> Error 110.
+The island's 16 parallel internal pipes are capped by pipecoeff() at a head loss
+gradient of RQTOL/Hexp = 2^-24 exactly (RQTOL below is 1.852*2^-24), giving the
+island block a conductance of exactly 16*2^24 = 2^28. The closed boundary pipes
+couple the island to the network at only 1/CBIG = 1e-8, which vanishes below
+half an ulp when added to 2^28. All Cholesky quantities are exact powers of two
+(sqrt(2^28) = 2^14), so the island's final pivot is exactly 0.0 on any IEEE-754
+platform and in any elimination order -> linsolve() reports ill-conditioning ->
+Error 110.
 
 [JUNCTIONS]
 ;ID    Elev    Demand
@@ -22,41 +21,39 @@ its pivot residual 2e-8 exceeds the ~2e-9 rounding at the 1.852e7 scale.)
  R1    200
 
 [PIPES]
-;ID    Node1   Node2   Length  Diam  Rough  Mloss  Status
- P1    R1      J1      1000    12    100    0      Open
- P2    J1      J2      1000    12    100    0      Open
- PC1   J2      J3      1000    12    100    0      Closed
- PC2   J4      J1      1000    12    100    0      Closed
- PI1   J3      J4      1000    12    100    0      Open
- PI2   J3      J4      1000    12    100    0      Open
- PI3   J3      J4      1000    12    100    0      Open
- PI4   J3      J4      1000    12    100    0      Open
- PI5   J3      J4      1000    12    100    0      Open
- PI6   J3      J4      1000    12    100    0      Open
- PI7   J3      J4      1000    12    100    0      Open
- PI8   J3      J4      1000    12    100    0      Open
- PI9   J3      J4      1000    12    100    0      Open
- PI10  J3      J4      1000    12    100    0      Open
- PI11  J3      J4      1000    12    100    0      Open
- PI12  J3      J4      1000    12    100    0      Open
-
-[STATUS]
-;ID    Status
- PC1   Closed
- PC2   Closed
+;ID    Node1   Node2   Length  Diam   Rough   Mloss  Status
+ P1    R1      J1      1000    12     130     0      Open
+ P2    J1      J2      1000    12     130     0      Open
+ PC1   J2      J3      1000    12     130     0      Closed
+ PC2   J4      J1      1000    12     130     0      Closed
+ PI1   J3      J4      0.1     10000  1000000 0      Open
+ PI2   J3      J4      0.1     10000  1000000 0      Open
+ PI3   J3      J4      0.1     10000  1000000 0      Open
+ PI4   J3      J4      0.1     10000  1000000 0      Open
+ PI5   J3      J4      0.1     10000  1000000 0      Open
+ PI6   J3      J4      0.1     10000  1000000 0      Open
+ PI7   J3      J4      0.1     10000  1000000 0      Open
+ PI8   J3      J4      0.1     10000  1000000 0      Open
+ PI9   J3      J4      0.1     10000  1000000 0      Open
+ PI10  J3      J4      0.1     10000  1000000 0      Open
+ PI11  J3      J4      0.1     10000  1000000 0      Open
+ PI12  J3      J4      0.1     10000  1000000 0      Open
+ PI13  J3      J4      0.1     10000  1000000 0      Open
+ PI14  J3      J4      0.1     10000  1000000 0      Open
+ PI15  J3      J4      0.1     10000  1000000 0      Open
+ PI16  J3      J4      0.1     10000  1000000 0      Open
 
 [REPORT]
  Status    Full
- Summary   Yes
+ Summary   No
  Messages  Yes
- Nodes     All
- Links     All
 
 [OPTIONS]
  Units     GPM
  Headloss  H-W
  Trials    40
  Accuracy  0.001
+ RQTOL     1.1038780212402344e-07
 
 [TIMES]
  Duration  0

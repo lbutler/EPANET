@@ -64,6 +64,86 @@ BOOST_AUTO_TEST_CASE(test_hyderr_disconnected)
     EN_deleteproject(ph);
 }
 
+BOOST_AUTO_TEST_CASE(test_hyderr_valve)
+{
+    int error = 0;
+    double cause, node, link;
+    char id[EN_MAXID + 1];
+
+    // PRV V2's setting conflicts with the network: badvalve() forces
+    // it open but the retry still fails at its downstream node D2,
+    // which remains connected to the reservoir through open pipes
+    EN_Project ph = NULL;
+    error = EN_createproject(&ph);
+    BOOST_REQUIRE(error == 0);
+    error = EN_open(ph, "./test_hyderr_valve.inp", DATA_PATH_RPT, "");
+    BOOST_REQUIRE(error == 0);
+
+    error = EN_solveH(ph);
+    BOOST_REQUIRE(error == 110);
+
+    error = EN_getstatistic(ph, EN_HYDERRCAUSE, &cause);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(cause == EN_HYDERR_VALVE);
+
+    error = EN_getstatistic(ph, EN_HYDERRNODE, &node);
+    BOOST_REQUIRE(error == 0);
+    error = EN_getnodeid(ph, (int)node, id);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(strcmp(id, "D2") == 0);
+
+    error = EN_getstatistic(ph, EN_HYDERRLINK, &link);
+    BOOST_REQUIRE(error == 0);
+    error = EN_getlinkid(ph, (int)link, id);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(strcmp(id, "V2") == 0);
+
+    error = EN_close(ph);
+    BOOST_REQUIRE(error == 0);
+    EN_deleteproject(ph);
+}
+
+BOOST_AUTO_TEST_CASE(test_hyderr_other)
+{
+    int error = 0;
+    double cause, node, link, count;
+    char id[EN_MAXID + 1];
+
+    // An all-open pure-pipe network with an extreme conductance
+    // contrast: the failing node is reachable from both reservoirs
+    // and touches no control valve, so no cause can be assigned
+    EN_Project ph = NULL;
+    error = EN_createproject(&ph);
+    BOOST_REQUIRE(error == 0);
+    error = EN_open(ph, "./test_hyderr_other.inp", DATA_PATH_RPT, "");
+    BOOST_REQUIRE(error == 0);
+
+    error = EN_solveH(ph);
+    BOOST_REQUIRE(error == 110);
+
+    error = EN_getstatistic(ph, EN_HYDERRCAUSE, &cause);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(cause == EN_HYDERR_OTHER);
+
+    error = EN_getstatistic(ph, EN_HYDERRNODE, &node);
+    BOOST_REQUIRE(error == 0);
+    error = EN_getnodeid(ph, (int)node, id);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(strcmp(id, "J1") == 0);
+
+    error = EN_getstatistic(ph, EN_HYDERRLINK, &link);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(link == 0);
+
+    error = EN_getstatistic(ph, EN_DISCONNECTEDNODES, &count);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(count == 0);
+
+    error = EN_close(ph);
+    BOOST_REQUIRE(error == 0);
+    EN_deleteproject(ph);
+}
+
 BOOST_FIXTURE_TEST_CASE(test_hyderr_none, FixtureOpenClose)
 {
     double value;

@@ -1,0 +1,43 @@
+[TITLE]
+OTHER 110 (deterministic): pure pipes, every link OPEN, no valves anywhere.
+BIG pipe J1-J2 has near-zero head-loss gradient, so pipecoeff() caps its
+gradient at RQtol/Hexp. RQTOL is set to 1.852*2^-24 so the capped gradient
+is exactly 2^-24 and the pipe conductance exactly 2^24. The hair-thin feed
+pipes contribute ~1e-20, which vanishes when added to 2^24 in doubles.
+Cholesky: sqrt(2^24)=2^12 and (2^24/2^12)^2=2^24 are all exact, so the
+second pivot is exactly 0.0 -> linsolve returns the node -> no control
+valve to blame -> Error 110 at trial 1. Failing node is reachable from
+both reservoirs through OPEN pipes and touches no valve of any kind.
+
+[JUNCTIONS]
+;ID    Elev   Demand
+ J1    0      1
+ J2    0      0
+
+[RESERVOIRS]
+;ID    Head
+ R1    100
+ R2    50
+
+[PIPES]
+;ID     Node1  Node2  Length    Diam    Roughness  MinorLoss  Status
+ HAIR1  R1     J1     1000000   0.001   1          0          OPEN
+ BIG    J1     J2     0.1       10000   1000000    0          OPEN
+ HAIR2  J2     R2     1000000   0.001   1          0          OPEN
+
+[REPORT]
+ STATUS    FULL
+ MESSAGES  YES
+ SUMMARY   YES
+
+[OPTIONS]
+ UNITS     GPM
+ HEADLOSS  H-W
+ TRIALS    200
+ ACCURACY  0.001
+ RQTOL     1.1038780212402344e-07
+
+[TIMES]
+ DURATION  0
+
+[END]
