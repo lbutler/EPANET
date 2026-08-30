@@ -53,6 +53,8 @@ static void   checkhydbalance(Project *, Hydbalance *);
 static int    hasconverged(Project *, double *, Hydbalance *);
 static int    pdaconverged(Project *);
 static int    remark(Project *);
+
+#define MAXREMARKS 16  // Connectivity re-marks allowed per time step
 static void   demanddeficit(Project *, double *, double *);
 static void   reporthydbal(Project *, Hydbalance *);
 
@@ -119,10 +121,9 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
     hyd->HydErrLink = 0;
     hyd->DisconnectedNodes = 0;
     hyd->DisconRemark = hyd->Isolation;
-    // With isolation off no junction is ever taken out of service, so
-    // the mid-trial re-checks below are switched off by declaring the
-    // treatment already applied
-    hyd->DisconPinned = !hyd->Isolation;
+    // DisconPinned counts the mid-step connectivity re-marks taken; with
+    // isolation off the budget is spent up front so remark() never runs
+    hyd->DisconPinned = hyd->Isolation ? 0 : MAXREMARKS;
 
     // Repeat iterations until convergence or trial limit is exceeded.
     // (ExtraIter used to increase trials in case of status cycling.)
@@ -150,10 +151,7 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
             // If mid-trial status changes have cut off junctions not yet
             // taken out of service, re-mark connectivity & retry with
             // them treated (see findconnected() in hydcoeffs.c)
-            if (!hyd->DisconPinned && remark(pr))
-            {
-                continue;
-            }
+            if (remark(pr)) continue;
             break;
         }
 
@@ -197,7 +195,7 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
             // re-balance with the current set taken out of service)
             if (*iter > hyd->MaxIter)
             {
-                if (hyd->DisconPinned || !remark(pr)) break;
+                if (!remark(pr)) break;
                 maxtrials += hyd->MaxIter;
             }
             else
@@ -210,7 +208,7 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
                 if (pswitch(pr))    statChange = TRUE;
                 if (!statChange)
                 {
-                    if (hyd->DisconPinned || !remark(pr)) break;
+                    if (!remark(pr)) break;
                     maxtrials += hyd->MaxIter;
                 }
 
@@ -231,7 +229,7 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
         // The final trial is about to end without a balanced network -
         // if mid-trial status changes have cut off junctions not yet
         // taken out of service, treat them & grant more trials
-        if (*iter == maxtrials && !hyd->DisconPinned && remark(pr))
+        if (*iter == maxtrials && remark(pr))
         {
             maxtrials += hyd->MaxIter;
         }
@@ -824,19 +822,25 @@ int remark(Project *pr)
 **            has changed
 **   Purpose: re-marks junction connectivity part way through a
 **            time step, after status changes may have cut
-**            junctions off. The new set holds for the rest of the
-**            time step: re-marking at every trial instead lets the
-**            set follow the status logic's own cycling and the
-**            network then never balances.
+**            junctions off (or reconnected them). Only the points
+**            where the solver would otherwise finish or fail ask
+**            for it - re-marking at every trial lets the marks
+**            follow the status logic's own cycling and the network
+**            then never balances - and at most MAXREMARKS re-marks
+**            are taken per time step so cycling marks cannot
+**            extend the trial budget forever.
 **--------------------------------------------------------------
 */
 {
     Hydraul *hyd = &pr->hydraul;
-    int n = findconnected(pr);
+    int n, oldsig = hyd->DisconSig;
 
-    if (n == hyd->DisconnectedNodes) return FALSE;
+    if (hyd->DisconPinned >= MAXREMARKS) return FALSE;
+    n = findconnected(pr);
+    if (n == hyd->DisconnectedNodes && hyd->DisconSig == oldsig)
+        return FALSE;
     hyd->DisconnectedNodes = n;
-    hyd->DisconPinned = TRUE;
+    hyd->DisconPinned++;
     return TRUE;
 }
 

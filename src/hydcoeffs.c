@@ -369,17 +369,22 @@ int findconnected(Project *pr)
     Hydraul *hyd = &pr->hydraul;
 
     int i, m, n;
+    unsigned sig;
 
     memset(hyd->Connected, 0, (net->Nnodes + 1) * sizeof(char));
     m = marksources(pr, hyd->ConnNodeList, hyd->Connected);
     marknodes(pr, m, hyd->ConnNodeList, hyd->Connected);
 
-    // Count the junctions left unmarked
+    // Count the junctions left unmarked & fingerprint the marks, so
+    // remark() can tell when membership shifts at a constant count
     n = 0;
+    sig = 2166136261u;
     for (i = 1; i <= net->Njuncs; i++)
     {
         if (!hyd->Connected[i]) n++;
+        sig = (sig ^ (unsigned)hyd->Connected[i]) * 16777619u;
     }
+    hyd->DisconSig = (int)sig;
     return n;
 }
 
@@ -455,16 +460,23 @@ void disconflows(Project *pr)
         }
     }
 
-    // A link with both ends out of service carries no flow (its end
-    // nodes share one fixed head, so once zeroed it stays zero)
+    // A link touching an out-of-service junction conveys nothing:
+    // drop its coupling coefficient & let its flow decay to zero in
+    // one trial (the same device pipecoeff() uses for a closed pipe).
+    // Left alone, an open link at such a boundary pours real flow
+    // into a fixed-head row, and an open pump between two junctions
+    // fixed at one head keeps trying to spin up against dh = 0 -
+    // either way the flow corrections never die out.
     if (hyd->DisconnectedNodes > 0) for (k = 1; k <= net->Nlinks; k++)
     {
+        int out1, out2;
         link = &net->Link[k];
-        if (link->N1 <= net->Njuncs && !hyd->Connected[link->N1] &&
-            link->N2 <= net->Njuncs && !hyd->Connected[link->N2])
-        {
-            hyd->LinkFlow[k] = 0.0;
-        }
+        out1 = (link->N1 <= net->Njuncs && !hyd->Connected[link->N1]);
+        out2 = (link->N2 <= net->Njuncs && !hyd->Connected[link->N2]);
+        if (!out1 && !out2) continue;
+        if (out1 && out2) hyd->LinkFlow[k] = 0.0;
+        hyd->P[k] = 0.0;
+        hyd->Y[k] = hyd->LinkFlow[k];
     }
 }
 
@@ -683,6 +695,13 @@ void  valvecoeffs(Project *pr)
         link = &net->Link[k];
         n1 = link->N1;
         n2 = link->N2;
+
+        // A non-ACTIVE valve into an out-of-service group conveys
+        // nothing - leave it as disconflows() froze it. (An ACTIVE
+        // one keeps the coeffs. that fix its controlled node's head.)
+        if (hyd->LinkStatus[k] != ACTIVE &&
+            ((n1 <= net->Njuncs && !hyd->Connected[n1]) ||
+             (n2 <= net->Njuncs && !hyd->Connected[n2]))) continue;
 
         // Call valve-specific function
         switch (link->Type)

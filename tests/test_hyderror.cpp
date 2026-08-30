@@ -427,7 +427,9 @@ BOOST_AUTO_TEST_CASE(test_isolation_follows_asset_direction)
 {
     // A check valve only conveys flow from its upstream to its
     // downstream node: J2 beyond CV1's outlet is supplied, while J3
-    // behind CV2's inlet cannot be reached through it
+    // behind CV2's inlet is not - the status logic closes CV2 when
+    // flow tries to reverse through it and the refreshed detection
+    // then takes J3 out of service
     EN_Project ph = NULL;
     int error = solve(ph, "./test_hyderr_direction.inp");
     BOOST_REQUIRE(error == 3);

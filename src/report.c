@@ -1403,17 +1403,12 @@ void marknodes(Project *pr, int m, int *nodelist, char *marked)
             j = alink->node;
             if (marked[j]) continue;
 
-            // Check if valve connection is in correct direction
-            switch (net->Link[k].Type)
-            {
-              case CVPIPE:
-              case PRV:
-              case PSV:
-                if (j == net->Link[k].N1) continue;
-                break;
-              default:
-                break;
-            }
+            // No one-way (CV/PRV/PSV) direction test is made here: the
+            // status logic enforces asset direction by closing a link
+            // that flows the wrong way, and linkpassable() reads that
+            // status. Blocking a direction here instead makes membership
+            // depend on valve statuses that change while the equations
+            // are being solved, which destabilizes the solver.
 
             // Mark connection node if link can convey flow to it
             if (linkpassable(pr, k))
