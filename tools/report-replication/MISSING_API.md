@@ -40,7 +40,14 @@ one that can be read back is the status level
 | secondary report file      | `FILE name`                     | -                                   |
 
 *Workaround used:* re-parse the `[REPORT]` section of the INP file
-(`inp_sniff.c`), duplicating `reportdata()` from `src/input3.c`.
+(`inp_sniff.c`), duplicating `reportdata()` from `src/input3.c`.  For
+settings that act after `EN_open`, `EN_resetreport()` + `EN_setreport()`
+can impose a *known* state instead - but that cannot retroactively fix the
+summary block, which `EN_open` has already written.
+
+Related setter-side quirk: in the `EN_setreport` grammar the word `QUALITY`
+always resolves to the *node* quality field (first match), so the link
+quality column cannot be addressed by name at all.
 
 *Suggested API:* getters mirroring the setters, e.g.
 `EN_getreportoption(ph, EN_RPT_SUMMARY | EN_RPT_ENERGY | EN_RPT_PAGESIZE |
@@ -94,10 +101,11 @@ can by probing the API after each warned step, mirroring `writehydwarn()`:
 |---------|------------------|---------------|
 | WARN01 system unbalanced          | yes | `EN_getstatistic(EN_ITERATIONS/EN_RELATIVEERROR)` vs `EN_TRIALS`/`EN_ACCURACY`; `EN_getoption(EN_UNBALANCED) == -1` adds "EXECUTION HALTED." |
 | WARN02 max trials, maybe unstable | yes | same statistics |
-| WARN03a/b/c disconnected nodes    | **no** | needs the engine's connectivity walk: which nodes are cut off and which closed link caused it |
+| WARN03a/b/c disconnected nodes    | **no** | needs the engine's connectivity walk; a caller-side flood fill over `EN_getlinknodes` is possible but WARN03c's "because of Link X" depends on the engine's adjacency-list ordering, so even a re-implementation may name a different (equally valid) link |
 | WARN04 pump cannot deliver head/flow | yes | `EN_getlinkvalue(EN_PUMP_STATE)` = XHEAD/XFLOW per pump |
 | WARN05 valve in abnormal state    | **no** | gap #3 |
 | WARN06 negative pressures         | yes | scan junctions for pressure < 0 and demand > 0 (DDA only) |
+| FMT62 "System ill-conditioned at node X" | **no** | written when the hydraulic solve fails (error 110); the offending node index is not exposed - suggest `EN_getstatistic(EN_ILLCONDITIONEDNODE)` |
 
 *Suggested API:* a per-step warning enumerator
 (`EN_getwarningcount`/`EN_getwarning(i, *code, *elementType, *elementIndex)`)
@@ -127,8 +135,11 @@ The output file stores 8 link variables; the last two - average reaction
 rate and friction factor - have **no** `EN_getlinkvalue` codes.  They only
 appear in reports when the non-default `[REPORT]` fields are enabled (no
 corpus network does), so this doesn't bite yet; the replica would print
-zeros.  *Suggested API:* `EN_REACTIONRATE`, `EN_FRICTIONFACTOR` link
-properties.
+zeros.  The friction factor can *almost* be re-derived from headloss,
+length, diameter and velocity, but with extra rounding relative to the
+engine's internal computation; the average reaction rate cannot be
+recomputed at all (it needs internal pipe-segment quality data).
+*Suggested API:* `EN_REACTIONRATE`, `EN_FRICTIONFACTOR` link properties.
 
 ## 7b. Report-unit conventions the caller must re-derive  (informational)
 
@@ -164,11 +175,21 @@ storage (#8).
 
 ## 10. Still to examine: STATUS YES / FULL  (second pass)
 
-The hydraulic status report (`writehydstat`, `writestatchange`,
-`writecontrolaction`, `writeruleaction`, `writerelerr`, flow/mass balance
-blocks) needs per-event data the API does not expose: per-step status-change
-events with old/new state, tank filling/emptying transitions, which
-control/rule fired a change, per-trial convergence traces (FULL), and the
-flow-balance / water-quality mass-balance summaries.  `repgen --status
-yes|full` already runs and produces both reports so the gaps can be measured
-when this pass starts.
+The hydraulic status report needs per-event data the API does not expose.
+Mapped so far (each line's producer in `src/report.c` / `src/hydraul.c`):
+
+| Status line | Blocking gap |
+|-------------|--------------|
+| FMT58/59 "Balanced/Unbalanced after N trials" | derivable per step from `EN_getstatistic(EN_ITERATIONS/EN_RELATIVEERROR)` |
+| FMT50/51 tank/reservoir filling/emptying/overflowing transitions | no tank status property; caller must re-derive from net inflow and level and keep its own old-status memory (engine starts from TEMPCLOSED after `EN_initH`) |
+| FMT52/53 link status changes | old/new status memory not exposed; per-step `EN_STATUS` diffing approximates it but misses abnormal states (gap #3) |
+| FMT54/55 "changed by ... control" / "by timer control" | no control-fired notification - suggest a control-action event callback (control index, link, time) |
+| FMT63 "changed by rule X" | no rule-firing notification, and rule actions occur at sub-step clock times |
+| FMT56/57 setting/status switches (FULL) | intra-iteration solver events, invisible to the API - suggest a solver trace callback |
+| FMT64/65 per-trial convergence log (FULL) | per-trial relative error unavailable - suggest an iteration callback |
+| FMT66-68 convergence detail (FULL) | element IDs behind `EN_MAXHEADERROR`/`EN_MAXFLOWCHANGE` not exposed - suggest `EN_MAXHEADERRORLINK`/`EN_MAXFLOWCHANGELINK` statistics |
+| Hydraulic Flow Balance block | totals accumulable caller-side from per-step `EN_DEMAND`/`EN_EMITTERFLOW`/`EN_LEAKAGEFLOW`/`EN_DEMANDFLOW`, but laborious and rounding-sensitive - suggest exposing `hyd->FlowBalance` |
+| Water Quality Mass Balance block | not exposed (`EN_getstatistic(EN_MASSBALANCE)` returns only the ratio) - suggest an `EN_getmassbalance` API for the initial/inflow/outflow/reacted/final masses and segment count |
+
+`repgen --status yes|full` already runs and produces both reports so these
+gaps can be measured directly when this pass starts.
