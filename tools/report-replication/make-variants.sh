@@ -17,6 +17,7 @@
 #   bad_parse_Net1.inp  malformed input line       -> input2.c parse errors
 #   bad_rule_Net1.inp   malformed rule clause      -> rules.c ruleerrmsg
 #   bad_unlinked_Net1.inp junction with no links   -> unlinked() Errors 234/233
+#   bad_hydfile_Net1.inp  HYDRAULICS USE <missing> -> silent Error 305
 #
 # Usage:
 #   make-variants.sh <output-dir> <inp-file-or-dir>...
@@ -116,6 +117,12 @@ if [ -n "$NET1" ]; then
     # a line the input parser cannot read
     awk '/^\[PATTERNS\]/{ print; print " EMPTYPAT"; next } {print}' \
         "$NET1" > "$OUTDIR/bad_parse_Net1.inp"
+
+    # a missing saved-hydraulics file: the engine reports Error 305 in the
+    # report, falls back to SCRATCH and returns success - no API signal
+    awk '/^\[OPTIONS\]/{ print;
+             print " Hydraulics          Use     /nonexistent/nope.hyd"; next }
+         {print}' "$NET1" > "$OUTDIR/bad_hydfile_Net1.inp"
 
     # a junction no link connects to
     awk '/^\[JUNCTIONS\]/{ print; print " LONELY          \t700         \t0           \t;"; next }

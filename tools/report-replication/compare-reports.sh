@@ -103,6 +103,11 @@ for inp in "${INPS[@]}"; do
                 if (line ~ /^Error [0-9]+: .* in \[[A-Z]+\] section:$/) { echo=1; next }
                 if (line ~ /^Error [0-9]+: .*: section contents ignored\.$/) { echo=1; next }
                 if (line ~ /^Input Error [0-9]+: .* in following line of /) { echo=1; next }
+                # Error 305 (saved hydraulics file could not be opened) is
+                # written into the report and then swallowed: EN_open falls
+                # back to SCRATCH and returns success, so no API caller can
+                # know it happened (#15).
+                if (line ~ /^Error 305: /) next
                 if (echo) { echo=0; next }
                 exit 1
             }

@@ -377,6 +377,26 @@ those too, by rebuilding adjacency from `EN_getlinknodes`.
 *Suggested API:* have `EN_openH` (or a follow-up query) enumerate the
 offending elements, e.g. `EN_getvalidationerror(i, *code, *objType, *index)`.
 
+## 15. An error line the API never signals at all  (GAP)
+
+If an INP file asks to reuse a saved hydraulics file
+(`[OPTIONS] HYDRAULICS USE <file>`) and that file cannot be opened,
+`openproject()` (`src/project.c`) writes
+
+```
+  Error 305: cannot open hydraulics file
+```
+
+into the report, silently falls back to a scratch file, and carries on.
+**`EN_open` returns 0** - the command line tool even prints "EPANET ran
+successfully".  This is the sharpest case in this document: a line appears
+in the report that a pure-API caller cannot detect by any means, because
+nothing anywhere reports it.  Everything else in the run replicates; that
+one line simply cannot.
+
+*Suggested API:* propagate a non-fatal warning from `EN_open`, or expose a
+query for diagnostics raised during the open.
+
 ## 14. Input-file parse diagnostics are unreachable  (GAP)
 
 When the input file cannot be read cleanly, `src/input2.c` writes a
