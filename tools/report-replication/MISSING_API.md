@@ -457,14 +457,26 @@ Mechanically counting real `writeline()` call sites across `src/`:
 | `project.c`   | 2 | `Error 234` unlinked junction, and `errmsg()`'s terminal line | yes - #13 |
 | `rules.c`     | 2 | rule-clause parse errors (`ruleerrmsg`) | no - #14 |
 
-`epanet.c` additionally exposes `EN_writeline`, which writes whatever the
-*caller* passes - not engine output.
+133 engine-originated call sites in all.  `epanet.c` adds a 134th through
+`EN_writeline`, which writes whatever the *caller* passes - not engine
+output.
 
 Cross-check by format macro: every `FMT*` / `WARN*` / `R_ERR*` macro in
 `src/text.h` is accounted for as either handled, a documented gap
 (FMT61/66/67/68; R_ERR201-221), console-only (FMT100-103, FMT106 go to
 `writewin`), or **dead** - `FMT02`, `FMT04`-`FMT08`, `FMT14`-`FMT17`,
 `FMT60a`, `FMT60b` are defined but never referenced anywhere in `src/`.
+Widening the sweep to all 402 text macros finds **47** with no reference
+outside `text.h` (those 12 plus 35 `t_`/`u_`/`w_` names), and three macros
+- `w_HEAD`, `w_PATTERN`, `w_POWER` - each defined twice with identical
+values.  One more piece of dead formatting: `writeheader(STATHDR, 1)` is
+never called, so FMT49's `" (continued)"` suffix can never appear.
+
+Two `errmsg()` subtleties worth knowing when reproducing error output:
+error **309** (report-file write failure) is deliberately silent - it would
+have to write into the file that just failed - and `EN_report` itself calls
+`errmsg()` on failure, so an `Error N: ...` line can appear during the
+reporting phase, after all simulation output.
 
 What that leaves genuinely unreachable, in full:
 
