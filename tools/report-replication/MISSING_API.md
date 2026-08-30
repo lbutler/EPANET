@@ -215,8 +215,35 @@ same memories the engine keeps internally.  What that costs, line by line:
 | FMT50/51 tank/reservoir filling/emptying/overflowing | no tank-status property: the caller must re-implement the state machine (net inflow thresholded at 0.001 **cfs** - so `EN_DEMAND` must be converted back from flow units - plus an `EN_MAXLEVEL` overflow test in feet) *and* seed its own memory to `TEMPCLOSED`, an internal detail of `inithyd()` |
 | FMT52/53 link status changes | needs the RAW internal status code, which only the gap #3 quirk provides; `EN_STATUS` is too coarse. For pumps the quirk's XFLOW/XHEAD refinement must be undone (`EN_STATUS >= 1` means raw OPEN) |
 | FMT54/55 control actions | **no control-fired notification**: the replica re-implements `controls()` - including `tankvolume()` over `EN_VOLCURVE` / `EN_TANKDIAM` / `EN_MINVOLUME` / `EN_MINLEVEL` - and evaluates it against cached state. See the sequencing trap below |
-| FMT63 rule actions | not implemented; no rule-firing notification exists, and rule actions fire at sub-step times. No corpus network emits one, so this is untested |
+| FMT63 rule actions | not implemented - see the rule note below. No corpus network emits one |
 | Hydraulic Flow Balance block | reproducible but laborious: per-step accumulation of `EN_DEMANDFLOW` / `EN_EMITTERFLOW` / `EN_LEAKAGEFLOW` / `EN_FULLDEMAND` / tank `EN_DEMAND`, weighted by the *next* step length and divided by the final time - suggest exposing `hyd->FlowBalance` directly |
+
+**Rule actions (FMT63) are only half-observable.**  They are emitted from
+inside `EN_nextH` (via `timestep()` -> `ruletimestep()` -> `checkrules()`),
+stamped with the *next* period's clock time - so in the report they sit
+after the current period's blank line and before the next period's control
+lines.  A caller can detect *that* rules fired, by diffing each link's raw
+status/setting across `EN_nextH`, but cannot recover:
+* **which rule** fired - there is no "rule fired" query, and re-deriving it
+  means re-implementing the premise evaluator; premises of the form
+  `IF SYSTEM DEMAND ...` are not even re-derivable, because the engine's
+  internal system-demand accumulation differs from what `EN_FULLDEMAND`
+  exposes;
+* **the order** of several actions taken at the same instant, which the
+  engine emits by descending rule index after a priority-based replacement
+  pass - nothing in the API reports that list.
+
+Do not reach for `EN_LINK_INCONTROL` / `EN_NODE_INCONTROL` here: both are
+answered by `incontrols()` (`src/project.c`), a purely *structural* scan of
+the control and rule definitions.  They return 1 for any element merely
+*mentioned* by a control or rule and never change during a run, so they say
+nothing about whether anything fired.  (The rule-inspection getters
+themselves are sound: `EN_getpremise` was verified to return object,
+variable and operator codes that do match the public `EN_RuleObject` /
+`EN_RuleVariable` / `EN_RuleOperator` enums.)
+
+*Suggested API:* a rule-action event callback reporting (rule index, link
+index, time) as each action is taken.
 
 **`EN_getcontrol` cannot express a control's status.**  It returns the
 control's *setting*, using the sentinels `EN_SET_OPEN`/`EN_SET_CLOSED` only
