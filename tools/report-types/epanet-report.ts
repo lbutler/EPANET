@@ -62,9 +62,10 @@ export type NodeTypeText = 'Junction' | 'Reservoir' | 'Tank';
 
 /**
  * The full internal link-state vocabulary as the status report prints it
- * (StatTxt in src/enumstxt.h).  FMT52/53/57 lines can use any of these;
- * the results-table State column only ever shows the first three of
- * `closed` / `open` / `active`.
+ * (StatTxt in src/enumstxt.h).  Only the FMT52/53 status-change lines can
+ * use all eight; FMT57 switch lines and the results-table State column
+ * collapse to `closed` / `open` / `active` before printing
+ * (writestatchange / writelinktable in src/report.c).
  */
 export type LinkStateText =
   | 'closed because cannot deliver head' // XHEAD
@@ -75,6 +76,9 @@ export type LinkStateText =
   | 'open but exceeds maximum flow'      // XFLOW
   | 'open but cannot deliver flow'       // XFCV
   | 'open but cannot deliver pressure';  // XPRESSURE
+
+/** The collapsed three-state view several lines print. */
+export type CollapsedLinkState = 'closed' | 'open' | 'active';
 
 /** Tank/reservoir states from FMT50/51 status lines. */
 export type TankStateText = 'closed' | 'filling' | 'emptying' | 'overflowing';
@@ -97,6 +101,13 @@ export interface ReportHeader {
   version: { major: number; minor: number; patch: number };
   /** Raw ctime() string from the page-1 header, e.g. "Sun Aug 30 18:08:50 2026". */
   dateStamp: string;
+  /**
+   * The project's first [TITLE] line, as carried by `Page 2+` headers
+   * (FMT82).  With SUMMARY off and PAGE > 0, those headers are the ONLY
+   * place the title appears — so a parser that skips pagination should
+   * still capture the title from the first continuation header it drops.
+   */
+  title?: string;
 }
 
 /* ================================================================== */
@@ -208,26 +219,36 @@ export type StatusEvent =
   /**
    * FMT66/67/68 — `maximum flow change = x for Link|Node <id>` and
    * `maximum head error = x for Link <id>` (STATUS FULL only; can
-   * repeat within one step as convergence is re-tested).
+   * repeat within one step as convergence is re-tested).  Head error is
+   * only ever attributed to a link (reporthydbal, src/hydsolver.c).
    */
   | {
       kind: 'convergence-detail';
-      measure: 'max-flow-change' | 'max-head-error';
+      measure: 'max-flow-change';
       elementType: 'link' | 'node';
       elementId: string;
+      value: number;
+    }
+  | {
+      kind: 'convergence-detail';
+      measure: 'max-head-error';
+      elementType: 'link';
+      elementId: LinkId;
       value: number;
     }
   /**
    * FMT57 — `<LinkType> <id> switched from <state> to <state>`
    * (STATUS FULL only): a state switch BETWEEN solver trials.  Frequent
    * switches on the same links are the signature of an unstable model.
+   * The engine collapses both states to closed/open/active before
+   * printing (writestatchange, src/report.c).
    */
   | {
       kind: 'link-switch';
       linkType: LinkTypeText;
       linkId: LinkId;
-      from: LinkStateText;
-      to: LinkStateText;
+      from: CollapsedLinkState;
+      to: CollapsedLinkState;
     }
   /** FMT56 — `<LinkType> <id> setting changed to <x>` (STATUS FULL only). */
   | { kind: 'setting-change'; linkType: LinkTypeText; linkId: LinkId; setting: number }
@@ -251,8 +272,15 @@ export type StatusEvent =
       level: number;
       levelUnits: string;
     }
-  /** FMT51 — `<t>: Reservoir <id> is <state>` (no level). */
-  | { kind: 'reservoir-status'; nodeId: NodeId; state: TankStateText }
+  /**
+   * FMT51 — `<t>: Reservoir <id> is <state>` (no level).  Overflowing
+   * requires a finite tank area, so a reservoir never prints it.
+   */
+  | {
+      kind: 'reservoir-status';
+      nodeId: NodeId;
+      state: Exclude<TankStateText, 'overflowing'>;
+    }
   /**
    * FMT52 (time zero: `<t>: <LinkType> <id> <state>`, no `from`) and
    * FMT53 (`<t>: <LinkType> <id> changed from <state> to <state>`).
@@ -321,8 +349,9 @@ export interface FlowBalance {
 
 /**
  * `Water Quality Mass Balance<units>` block (writemassbalance).
- * `unitsSuffix` mirrors the header: ` (mg)`, ` (ug)`, ` (hrs)` for age,
- * or absent.  Mass values print in `%12.5e` scientific notation.
+ * `unitsSuffix` mirrors the header: trace runs print ` (mg)`; chemical
+ * runs print ` (mg)` / ` (ug)` per their chem units or nothing for other
+ * units; age prints ` (hrs)`.  Mass values print in `%12.5e` notation.
  */
 export interface MassBalance {
   unitsSuffix: 'mg' | 'ug' | 'hrs' | null;
@@ -493,7 +522,10 @@ export type ReportDiagnostic =
   /**
    * Input parse pair (src/input2.c): `Error NNN: <msg> <token> in
    * [SECTION] section:` followed by an echo of the offending line.
-   * The `section contents ignored` variant (299) has no section.
+   * The `section contents ignored` variant (299) has no section, and
+   * the line-too-long variant (214) has no `Error NNN:` prefix at all —
+   * it prints `<msg> section: <SECTION>` and the parser must synthesize
+   * code 214 from the message text.
    */
   | {
       kind: 'parse';
@@ -550,7 +582,10 @@ export interface EpanetReport {
   analysisBegun: string | null;
 
   /**
-   * The hydraulic status stream (empty at STATUS NO).  Steps are in
+   * The hydraulic status stream.  Status lines proper need STATUS
+   * YES/FULL, but WARNING events (and the status dump written when a
+   * solve fails ill-conditioned) are gated by MESSAGES — on by default —
+   * so this log can be non-empty even at STATUS NO.  Steps are in
    * simulation order; rule actions stamped with a step's time appear in
    * that step even though the engine emitted them a moment earlier.
    */
@@ -603,8 +638,9 @@ export type ReportStreamEvent =
   | { kind: 'status-start' }
   /**
    * One status event with its report timestamp.  `time` is null for the
-   * few lines printed without one (WARN03c, FMT56/57 switch lines —
-   * attribute them to the current step).
+   * lines printed without one — WARN03c, the FULL intra-step switch and
+   * setting lines (FMT56/57), and the FULL trial / convergence-detail
+   * continuation lines (FMT65–68) — attribute them to the current step.
    */
   | { kind: 'status-event'; time: Seconds | null; event: StatusEvent }
   | { kind: 'flow-balance'; balance: FlowBalance }

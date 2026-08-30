@@ -55,9 +55,16 @@ the energy + results tables print **after** it (they are written by
   `ctime()` strings.
 - **Numbers.**  Table cells switch to `%10.2e` scientific notation above
   1e6 in magnitude; mass balance values are always `%12.5e`.
-- **Timeless status lines.**  WARN03c and the FULL intra-step
-  `switched from` / `setting changed to` lines carry no timestamp —
-  attribute them to the current step.
+- **Timeless status lines.**  WARN03c, the FULL intra-step
+  `switched from` / `setting changed to` lines, and the FULL trial /
+  convergence-detail continuation lines carry no timestamp — attribute
+  them to the current step.
+- **Warnings ignore the STATUS level.**  WARNING lines (and the status
+  dump on an ill-conditioned failure) are gated by `MESSAGES` — on by
+  default — so the status log can be non-empty even at STATUS NO.
+- **The title can hide in a page header.**  With SUMMARY off and
+  `PAGE n` set, the project title appears only in `Page 2+` headers —
+  capture it before dropping them.
 - **Rule action timestamps.**  FMT63 lines are emitted from inside
   `EN_nextH` and stamped with the *next* period's time, so they appear
   between one step's block and the next.
@@ -80,3 +87,17 @@ the energy + results tables print **after** it (they are written by
 ## Checking
 
 The file compiles clean under `tsc --strict --noEmit` (TypeScript 5.6).
+
+`check-coverage.mjs` classifies every line of a set of `.rpt` files
+against the model's shapes and reports any line with no home:
+
+```
+node check-coverage.mjs <dir-or-file>...
+```
+
+Validated against 405 engine-produced reports (439k non-blank lines,
+including STATUS FULL runs, statistic runs, priced energy, pagination and
+every deliberately-broken network): the only unmatched shapes are echoed
+offending input lines, which the model stores as opaque strings by
+design.  The regexes map one-to-one onto `ReportStreamEvent` arms, so the
+script doubles as the seed of a real streaming parser.
