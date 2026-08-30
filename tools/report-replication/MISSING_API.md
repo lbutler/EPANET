@@ -392,5 +392,22 @@ of the line.  The replica can reproduce the logo and the terminal
 (`EN_openX` opens the project anyway and would at least allow the rest of
 the report to be built, but it still does not expose the diagnostics.)
 
+Malformed **rules** add a second, differently-shaped block, because
+`ruleerrmsg()` (`src/rules.c`) reports the clause itself before the generic
+handler reports the line again:
+
+```
+  Input Error 201: syntax error in following line of Rule BAD1:
+  IF TANK 2 LEVEL BOGUSOP 110
+  Error 200: one or more errors in input file  in [RULES] section:
+  IF TANK 2 LEVEL BOGUSOP 110
+
+  Error 200: one or more errors in input file
+```
+
+(The doubled space in the third line is the engine's own formatting: the
+generic handler prints `"Error %d: %s %s in %s section:"` with an empty
+token argument.)  All five lines are equally unreachable.
+
 *Suggested API:* an error-list query after a failed open, e.g.
 `EN_getparseerrorcount` / `EN_getparseerror(i, *code, *section, char *line)`.

@@ -15,6 +15,7 @@
 #   bad_curve_Net1.inp  nonincreasing curve x      -> Errors 227 + 230
 #   bad_pump_Net1.inp   pump with no curve/power   -> Error 226
 #   bad_parse_Net1.inp  malformed input line       -> input2.c parse errors
+#   bad_rule_Net1.inp   malformed rule clause      -> rules.c ruleerrmsg
 #
 # Usage:
 #   make-variants.sh <output-dir> <inp-file-or-dir>...
@@ -114,6 +115,12 @@ if [ -n "$NET1" ]; then
     # a line the input parser cannot read
     awk '/^\[PATTERNS\]/{ print; print " EMPTYPAT"; next } {print}' \
         "$NET1" > "$OUTDIR/bad_parse_Net1.inp"
+
+    # a rule clause the rule parser cannot read
+    awk '/^\[RULES\]/{ print; print "RULE BAD1";
+             print "IF TANK 2 LEVEL BOGUSOP 110";
+             print "THEN PUMP 9 STATUS IS OPEN"; print ""; next } {print}' \
+        "$NET1" > "$OUTDIR/bad_rule_Net1.inp"
 fi
 
 if [ -n "$NET2" ]; then

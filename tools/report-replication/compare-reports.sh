@@ -102,6 +102,7 @@ for inp in "${INPS[@]}"; do
                 # is reachable through the API (#13).
                 if (line ~ /^Error [0-9]+: .* in \[[A-Z]+\] section:$/) { echo=1; next }
                 if (line ~ /^Error [0-9]+: .*: section contents ignored\.$/) { echo=1; next }
+                if (line ~ /^Input Error [0-9]+: .* in following line of /) { echo=1; next }
                 if (echo) { echo=0; next }
                 exit 1
             }
