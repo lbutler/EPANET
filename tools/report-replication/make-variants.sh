@@ -9,6 +9,8 @@
 #   age_Net2.inp      QUALITY AGE analysis
 #   price_Net1.inp    global energy price + price pattern + demand charge
 #   pprice_Net1.inp   pump-specific price/pattern + pump efficiency curve
+#   timer_Net1.inp    TIMER and CLOCKTIME simple controls (STATUS YES lines)
+#   pda_Net3.inp      pressure-driven analysis (PDA demand-reduction lines)
 #
 # Usage:
 #   make-variants.sh <output-dir> <inp-file-or-dir>...
@@ -38,11 +40,13 @@ done
 
 NET1=""
 NET2=""
+NET3=""
 for f in "${INPS[@]}"; do
     n=$(basename "$f")
     sed -E 's/^([ \t]*[Ss]ummary[ \t]+)[Nn]o/\1Yes/' "$f" > "$OUTDIR/sum_$n"
     [ "$n" = "Net1.inp" ] && NET1=$f
     [ "$n" = "Net2.inp" ] && NET2=$f
+    [ "$n" = "Net3.inp" ] && NET3=$f
 done
 
 if [ -n "$NET1" ]; then
@@ -72,6 +76,22 @@ if [ -n "$NET1" ]; then
              print " E1  1500 80";
              print " E1  2000 70"; next }
          {print}' "$NET1" > "$OUTDIR/pprice_Net1.inp"
+fi
+
+if [ -n "$NET1" ]; then
+    awk '/^\[CONTROLS\]/{ print;
+             print " LINK 9 CLOSED AT TIME 5";
+             print " LINK 9 OPEN AT CLOCKTIME 3 AM"; next }
+         {print}' "$NET1" > "$OUTDIR/timer_Net1.inp"
+fi
+
+if [ -n "$NET3" ]; then
+    awk '/^\[OPTIONS\]/{ print;
+             print " Demand Model        PDA";
+             print " Minimum Pressure    0";
+             print " Required Pressure   30";
+             print " Pressure Exponent   0.5"; next }
+         {print}' "$NET3" > "$OUTDIR/pda_Net3.inp"
 fi
 
 if [ -n "$NET2" ]; then

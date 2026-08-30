@@ -12,8 +12,8 @@ regression corpus (59 networks total).
 
 | Report level | Result over the 59 networks |
 |--------------|-----------------------------|
-| `STATUS NO`  | **59 / 59 byte-identical** (also with `NODES ALL`, `LINKS ALL`, `ENERGY YES` forced on, and on the 63-network `make-variants.sh` corpus) |
-| `STATUS YES` | **46 / 59 byte-identical**; the other 13 differ *only* by the six water quality mass-balance lines of gap #11 |
+| `STATUS NO`  | **59 / 59 byte-identical** (also with `NODES ALL`, `LINKS ALL`, `ENERGY YES` forced on, and on the 65-network `make-variants.sh` corpus) |
+| `STATUS YES` | **46 / 59 byte-identical**; the other 13 differ *only* by the six water quality mass-balance lines of gap #11. On the variant corpus (which adds PDA, timer/clocktime controls, pagination, AGE quality and priced energy): 46 identical, 19 mass-balance-only, 0 mismatched |
 | `STATUS FULL`| not implemented - see #12 |
 
 Getting there required every workaround documented below: the gaps are real
