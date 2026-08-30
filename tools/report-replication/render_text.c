@@ -569,6 +569,18 @@ static void renderWarning(const RD_ReportData *rd, Sink *sk,
         sprintf(s, "WARNING: Pump %s %s at %s hrs.", rd->linkId[ev->index],
                 STAT_TXT[ev->warnStatus], atime);
         break;
+      case RD_WARN_DISCONNECTED:
+        sprintf(s, "WARNING: Node %s disconnected at %s hrs",
+                rd->nodeId[ev->nodeIndex], atime);
+        break;
+      case RD_WARN_DISCONNECTED_MORE:
+        sprintf(s, "WARNING: %d additional nodes disconnected at %s hrs",
+                ev->count, atime);
+        break;
+      case RD_WARN_DISCONNECTED_LINK:
+        sprintf(s, "WARNING: System disconnected because of Link %s",
+                rd->linkId[ev->index]);
+        break;
       case RD_WARN_UNBALANCED:
         sprintf(s, "WARNING: System unbalanced at %s hrs.%s", atime,
                 ev->count ? " EXECUTION HALTED." : "");
@@ -787,7 +799,11 @@ int rd_render_text(const RD_ReportData *rd, FILE *f)
         renderMassBalance(rd, &sk);
     }
 
-    renderTimestamp(&sk, "Analysis ended %s");
+    /* a run cut short by an error never reaches EN_closeQ, so the engine
+       never stamps "Analysis ended"; the failing call wrote the error
+       line instead                                                      */
+    if (rd->analysisEnded) renderTimestamp(&sk, "Analysis ended %s");
+    else renderErrorLines(rd, &sk);
 
     if (rd->energyFlag) renderEnergy(rd, &sk);
     renderResults(rd, &sk);

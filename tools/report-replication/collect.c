@@ -1126,6 +1126,136 @@ static void recordWarning(RD_ReportData *rd, long t, int code)
     if (code > rd->warnflag) rd->warnflag = code;
 }
 
+
+/* disconnected() + marknodes() + getclosedlink() from src/report.c.
+   Called from writehydwarn() whenever any other warning fired, it names
+   junctions that no open path connects to a tank, then the closed link
+   responsible.  Nothing in the API reports this, so the whole traversal is
+   rebuilt here - including the adjacency ORDER, which decides which link
+   WARN03c names: buildadjlists() (src/project.c) prepends as it walks
+   links 1..Nlinks, so each node's list runs in DESCENDING link index.   */
+static void probeDisconnected(EN_Project ph, RD_ReportData *rd, long t)
+{
+    int n = rd->nNodes, i, k, m = 0, count = 0, last = 0, top;
+    char *marked = calloc(n + 1, 1);
+    int *nodelist = calloc(n + 2, sizeof(int));
+    int *adjHead = calloc(n + 1, sizeof(int));   /* first adj entry per node */
+    int *adjNext = NULL, *adjLink = NULL, *adjNode = NULL;
+    int nadj = 0;
+    RD_StatusEvent *ev;
+
+    if (!marked || !nodelist || !adjHead) goto done;
+    adjNext = calloc(2 * rd->nLinks + 2, sizeof(int));
+    adjLink = calloc(2 * rd->nLinks + 2, sizeof(int));
+    adjNode = calloc(2 * rd->nLinks + 2, sizeof(int));
+    if (!adjNext || !adjLink || !adjNode) goto done;
+    for (i = 0; i <= n; i++) adjHead[i] = -1;
+
+    /* build adjacency in the engine's order: walk links ascending and
+       prepend, so traversal later sees them descending                  */
+    for (k = 1; k <= rd->nLinks; k++)
+    {
+        int n1 = 0, n2 = 0, e;
+        if (EN_getlinknodes(ph, k, &n1, &n2) > 0) continue;
+        e = nadj++; adjLink[e] = k; adjNode[e] = n2;
+        adjNext[e] = adjHead[n1]; adjHead[n1] = e;
+        e = nadj++; adjLink[e] = k; adjNode[e] = n1;
+        adjNext[e] = adjHead[n2]; adjHead[n2] = e;
+    }
+
+    /* seed with every tank and reservoir, then junctions drawing inflow */
+    for (i = 0; i < n; i++)
+        if (rd->nodeType[i] != EN_JUNCTION)
+        {
+            nodelist[++m] = i + 1;
+            marked[i + 1] = 1;
+        }
+    for (i = 0; i < n; i++)
+    {
+        double d = 0.0;
+        if (rd->nodeType[i] != EN_JUNCTION) continue;
+        EN_getnodevalue(ph, i + 1, EN_DEMAND, &d);
+        if (d < 0.0) { nodelist[++m] = i + 1; marked[i + 1] = 1; }
+    }
+
+    /* marknodes(): flood fill over links that are not closed, honouring
+       the one-way check on CV / PRV / PSV                               */
+    for (i = 1; i <= m; i++)
+    {
+        int node = nodelist[i], e;
+        for (e = adjHead[node]; e >= 0; e = adjNext[e])
+        {
+            int lk = adjLink[e], other = adjNode[e], type, n1 = 0, n2 = 0;
+            if (marked[other]) continue;
+            type = rd->linkType[lk - 1];
+            if (type == EN_CVPIPE || type == EN_PRV || type == EN_PSV)
+            {
+                EN_getlinknodes(ph, lk, &n1, &n2);
+                if (other == n1) continue;
+            }
+            if (rawLinkStatus(ph, lk, type) > RD_CLOSED)
+            {
+                marked[other] = 1;
+                nodelist[++m] = other;
+            }
+        }
+    }
+
+    /* junctions still unmarked that carry a demand are disconnected */
+    for (i = 0; i < n; i++)
+    {
+        double d = 0.0;
+        if (rd->nodeType[i] != EN_JUNCTION) continue;
+        if (marked[i + 1]) continue;
+        EN_getnodevalue(ph, i + 1, EN_DEMAND, &d);
+        if (d == 0.0) continue;
+        count++;
+        if (count <= 10)
+        {
+            ev = newEvent(rd, RD_EV_WARNING, t);
+            if (ev) { ev->warnKind = RD_WARN_DISCONNECTED; ev->nodeIndex = i; }
+        }
+        last = i + 1;
+    }
+    if (count == 0) goto done;
+    if (count > 10)
+    {
+        ev = newEvent(rd, RD_EV_WARNING, t);
+        if (ev) { ev->warnKind = RD_WARN_DISCONNECTED_MORE; ev->count = count - 10; }
+    }
+
+    /* getclosedlink(): depth-first from the last unmarked junction; the
+       first neighbour still marked 1 identifies the offending link      */
+    marked[last] = 2;
+    nodelist[0] = last;
+    top = 0;
+    while (top >= 0)
+    {
+        int node = nodelist[top--], e;
+        for (e = adjHead[node]; e >= 0; e = adjNext[e])
+        {
+            int lk = adjLink[e], other = adjNode[e];
+            if (marked[other] == 2) continue;
+            if (marked[other] == 1)
+            {
+                ev = newEvent(rd, RD_EV_WARNING, t);
+                if (ev)
+                {
+                    ev->warnKind = RD_WARN_DISCONNECTED_LINK;
+                    ev->index = lk - 1;
+                }
+                goto done;
+            }
+            marked[other] = 2;
+            nodelist[++top] = other;
+        }
+    }
+
+done:
+    free(marked); free(nodelist); free(adjHead);
+    free(adjNext); free(adjLink); free(adjNode);
+}
+
 /* Best-effort reconstruction of the WARNING lines writehydwarn() (in
    src/report.c) writes after a warned hydraulic step, by probing solver
    state through the API.  Checks run in the engine's order.  What CANNOT
@@ -1220,7 +1350,9 @@ static void probeWarnings(EN_Project ph, RD_ReportData *rd,
         fired = 1;
     }
 
-    /* WARN03a/b/c (disconnected nodes) would be written here - GAP */
+    /* WARN03a/b/c: the engine runs its connectivity walk whenever any
+       other warning fired                                              */
+    if (fired) probeDisconnected(ph, rd, t);
 
     if (fired) newEvent(rd, RD_EV_BLANK, t);
 }
@@ -1468,6 +1600,7 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
 
     err = EN_closeQ(ph);
     if (err > 100) goto fail;
+    rd->analysisEnded = 1;
 
     /* sanity check: engine's own period count should match our sampling */
     EN_gettimeparam(ph, EN_PERIODS, &enginePeriods);
@@ -1494,14 +1627,21 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
     return rd->warnflag;
 
 fail:
+    /* A mid-run failure is reported by the failing EN_* call itself: it
+       calls errmsg(), which writes "Error N: ..." into the report and
+       stops.  Record that and render everything collected up to the
+       failure, rather than discarding the run.                          */
+    rd->fatalError = err;
+    rd->analysisEnded = 0;
     if (!errmsg[0])
-        snprintf(errmsg, errlen, "API error %d during simulation", err);
+        snprintf(errmsg, errlen, "simulation stopped with error %d; replica "
+                 "rendered up to that point", err);
     EN_close(ph);
     EN_deleteproject(ph);
     free(acc);
     free(rs.oldLinkStatus); free(rs.curLinkStatus); free(rs.oldTankStatus);
     free(rs.prevHead); free(rs.prevDemand); free(rs.prevSetting);
-    return err;
+    return 0;
 }
 
 void rd_geterrortext(int code, char *buf, int len)

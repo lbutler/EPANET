@@ -18,6 +18,7 @@
 #   bad_rule_Net1.inp   malformed rule clause      -> rules.c ruleerrmsg
 #   bad_unlinked_Net1.inp junction with no links   -> unlinked() Errors 234/233
 #   bad_hydfile_Net1.inp  HYDRAULICS USE <missing> -> silent Error 305
+#   bad_discon_Net1.inp   junction behind a closed pipe -> WARN03a/WARN03c
 #
 # Usage:
 #   make-variants.sh <output-dir> <inp-file-or-dir>...
@@ -123,6 +124,13 @@ if [ -n "$NET1" ]; then
     awk '/^\[OPTIONS\]/{ print;
              print " Hydraulics          Use     /nonexistent/nope.hyd"; next }
          {print}' "$NET1" > "$OUTDIR/bad_hydfile_Net1.inp"
+
+    # a junction reachable only through a closed pipe: exercises the
+    # disconnected-node warnings (WARN03a / WARN03c)
+    awk '/^\[JUNCTIONS\]/{ print; print " ISOJ            \t700         \t50          \t;"; next }
+         /^\[PIPES\]/{ print;
+             print " ISO   ISOJ 12   1000  12  100  0  Closed ;"; next }
+         {print}' "$NET1" > "$OUTDIR/bad_discon_Net1.inp"
 
     # a junction no link connects to
     awk '/^\[JUNCTIONS\]/{ print; print " LONELY          \t700         \t0           \t;"; next }

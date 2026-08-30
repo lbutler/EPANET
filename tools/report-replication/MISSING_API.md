@@ -124,7 +124,7 @@ can by probing the API after each warned step, mirroring `writehydwarn()`:
 |---------|------------------|---------------|
 | WARN01 system unbalanced          | yes | `EN_getstatistic(EN_ITERATIONS/EN_RELATIVEERROR)` vs `EN_TRIALS`/`EN_ACCURACY`; `EN_getoption(EN_UNBALANCED) == -1` adds "EXECUTION HALTED." |
 | WARN02 max trials, maybe unstable | yes | same statistics |
-| WARN03a/b/c disconnected nodes    | **no** | needs the engine's connectivity walk; a caller-side flood fill over `EN_getlinknodes` is possible but WARN03c's "because of Link X" depends on the engine's adjacency-list ordering, so even a re-implementation may name a different (equally valid) link |
+| WARN03a/b/c disconnected nodes    | via workaround | the engine's whole connectivity walk has to be rebuilt: seed from every tank plus any junction drawing inflow, flood-fill over links that are not closed (honouring the one-way test on CV/PRV/PSV), then depth-first from the *last* unmarked junction for WARN03c. The link WARN03c names depends on adjacency **order**, which is reproducible only because `buildadjlists()` (`src/project.c`) prepends while walking links ascending - so each node's list runs in descending link index. Verified byte-for-byte on a purpose-built network. |
 | WARN04 pump cannot deliver head/flow | yes | `EN_getlinkvalue(EN_PUMP_STATE)` = XHEAD/XFLOW per pump |
 | WARN05 valve in abnormal state    | via quirk | `EN_PUMP_STATE` on the valve link returns the raw status code (gap #3's undocumented workaround) |
 | WARN06 negative pressures         | yes | scan junctions for pressure < 0 and demand > 0 (DDA only) |
@@ -473,8 +473,9 @@ What that leaves genuinely unreachable, in full:
 2. the water quality mass balance terms and segment count (#11);
 3. input-file and rule parse diagnostics (#14);
 4. `Error 305`, written and then silently swallowed (#15);
-5. disconnected-node warnings WARN03a/b/c and the ill-conditioned-node
-   identity in FMT62 (#4).
+5. the ill-conditioned-node identity in FMT62 (#4).  (WARN03a/b/c, listed
+   there as unreachable in an earlier pass, turned out to be reproducible
+   once the adjacency ordering was understood - see #4.)
 
 Everything else in an EPANET report can be reconstructed from public API
 calls - though, as the sections above record, often only by duplicating

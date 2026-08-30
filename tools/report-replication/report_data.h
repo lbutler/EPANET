@@ -113,7 +113,10 @@ enum {
     RD_WARN_UNSTABLE,        /* WARN02 */
     RD_WARN_PUMP,            /* WARN04 */
     RD_WARN_VALVE,           /* WARN05 */
-    RD_WARN_NEGPRESSURE      /* WARN06 */
+    RD_WARN_NEGPRESSURE,     /* WARN06  */
+    RD_WARN_DISCONNECTED,        /* WARN03a */
+    RD_WARN_DISCONNECTED_MORE,   /* WARN03b */
+    RD_WARN_DISCONNECTED_LINK    /* WARN03c */
 };
 
 typedef struct {
@@ -273,6 +276,8 @@ typedef struct RD_ReportData {
     int    fatalError;    /* terminal errmsg() code, 0 if the run completed */
     int    analysisRan;   /* 0 if EN_openH failed: no begun/ended stamps,
                              no status report, no results                  */
+    int    analysisEnded; /* 1 once EN_closeQ stamped "Analysis ended";
+                             0 when a mid-run error cut the run short      */
 } RD_ReportData;
 
 /* collect.c */
