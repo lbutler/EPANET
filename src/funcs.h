@@ -26,6 +26,7 @@ int     openoutfile(Project *);
 void    closeoutfile(Project *);
 
 int     buildadjlists(Network *);
+int     findconnected(Project *);
 void    freeadjlists(Network *);
 
 int     incontrols(Project *, int, int);

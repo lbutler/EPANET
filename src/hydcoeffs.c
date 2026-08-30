@@ -43,11 +43,13 @@ const double CBIG   = 1.e8;
 //void   demandheadloss(Project *, int, double, double, double *, double *);
 
 // Local functions
+static int     linkcoupled(Project *pr, int k);
 static void    linkcoeffs(Project *pr);
 static void    nodecoeffs(Project *pr);
 static void    valvecoeffs(Project *pr);
 static void    emittercoeffs(Project *pr);
 static void    demandcoeffs(Project *pr);
+static void    disconcoeffs(Project *pr);
 
 static void    pipecoeff(Project *pr, int k);
 static void    DWpipecoeff(Project *pr, int k);
@@ -297,12 +299,30 @@ void   matrixcoeffs(Project *pr)
     Hydraul *hyd = &pr->hydraul;
     Smatrix *sm = &hyd->smatrix;
 
+    int i;
+
     // Reset values of all diagonal coeffs. (Aii), off-diagonal
     // coeffs. (Aij), r.h.s. coeffs. (F) and node excess flow (Xflow)
     memset(sm->Aii, 0, (net->Nnodes + 1) * sizeof(double));
     memset(sm->Aij, 0, (sm->Ncoeffs + 1) * sizeof(double));
     memset(sm->F, 0, (net->Nnodes + 1) * sizeof(double));
     memset(hyd->Xflow, 0, (net->Nnodes + 1) * sizeof(double));
+
+    // When disconnected junctions are being isolated, re-mark them
+    // (link statuses may have changed) & adjust junction demands:
+    // an isolated junction delivers no demand while a connected one
+    // analyzed as DDA gets its full demand back in case it was
+    // isolated in a previous trial or time period
+    if (hyd->DisconPinned)
+    {
+        hyd->DisconnectedNodes = findconnected(pr);
+        for (i = 1; i <= net->Njuncs; i++)
+        {
+            if (!hyd->Connected[i]) hyd->DemandFlow[i] = 0.0;
+            else if (hyd->DemandModel == DDA)
+                hyd->DemandFlow[i] = hyd->FullDemand[i];
+        }
+    }
 
     // Compute matrix coeffs. from links, emitters, and nodal demands
     linkcoeffs(pr);
@@ -313,9 +333,118 @@ void   matrixcoeffs(Project *pr)
     // Update nodal flow balances with demands and add onto r.h.s. coeffs.
     nodecoeffs(pr);
 
-    // Finally, find coeffs. for PRV/PSV/FCV control valves whose
+    // Find coeffs. for PRV/PSV/FCV control valves whose
     // status is not fixed to OPEN/CLOSED
     valvecoeffs(pr);
+
+    // Finally, fix the heads of any disconnected junctions
+    if (hyd->DisconPinned) disconcoeffs(pr);
+}
+
+
+int findconnected(Project *pr)
+/*
+**--------------------------------------------------------------
+**  Input:   none
+**  Output:  returns the number of disconnected junctions
+**  Purpose: marks junctions that are connected to a fixed grade
+**           node through the hydraulic equation matrix. A group
+**           of junctions isolated by closed links stays in the
+**           matrix coupled only through the 1/CBIG conductance
+**           placeholder that closed links retain, which makes
+**           the matrix ill-conditioned and lets the group's
+**           demand "leak" through closed links at absurd heads.
+**
+**  Note:    an ACTIVE PRV, PSV or FCV couples its end nodes with
+**           at most 1/CBIG, so it acts as a closed link here,
+**           while the node whose head an ACTIVE PRV or PSV fixes
+**           acts as a fixed grade node (see prvcoeff()/psvcoeff()).
+**--------------------------------------------------------------
+*/
+{
+    Network *net = &pr->network;
+    Hydraul *hyd = &pr->hydraul;
+
+    int i, j, k, m, n;
+    int *nodelist = hyd->ConnNodeList;
+    Slink *link;
+    Padjlist alink;
+
+    // Place all fixed grade nodes on the node list & mark them
+    memset(hyd->Connected, 0, (net->Nnodes + 1) * sizeof(char));
+    m = 0;
+    for (i = net->Njuncs + 1; i <= net->Nnodes; i++)
+    {
+        hyd->Connected[i] = 1;
+        nodelist[++m] = i;
+    }
+
+    // Do the same for the head-setting node of each active PRV & PSV
+    for (i = 1; i <= net->Nvalves; i++)
+    {
+        k = net->Valve[i].Link;
+        link = &net->Link[k];
+        if (hyd->LinkStatus[k] != ACTIVE) continue;
+        if (link->Type == PRV) j = link->N2;
+        else if (link->Type == PSV) j = link->N1;
+        else continue;
+        if (!hyd->Connected[j])
+        {
+            hyd->Connected[j] = 1;
+            nodelist[++m] = j;
+        }
+    }
+
+    // Mark every node connected to those on the list through links
+    // that have an actual conductance in the matrix
+    n = 1;
+    while (n <= m)
+    {
+        i = nodelist[n];
+        for (alink = net->Adjlist[i]; alink != NULL; alink = alink->next)
+        {
+            j = alink->node;
+            if (hyd->Connected[j]) continue;
+            if (!linkcoupled(pr, alink->link)) continue;
+            hyd->Connected[j] = 1;
+            nodelist[++m] = j;
+        }
+        n++;
+    }
+
+    // Count the junctions left unmarked
+    n = 0;
+    for (i = 1; i <= net->Njuncs; i++)
+    {
+        if (!hyd->Connected[i]) n++;
+    }
+    return n;
+}
+
+
+int linkcoupled(Project *pr, int k)
+/*
+**--------------------------------------------------------------
+**  Input:   k = link index
+**  Output:  returns 1 if the link couples its end nodes through
+**           an actual conductance in the hydraulic equation
+**           matrix, 0 if it carries at most the 1/CBIG
+**           placeholder. Closed links, ACTIVE PRVs/PSVs/FCVs
+**           (see prvcoeff()/psvcoeff()/fcvcoeff()) and links
+**           whose head loss gradient has collapsed to the
+**           placeholder cap (e.g. a constant-power pump at
+**           near-zero flow) do not couple their end nodes.
+**--------------------------------------------------------------
+*/
+{
+    Hydraul *hyd = &pr->hydraul;
+    LinkType t = pr->network.Link[k].Type;
+
+    if (hyd->LinkStatus[k] <= CLOSED) return 0;
+    if ((t == PRV || t == PSV || t == FCV) &&
+        hyd->LinkSetting[k] != MISSING)
+        return hyd->LinkStatus[k] != ACTIVE;
+    return hyd->P[k] > 1.0 / CBIG;
 }
 
 
@@ -399,6 +528,74 @@ void  nodecoeffs(Project *pr)
     {
         hyd->Xflow[i] -= hyd->DemandFlow[i];
         sm->F[sm->Row[i]] += hyd->Xflow[i];
+    }
+}
+
+
+void  disconcoeffs(Project *pr)
+/*
+**----------------------------------------------------------------
+**  Input:   none
+**  Output:  none
+**  Purpose: fixes the head of each junction marked as disconnected
+**           by findconnected(), using the same large-diagonal
+**           device as prvcoeff(), so that an isolated group of
+**           junctions leaves the matrix well-conditioned. All
+**           junctions of a group share one head - the lowest
+**           elevation among them - so the group holds zero flow
+**           and can never display a plausible positive pressure.
+**----------------------------------------------------------------
+*/
+{
+    Network *net = &pr->network;
+    Hydraul *hyd = &pr->hydraul;
+    Smatrix *sm = &hyd->smatrix;
+
+    int i, j, m, n, row;
+    int *nodelist = hyd->ConnNodeList;
+    double elmin;
+    Padjlist alink;
+
+    if (hyd->DisconnectedNodes == 0) return;
+    for (i = 1; i <= net->Njuncs; i++)
+    {
+        if (hyd->Connected[i]) continue;
+
+        // Collect the group of junctions connected to junction i
+        // (marked 2 so each group is only processed once)
+        m = 1;
+        nodelist[1] = i;
+        hyd->Connected[i] = 2;
+        elmin = net->Node[i].El;
+        n = 1;
+        while (n <= m)
+        {
+            for (alink = net->Adjlist[nodelist[n]]; alink != NULL;
+                 alink = alink->next)
+            {
+                j = alink->node;
+                if (hyd->Connected[j]) continue;
+                if (!linkcoupled(pr, alink->link)) continue;
+                hyd->Connected[j] = 2;
+                nodelist[++m] = j;
+                elmin = MIN(elmin, net->Node[j].El);
+            }
+            n++;
+        }
+
+        // Fix each junction's head at the group's lowest elevation
+        for (n = 1; n <= m; n++)
+        {
+            row = sm->Row[nodelist[n]];
+            sm->Aii[row] += CBIG;
+            sm->F[row] += (elmin * CBIG);
+        }
+    }
+
+    // Restore the disconnected marking for reporting
+    for (i = 1; i <= net->Njuncs; i++)
+    {
+        if (hyd->Connected[i] == 2) hyd->Connected[i] = 0;
     }
 }
 

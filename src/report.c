@@ -1119,7 +1119,7 @@ int writehydwarn(Project *pr, int iter, double relerr)
     Report  *rpt = &pr->report;
     Times   *time = &pr->times;
 
-    int i, j;
+    int i, j, k, count;
     char flag = 0;
     int s;
     Snode *node;
@@ -1194,6 +1194,43 @@ int writehydwarn(Project *pr, int iter, double relerr)
             }
             flag = 4;
         }
+    }
+
+    // Check for junctions disconnected from all tanks & reservoirs
+    // (their heads were fixed & their demands zeroed when the network
+    // hydraulic equations were solved - see findconnected() in hydcoeffs.c)
+    if (hyd->DisconnectedNodes > 0)
+    {
+        if (rpt->Messageflag)
+        {
+            count = 0;
+            j = 0;
+            for (i = 1; i <= net->Njuncs; i++)
+            {
+                if (hyd->Connected[i]) continue;
+                count++;
+                if (count <= MAXCOUNT)
+                {
+                    sprintf(pr->Msg, WARN03a, net->Node[i].ID,
+                            clocktime(rpt->Atime, time->Htime));
+                    writeline(pr, pr->Msg);
+                }
+                j = i;
+            }
+            if (count > MAXCOUNT)
+            {
+                sprintf(pr->Msg, WARN03b, count - MAXCOUNT,
+                        clocktime(rpt->Atime, time->Htime));
+                writeline(pr, pr->Msg);
+            }
+            k = getclosedlink(pr, j, hyd->Connected, hyd->ConnNodeList);
+            if (k > 0)
+            {
+                sprintf(pr->Msg, WARN03c, net->Link[k].ID);
+                writeline(pr, pr->Msg);
+            }
+        }
+        flag = 3;
     }
 
     // Check if system is unbalanced

@@ -41,6 +41,7 @@ extern int  linkstatus(Project *);     //(see HYDSTATUS.C)
 
 // Local functions
 static int    badvalve(Project *, int);
+static int    isolateddemand(Project *);
 static int    pswitch(Project *);
 
 static double newflows(Project *, Hydbalance *);
@@ -105,11 +106,12 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
     hyd->DeficientNodes = 0;
     hyd->DemandReduction = 0.0;
 
-    // Initialize ill-conditioning diagnosis
+    // Initialize ill-conditioning diagnosis & disconnection handling
     hyd->HydErrCause = HYDERR_NONE;
     hyd->HydErrNode = 0;
     hyd->HydErrLink = 0;
     hyd->DisconnectedNodes = 0;
+    hyd->DisconPinned = FALSE;
 
     // Repeat iterations until convergence or trial limit is exceeded.
     // (ExtraIter used to increase trials in case of status cycling.)
@@ -133,7 +135,16 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
         if (errcode > 0)
         {
             if (badvalve(pr, sm->Order[errcode])) continue;
-            else break;
+
+            // If junctions have been cut off from all fixed grade nodes
+            // then retry with their heads fixed & demands zeroed
+            // (see findconnected() & disconcoeffs() in hydcoeffs.c)
+            if (!hyd->DisconPinned && findconnected(pr) > 0)
+            {
+                hyd->DisconPinned = TRUE;
+                continue;
+            }
+            break;
         }
 
         // Update current solution.
@@ -170,18 +181,38 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
         // Check for convergence
         if (hasconverged(pr, relerr, &hydbal))
         {
-            // We have convergence - quit if we are into extra iterations
-            if (*iter > hyd->MaxIter) break;
+            // We have convergence - quit if we are into extra iterations,
+            // unless the solution contains junctions with demand that are
+            // cut off from all fixed grade nodes: then re-balance with
+            // their heads fixed & their demands zeroed instead of letting
+            // those demands "leak" through closed links at absurd heads
+            // (see findconnected() & disconcoeffs() in hydcoeffs.c)
+            if (*iter > hyd->MaxIter)
+            {
+                if (hyd->DisconPinned || findconnected(pr) == 0 ||
+                    !isolateddemand(pr)) break;
+                hyd->DisconPinned = TRUE;
+                maxtrials += hyd->MaxIter;
+            }
+            else
+            {
+                // Quit if no status changes occur & no junctions with
+                // demand are cut off from all fixed grade nodes
+                statChange = FALSE;
+                if (valveChange)    statChange = TRUE;
+                if (linkstatus(pr)) statChange = TRUE;
+                if (pswitch(pr))    statChange = TRUE;
+                if (!statChange)
+                {
+                    if (hyd->DisconPinned || findconnected(pr) == 0 ||
+                        !isolateddemand(pr)) break;
+                    hyd->DisconPinned = TRUE;
+                }
 
-            // Quit if no status changes occur
-            statChange = FALSE;
-            if (valveChange)    statChange = TRUE;
-            if (linkstatus(pr)) statChange = TRUE;
-            if (pswitch(pr))    statChange = TRUE;
-            if (!statChange)    break;
-
-            // We have a status change so continue the iterations
-            nextcheck = *iter + hyd->CheckFreq;
+                // We have a status change or newly cut off junctions
+                // so continue the iterations
+                nextcheck = *iter + hyd->CheckFreq;
+            }
         }
 
         // No convergence yet - see if it's time for a periodic status
@@ -190,6 +221,17 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
         {
             linkstatus(pr);
             nextcheck += hyd->CheckFreq;
+        }
+
+        // The final trial is about to end without a balanced network -
+        // if junctions with demand have been cut off from all fixed
+        // grade nodes their leaking demands are usually the reason, so
+        // fix their heads & zero their demands, then grant more trials
+        if (*iter == maxtrials && !hyd->DisconPinned &&
+            findconnected(pr) > 0 && isolateddemand(pr))
+        {
+            hyd->DisconPinned = TRUE;
+            maxtrials += hyd->MaxIter;
         }
         (*iter)++;
     }
@@ -215,6 +257,33 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
     hyd->MaxFlowChange = hydbal.maxflowchange;
     hyd->Iterations = *iter;
     return errcode;
+}
+
+
+int  isolateddemand(Project *pr)
+/*
+**-----------------------------------------------------------------
+**  Input:   none
+**  Output:  returns 1 if a junction marked as disconnected by
+**           findconnected() has a demand or an emitter, 0 otherwise
+**  Purpose: determines if a disconnected junction needs to have its
+**           head fixed & its demand zeroed. A disconnected junction
+**           with no demand receives no phantom flow through closed
+**           links, so it is left alone.
+**-----------------------------------------------------------------
+*/
+{
+    Network *net = &pr->network;
+    Hydraul *hyd = &pr->hydraul;
+
+    int i;
+
+    for (i = 1; i <= net->Njuncs; i++)
+    {
+        if (hyd->Connected[i]) continue;
+        if (hyd->FullDemand[i] != 0.0 || net->Node[i].Ke > 0.0) return 1;
+    }
+    return 0;
 }
 
 
