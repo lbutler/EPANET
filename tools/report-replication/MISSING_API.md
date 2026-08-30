@@ -436,3 +436,46 @@ token argument.)  All five lines are equally unreachable.
 
 *Suggested API:* an error-list query after a failed open, e.g.
 `EN_getparseerrorcount` / `EN_getparseerror(i, *code, *section, char *line)`.
+
+---
+
+## Appendix: every path that writes to the report
+
+Text reaches an EPANET report through exactly one sink - `writeline()`
+(`src/report.c`) - plus four direct `fprintf(RptFile, ...)` calls inside
+`report.c` itself (the page-1 datestamp, and the page-break header).
+`writewin()` looks similar but goes to the **console**, not the report.
+
+Mechanically counting real `writeline()` call sites across `src/`:
+
+| File | Call sites | What they are | Covered? |
+|------|-----------:|---------------|----------|
+| `report.c`    | 116 | the whole catalogue: logo, summary, status, warnings, energy, node/link tables, flow & mass balance, page headers, timestamps | yes, except #11 (mass terms) and the FULL trace #12 |
+| `validate.c`  | 5 | per-element validation errors 225 / 226-227 / 230 / 231 / 232 | yes - #13 |
+| `hydsolver.c` | 4 | FMT61 valve ill-conditioning, FMT66/67/68 convergence detail | no - #12 |
+| `input2.c`    | 4 | input parse diagnostics + echo of the offending line | no - #14 |
+| `project.c`   | 2 | `Error 234` unlinked junction, and `errmsg()`'s terminal line | yes - #13 |
+| `rules.c`     | 2 | rule-clause parse errors (`ruleerrmsg`) | no - #14 |
+
+`epanet.c` additionally exposes `EN_writeline`, which writes whatever the
+*caller* passes - not engine output.
+
+Cross-check by format macro: every `FMT*` / `WARN*` / `R_ERR*` macro in
+`src/text.h` is accounted for as either handled, a documented gap
+(FMT61/66/67/68; R_ERR201-221), console-only (FMT100-103, FMT106 go to
+`writewin`), or **dead** - `FMT02`, `FMT04`-`FMT08`, `FMT14`-`FMT17`,
+`FMT60a`, `FMT60b` are defined but never referenced anywhere in `src/`.
+
+What that leaves genuinely unreachable, in full:
+
+1. the STATUS FULL solver trace (#12) - FMT61, FMT64, FMT65, FMT66/67/68,
+   FMT56/57;
+2. the water quality mass balance terms and segment count (#11);
+3. input-file and rule parse diagnostics (#14);
+4. `Error 305`, written and then silently swallowed (#15);
+5. disconnected-node warnings WARN03a/b/c and the ill-conditioned-node
+   identity in FMT62 (#4).
+
+Everything else in an EPANET report can be reconstructed from public API
+calls - though, as the sections above record, often only by duplicating
+engine logic or leaning on undocumented behavior.
