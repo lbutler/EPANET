@@ -14,7 +14,7 @@ regression corpus (59 networks total).
 |--------------|-----------------------------|
 | `STATUS NO`  | **59 / 59 byte-identical** (also with `NODES ALL`, `LINKS ALL`, `ENERGY YES` forced on, and on the 65-network `make-variants.sh` corpus) |
 | `STATUS YES` | **46 / 59 byte-identical**; the other 13 differ *only* by the six water quality mass-balance lines of gap #11. On the variant corpus (which adds PDA, timer/clocktime controls, pagination, AGE quality and priced energy): 46 identical, 19 mass-balance-only, 0 mismatched |
-| validation-error networks | reproduced byte-for-byte (#13); input parse errors are not (#14) |
+| validation-error networks | reproduced byte-for-byte - bad tank levels, pump curves, patterns, curves and unlinked junctions (#13); input and rule parse errors are not (#14) |
 | `STATUS FULL`| **59 / 59 reach "api-gap only"**: every line the replica cannot produce is one the API provably cannot supply (the solver trace of #12 plus #11), and the replica invents nothing |
 
 Getting there required every workaround documented below: the gaps are real
@@ -368,6 +368,11 @@ Two smaller wrinkles found here:
 * `validatepatterns()` loops from pattern index **0**, which the API cannot
   address (`EN_getpatternlen` rejects index 0), so an empty pattern 0 would
   be missed.
+
+`unlinked()` (`src/project.c`) is a second such check, running in the same
+`EN_openH` after validation passes: it names up to ten junctions no link
+connects to (`Error 234`) before failing with 233.  The replica reproduces
+those too, by rebuilding adjacency from `EN_getlinknodes`.
 
 *Suggested API:* have `EN_openH` (or a follow-up query) enumerate the
 offending elements, e.g. `EN_getvalidationerror(i, *code, *objType, *index)`.

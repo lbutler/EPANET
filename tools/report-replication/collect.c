@@ -653,6 +653,7 @@ static void probeValidation(EN_Project ph, RD_ReportData *rd)
     }
 
     /* --- curves: Error 231 (empty) then 230 (nonincreasing x) --- */
+    /* (unlinked junctions are checked separately - see probeUnlinked) */
     EN_getcount(ph, EN_CURVECOUNT, &nCurves);
     for (i = 1; i <= nCurves; i++)
     {
@@ -672,6 +673,35 @@ static void probeValidation(EN_Project ph, RD_ReportData *rd)
             x0 = x1;
         }
     }
+}
+
+/* unlinked() from src/project.c, which runs in openhyd() AFTER
+   validateproject() succeeds: reports up to 10 junctions that no link
+   connects to, then fails with 233.                                       */
+static void probeUnlinked(EN_Project ph, RD_ReportData *rd)
+{
+    char *linked = calloc(rd->nNodes + 1, 1);
+    int i, count = 0;
+
+    if (!linked) return;
+    for (i = 1; i <= rd->nLinks; i++)
+    {
+        int n1 = 0, n2 = 0;
+        if (EN_getlinknodes(ph, i, &n1, &n2) > 0) continue;
+        if (n1 >= 1 && n1 <= rd->nNodes) linked[n1] = 1;
+        if (n2 >= 1 && n2 <= rd->nNodes) linked[n2] = 1;
+    }
+    for (i = 0; i < rd->nNodes; i++)
+    {
+        if (rd->nodeType[i] != EN_JUNCTION) continue;
+        if (!linked[i + 1])
+        {
+            count++;
+            addErrorLine(rd, 234, rd->nodeId[i], 0);
+        }
+        if (count >= 10) break;
+    }
+    free(linked);
 }
 
 /* --------------------------------------------------------------------------
@@ -1325,6 +1355,7 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
     /* validateproject() runs inside EN_openH and writes one line per bad
        element before failing; reproduce those lines from the API first   */
     probeValidation(ph, rd);
+    if (rd->nErrorLines == 0) probeUnlinked(ph, rd);
 
     err = EN_openH(ph);
     if (err > 100)

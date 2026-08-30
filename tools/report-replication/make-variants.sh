@@ -16,6 +16,7 @@
 #   bad_pump_Net1.inp   pump with no curve/power   -> Error 226
 #   bad_parse_Net1.inp  malformed input line       -> input2.c parse errors
 #   bad_rule_Net1.inp   malformed rule clause      -> rules.c ruleerrmsg
+#   bad_unlinked_Net1.inp junction with no links   -> unlinked() Errors 234/233
 #
 # Usage:
 #   make-variants.sh <output-dir> <inp-file-or-dir>...
@@ -115,6 +116,10 @@ if [ -n "$NET1" ]; then
     # a line the input parser cannot read
     awk '/^\[PATTERNS\]/{ print; print " EMPTYPAT"; next } {print}' \
         "$NET1" > "$OUTDIR/bad_parse_Net1.inp"
+
+    # a junction no link connects to
+    awk '/^\[JUNCTIONS\]/{ print; print " LONELY          \t700         \t0           \t;"; next }
+         {print}' "$NET1" > "$OUTDIR/bad_unlinked_Net1.inp"
 
     # a rule clause the rule parser cannot read
     awk '/^\[RULES\]/{ print; print "RULE BAD1";
