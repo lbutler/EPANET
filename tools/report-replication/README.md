@@ -76,8 +76,8 @@ Against the 3 bundled example networks plus the 56 networks of
 | `--status no` + `NODES ALL`/`LINKS ALL`/`ENERGY YES` | **59** | 0 | 0 |
 | `--status no` on the 65-network `make-variants.sh` corpus | **65** | 0 | 0 |
 | `--status yes` | **46** | 13 | 0 |
-| `--status yes` on the `make-variants.sh` corpus | **46** | 19 | 0 |
 | `--status full` | 0 | **59** | 0 |
+| `--status yes` on the `make-variants.sh` corpus (69 nets, incl. deliberately invalid ones) | **49** | 20 | 0 |
 | as-is (each INP's own setting; 32 request `STATUS FULL`) | 20 | 7 | 32 |
 
 "api-gap only" means every remaining difference is a line the API provably

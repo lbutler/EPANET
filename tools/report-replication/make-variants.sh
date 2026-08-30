@@ -11,6 +11,10 @@
 #   pprice_Net1.inp   pump-specific price/pattern + pump efficiency curve
 #   timer_Net1.inp    TIMER and CLOCKTIME simple controls (STATUS YES lines)
 #   pda_Net3.inp      pressure-driven analysis (PDA demand-reduction lines)
+#   bad_tank_Net1.inp   invalid tank levels        -> validateproject Error 225
+#   bad_curve_Net1.inp  nonincreasing curve x      -> Errors 227 + 230
+#   bad_pump_Net1.inp   pump with no curve/power   -> Error 226
+#   bad_parse_Net1.inp  malformed input line       -> input2.c parse errors
 #
 # Usage:
 #   make-variants.sh <output-dir> <inp-file-or-dir>...
@@ -92,6 +96,24 @@ if [ -n "$NET3" ]; then
              print " Required Pressure   30";
              print " Pressure Exponent   0.5"; next }
          {print}' "$NET3" > "$OUTDIR/pda_Net3.inp"
+fi
+
+if [ -n "$NET1" ]; then
+    # invalid tank levels: initial level pushed above the maximum
+    sed -E 's/^( 2[ \t]+850[ \t]+)120/\1200/' "$NET1" > "$OUTDIR/bad_tank_Net1.inp"
+
+    # a curve whose x-values do not increase
+    awk '/^\[CURVES\]/{ print; print ";nonincreasing"; print " 1  100  200";
+                         print " 1   50  250"; next } {print}' \
+        "$NET1" > "$OUTDIR/bad_curve_Net1.inp"
+
+    # pump with neither a head curve nor a power rating
+    sed -E 's/^( 9[ \t]+9[ \t]+10[ \t]+)HEAD 1.*$/\1/' \
+        "$NET1" > "$OUTDIR/bad_pump_Net1.inp"
+
+    # a line the input parser cannot read
+    awk '/^\[PATTERNS\]/{ print; print " EMPTYPAT"; next } {print}' \
+        "$NET1" > "$OUTDIR/bad_parse_Net1.inp"
 fi
 
 if [ -n "$NET2" ]; then

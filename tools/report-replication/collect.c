@@ -37,6 +37,7 @@ static const double FLOW_PER_CFS[] = {
 };
 #define QZERO_CFS 1.e-6   /* zero-flow threshold used by the engine */
 #define PI_CONST  3.141592654
+#define TINY_VAL  1.E-6   /* TINY in src/types.h */
 #define RD_MISSING_SET (-1.e10)   /* the engine's MISSING link setting */
 #define LPSperCFS 28.317
 #define GPMperCFS 448.831
@@ -505,6 +506,172 @@ static int collectStatic(EN_Project ph, RD_ReportData *rd,
 
     (void)warncode;
     return 0;
+}
+
+
+/* --------------------------------------------------------------------------
+   Network validation errors
+
+   validateproject() (src/validate.c) runs inside EN_openH and writes one
+   line per offending element before EN_openH returns 110; errmsg()
+   (src/project.c) then writes the terminal "Error N: ..." line.  None of
+   those lines is announced by the API - EN_openH returns a single code and
+   never says which element failed - so the checks are re-implemented here
+   from public getters.  See MISSING_API.md.
+   ------------------------------------------------------------------------ */
+static void addErrorLine(RD_ReportData *rd, int code, const char *subject,
+                         int subjectIsNode)
+{
+    RD_ErrorLine *e = realloc(rd->errorLines,
+                              (rd->nErrorLines + 1) * sizeof(RD_ErrorLine));
+    if (!e) return;
+    rd->errorLines = e;
+    e = &rd->errorLines[rd->nErrorLines++];
+    e->code = code;
+    e->subjectIsNode = subjectIsNode;
+    snprintf(e->subject, sizeof(e->subject), "%s", subject ? subject : "");
+}
+
+/* powerfuncpump() from src/validate.c - pure arithmetic on curve points */
+static int powerFuncPump(double h0, double h1, double h2, double q1, double q2)
+{
+    double h4, h5, b, cc;
+    if (h0 < TINY_VAL || h0 - h1 < TINY_VAL || h1 - h2 < TINY_VAL ||
+        q1 < TINY_VAL || q2 - q1 < TINY_VAL) return 0;
+    h4 = h0 - h1;
+    h5 = h0 - h2;
+    cc = log(h5 / h4) / log(q2 / q1);
+    if (cc <= 0.0 || cc > 20.0) return 0;
+    b = -h4 / pow(q1, cc);
+    if (b >= 0.0) return 0;
+    return 1;
+}
+
+/* validateproject() from src/validate.c, in its exact emission order:
+   tanks, pumps, patterns, curves.  Returns the code EN_openH will report. */
+static void probeValidation(EN_Project ph, RD_ReportData *rd)
+{
+    int i, k, npts, nPats = 0, nCurves = 0;
+    double x0, y0, x1, y1, v;
+    char id[RD_MAXID] = "";
+
+    if (rd->nNodes < 2 || rd->nTanks == 0) return;   /* 223/224: no lines */
+
+    /* --- tanks: Error 225 (invalid lower/upper levels) --- */
+    for (i = 0; i < rd->nNodes; i++)
+    {
+        double initLvl = 0, minLvl = 0, maxLvl = 0, vcurve = 0;
+        int levelerr = 0;
+        if (rd->nodeType[i] != EN_TANK) continue;    /* skips reservoirs */
+        EN_getnodevalue(ph, i + 1, EN_TANKLEVEL, &initLvl);
+        EN_getnodevalue(ph, i + 1, EN_MINLEVEL, &minLvl);
+        EN_getnodevalue(ph, i + 1, EN_MAXLEVEL, &maxLvl);
+        if (initLvl > maxLvl || minLvl > maxLvl || initLvl < minLvl)
+            levelerr = 1;
+        EN_getnodevalue(ph, i + 1, EN_VOLCURVE, &vcurve);
+        if ((int)vcurve > 0)
+        {
+            npts = 0;
+            EN_getcurvelen(ph, (int)vcurve, &npts);
+            if (npts > 0)
+            {
+                EN_getcurvevalue(ph, (int)vcurve, 1, &x0, &y0);
+                EN_getcurvevalue(ph, (int)vcurve, npts, &x1, &y1);
+                if (minLvl < x0 - TINY_VAL || maxLvl > x1 + TINY_VAL)
+                    levelerr = 1;
+            }
+        }
+        if (levelerr) addErrorLine(rd, 225, rd->nodeId[i], 1);
+    }
+
+    /* --- pumps: Error 226 (no curve) / 227 (invalid head curve) --- */
+    for (i = 0; i < rd->nLinks; i++)
+    {
+        int hcurve = 0, errcode = 0;
+        if (rd->linkType[i] != EN_PUMP) continue;
+        EN_getheadcurveindex(ph, i + 1, &hcurve);
+        if (hcurve > 0)
+        {
+            npts = 0;
+            EN_getcurvelen(ph, hcurve, &npts);
+            if (npts == 1)
+            {
+                EN_getcurvevalue(ph, hcurve, 1, &x0, &y0);
+                if (!powerFuncPump(1.33334 * y0, y0, 0.0, x0, 2.0 * x0))
+                    errcode = 227;
+            }
+            else
+            {
+                double xs[3], ys[3];
+                int threePt = 0;
+                if (npts == 3)
+                {
+                    for (k = 0; k < 3; k++)
+                        EN_getcurvevalue(ph, hcurve, k + 1, &xs[k], &ys[k]);
+                    threePt = (xs[0] == 0.0);
+                }
+                if (threePt)
+                {
+                    if (!powerFuncPump(ys[0], ys[1], ys[2], xs[1], xs[2]))
+                        errcode = 227;
+                }
+                else
+                {
+                    /* customcurvepump(): head must decrease throughout */
+                    EN_getcurvevalue(ph, hcurve, 1, &x0, &y0);
+                    for (k = 2; k <= npts; k++)
+                    {
+                        EN_getcurvevalue(ph, hcurve, k, &x1, &y1);
+                        if (y1 >= y0) { errcode = 227; break; }
+                        y0 = y1;
+                    }
+                }
+            }
+        }
+        else
+        {
+            /* constant-power pump? Link.Km > 0 is EN_PUMP_POWER */
+            v = 0.0;
+            EN_getlinkvalue(ph, i + 1, EN_PUMP_POWER, &v);
+            if (!(v > 0.0)) errcode = 226;
+        }
+        if (errcode) addErrorLine(rd, errcode, rd->linkId[i], 0);
+    }
+
+    /* --- patterns: Error 232 (empty pattern); note the engine's loop
+           starts at index 0, which the API cannot address --- */
+    EN_getcount(ph, EN_PATCOUNT, &nPats);
+    for (i = 1; i <= nPats; i++)
+    {
+        int len = 0;
+        EN_getpatternlen(ph, i, &len);
+        if (len == 0)
+        {
+            EN_getpatternid(ph, i, id);
+            addErrorLine(rd, 232, id, 0);
+        }
+    }
+
+    /* --- curves: Error 231 (empty) then 230 (nonincreasing x) --- */
+    EN_getcount(ph, EN_CURVECOUNT, &nCurves);
+    for (i = 1; i <= nCurves; i++)
+    {
+        npts = 0;
+        EN_getcurvelen(ph, i, &npts);
+        EN_getcurveid(ph, i, id);
+        if (npts == 0)
+        {
+            addErrorLine(rd, 231, id, 0);
+            continue;
+        }
+        EN_getcurvevalue(ph, i, 1, &x0, &y0);
+        for (k = 2; k <= npts; k++)
+        {
+            EN_getcurvevalue(ph, i, k, &x1, &y1);
+            if (x0 >= x1) { addErrorLine(rd, 230, id, 0); break; }
+            x0 = x1;
+        }
+    }
 }
 
 /* --------------------------------------------------------------------------
@@ -1057,9 +1224,28 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
     err = EN_open(ph, inpFile, rptFile, "");
     if (err > 100)
     {
-        snprintf(errmsg, errlen, "EN_open failed with error %d", err);
+        /* The input file could not be read cleanly.  The engine has already
+           written its parse diagnostics (input2.c: an "Error N: ... in
+           [SECTION] section:" line plus an echo of the offending input
+           line) followed by the terminal error, and left the project
+           closed.  None of those diagnostics is reachable through the API -
+           EN_open returns one code and nothing else - so the replica can
+           only reproduce the logo and the terminal line.  Render that much
+           rather than bailing, so the diff shows exactly what is missing.
+           See MISSING_API.md.                                            */
+        int version = 0;
+        EN_getversion(&version);
+        rd->versionMajor = version / 10000;
+        rd->versionMinor = (version % 10000) / 100;
+        rd->versionPatch = version % 100;
+        rd->fatalError = err;
+        rd->analysisRan = 0;
+        rd->summaryFlag = 0;
+        snprintf(errmsg, errlen,
+                 "input file could not be read (error %d); replica limited "
+                 "to the logo and terminal error line", err);
         EN_deleteproject(ph);
-        return err;
+        return 0;
     }
 
     /* status level override requested on the command line: applied to the
@@ -1135,15 +1321,28 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
 
     /* ---- hydraulic phase (writes "Analysis begun" + status/warnings to
             the native report) ------------------------------------------- */
+
+    /* validateproject() runs inside EN_openH and writes one line per bad
+       element before failing; reproduce those lines from the API first   */
+    probeValidation(ph, rd);
+
     err = EN_openH(ph);
-    if (err > 100) goto fail;
+    if (err > 100)
+    {
+        /* the engine wrote its validation lines and a terminal error line,
+           then stopped: no "Analysis begun", no results.  Render that.   */
+        rd->fatalError = err;
+        rd->analysisRan = 0;
+        EN_close(ph);
+        EN_deleteproject(ph);
+        free(acc);
+        free(rs.oldLinkStatus); free(rs.curLinkStatus); free(rs.oldTankStatus);
+        free(rs.prevHead); free(rs.prevDemand); free(rs.prevSetting);
+        return 0;
+    }
+    rd->analysisRan = 1;
     err = EN_initH(ph, EN_SAVE);
     if (err > 100) goto fail;
-    {
-        double v = 0;
-        EN_getoption(ph, EN_UNBALANCED, &v);
-        unbalancedOpt = (int)v;
-    }
 
     /* status-report state: the engine seeds its status memories in
        inithyd(), so mirror that right after EN_initH                     */
@@ -1164,6 +1363,13 @@ int rd_collect(RD_ReportData *rd, const char *inpFile, const char *rptFile,
         goto fail;
     }
     seedStatus(ph, rd, &rs);
+
+    {
+        double v = 0;
+        EN_getoption(ph, EN_UNBALANCED, &v);
+        unbalancedOpt = (int)v;
+    }
+
 
     do
     {
@@ -1267,6 +1473,26 @@ fail:
     return err;
 }
 
+void rd_geterrortext(int code, char *buf, int len)
+{
+    /* EN_geterror composes "Error <code>: " + the raw message text
+       (src/epanet.c), but the report's own lines build that prefix
+       themselves, so it has to be stripped back off.  There is no getter
+       for the bare message - see MISSING_API.md.                        */
+    char raw[512] = "";
+    char prefix[32];
+    size_t plen;
+
+    buf[0] = '\0';
+    EN_geterror(code, raw, (int)sizeof(raw) - 1);
+    snprintf(prefix, sizeof(prefix), "Error %d: ", code);
+    plen = strlen(prefix);
+    if (strncmp(raw, prefix, plen) == 0)
+        snprintf(buf, len, "%s", raw + plen);
+    else
+        snprintf(buf, len, "%s", raw);
+}
+
 void rd_free(RD_ReportData *rd)
 {
     int p;
@@ -1285,5 +1511,6 @@ void rd_free(RD_ReportData *rd)
     free(rd->linkRpt);
     free(rd->pumpEnergy);
     free(rd->warnings);
+    free(rd->errorLines);
     memset(rd, 0, sizeof(*rd));
 }

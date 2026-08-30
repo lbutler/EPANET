@@ -14,6 +14,7 @@ regression corpus (59 networks total).
 |--------------|-----------------------------|
 | `STATUS NO`  | **59 / 59 byte-identical** (also with `NODES ALL`, `LINKS ALL`, `ENERGY YES` forced on, and on the 65-network `make-variants.sh` corpus) |
 | `STATUS YES` | **46 / 59 byte-identical**; the other 13 differ *only* by the six water quality mass-balance lines of gap #11. On the variant corpus (which adds PDA, timer/clocktime controls, pagination, AGE quality and priced energy): 46 identical, 19 mass-balance-only, 0 mismatched |
+| validation-error networks | reproduced byte-for-byte (#13); input parse errors are not (#14) |
 | `STATUS FULL`| **59 / 59 reach "api-gap only"**: every line the replica cannot produce is one the API provably cannot supply (the solver trace of #12 plus #11), and the replica invents nothing |
 
 Getting there required every workaround documented below: the gaps are real
@@ -337,3 +338,59 @@ withheld, and `reporthydbal()` can fire more than once per step.  Adding
 the four rows on its own.
 
 Closing the four rows above would finish `STATUS FULL`.
+
+## 13. Validation errors name elements the API never identifies  (WORKAROUND)
+
+`validateproject()` (`src/validate.c`) runs inside `EN_openH` and writes one
+line per offending element before failing:
+
+```
+  Error 225: invalid lower/upper levels for tank node 2
+  Error 227: invalid head curve for pump 9
+  Error 230: nonincreasing x-values for curve 1
+  Error 110: cannot solve network hydraulic equations
+```
+
+`EN_openH` returns a single code (110) and nothing about *which* tank, pump,
+pattern or curve was at fault.  The replica reproduces these lines by
+re-implementing every check - tank level and volume-curve range, pump head
+curve (including the power-function fit of `powerfuncpump()` and the
+monotonic-head test of `customcurvepump()`), empty patterns, empty and
+non-monotonic curves - in `validateproject()`'s exact emission order
+(tanks, pumps, patterns, curves).  All of the inputs are readable, so this
+works, but it is another wholesale duplication of engine logic.
+Two smaller wrinkles found here:
+
+* `EN_geterror` composes `"Error <code>: " + message`.  The report's own
+  lines build that prefix themselves, so reproducing them means stripping
+  the prefix back off the API's output - there is no getter for the bare
+  message text.
+* `validatepatterns()` loops from pattern index **0**, which the API cannot
+  address (`EN_getpatternlen` rejects index 0), so an empty pattern 0 would
+  be missed.
+
+*Suggested API:* have `EN_openH` (or a follow-up query) enumerate the
+offending elements, e.g. `EN_getvalidationerror(i, *code, *objType, *index)`.
+
+## 14. Input-file parse diagnostics are unreachable  (GAP)
+
+When the input file cannot be read cleanly, `src/input2.c` writes a
+diagnostic *pair* per bad line - the error with its token and section, then
+an echo of the offending input line itself:
+
+```
+  Error 201: syntax error  in [PATTERNS] section:
+   EMPTYPAT
+
+  Error 200: one or more errors in input file
+```
+
+`EN_open` returns only 200, and leaves the project closed, so a pure-API
+caller has no access to the section, the token, the line number or the text
+of the line.  The replica can reproduce the logo and the terminal
+`Error 200` line and nothing else; the diagnostic pairs are simply absent.
+(`EN_openX` opens the project anyway and would at least allow the rest of
+the report to be built, but it still does not expose the diagnostics.)
+
+*Suggested API:* an error-list query after a failed open, e.g.
+`EN_getparseerrorcount` / `EN_getparseerror(i, *code, *section, char *line)`.

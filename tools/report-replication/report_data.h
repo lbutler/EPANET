@@ -136,6 +136,16 @@ typedef struct {
     char   text[RD_MAXID];/* rule ID                                       */
 } RD_StatusEvent;
 
+/* A validation or terminal error line written into the report.
+   validateproject() (src/validate.c) writes one line per offending element
+   from inside EN_openH, then errmsg() (src/project.c) adds the terminal
+   "Error N: ..." line.                                                    */
+typedef struct {
+    int  code;                 /* EPANET error code                        */
+    char subject[RD_MAXID];    /* element ID the message names, or ""      */
+    int  subjectIsNode;        /* the tank message reads "... node <id>"   */
+} RD_ErrorLine;
+
 /* End-of-run hydraulic flow balance block (flow units) */
 typedef struct {
     int    valid;
@@ -256,6 +266,13 @@ typedef struct RD_ReportData {
     int    nAllocEvents;
     RD_FlowBalance flowBalance;
     RD_MassBalance massBalance;
+
+    /* ---- validation / error reporting ------------------------------- */
+    RD_ErrorLine *errorLines;
+    int    nErrorLines;
+    int    fatalError;    /* terminal errmsg() code, 0 if the run completed */
+    int    analysisRan;   /* 0 if EN_openH failed: no begun/ended stamps,
+                             no status report, no results                  */
 } RD_ReportData;
 
 /* collect.c */
@@ -272,5 +289,8 @@ int  rd_apply_report_command(RD_ReportData *rd, const char *command);
 
 /* render_text.c - renders the model in EPANET's native .rpt text format   */
 int  rd_render_text(const RD_ReportData *rd, FILE *f);
+
+/* collect.c - EN_geterror text, so renderers need not link the toolkit   */
+void rd_geterrortext(int code, char *buf, int len);
 
 #endif

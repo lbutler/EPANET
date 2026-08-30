@@ -83,6 +83,7 @@ for inp in "${INPS[@]}"; do
         #   <type> <id> setting changed to N  FMT56  intra-iteration    (#12)
         #   <t>: Valve <id> caused ill-cond.  FMT61                     (#12)
         if awk '
+            BEGIN { echo=0 }
             /^-/ && !/^---/ {
                 line=substr($0,2)
                 gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
@@ -95,6 +96,13 @@ for inp in "${INPS[@]}"; do
                 if (line ~ / switched from .* to /) next
                 if (line ~ / setting changed to /) next
                 if (line ~ /caused ill-conditioning$/) next
+                # input-file parse diagnostics (src/input2.c): the
+                # "Error N: ... in [SECTION] section:" line and the echo of
+                # the offending input line that always follows it. Neither
+                # is reachable through the API (#13).
+                if (line ~ /^Error [0-9]+: .* in \[[A-Z]+\] section:$/) { echo=1; next }
+                if (line ~ /^Error [0-9]+: .*: section contents ignored\.$/) { echo=1; next }
+                if (echo) { echo=0; next }
                 exit 1
             }
             /^\+/ && !/^\+\+\+/ {

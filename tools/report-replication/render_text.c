@@ -724,6 +724,34 @@ static void renderMassBalance(const RD_ReportData *rd, Sink *sk)
     wline(sk, "================================\n");
 }
 
+static void renderErrorLines(const RD_ReportData *rd, Sink *sk)
+{
+    /* mirrors the "Error N: <text> <element>" lines validateproject()
+       writes (src/validate.c) and the terminal line from errmsg()
+       (src/project.c).  The message text comes from EN_geterror.       */
+    char s[RD_MAXLINE];
+    int i;
+
+    for (i = 0; i < rd->nErrorLines; i++)
+    {
+        const RD_ErrorLine *e = &rd->errorLines[i];
+        char msg[RD_MAXLINE] = "";
+        rd_geterrortext(e->code, msg, sizeof(msg));
+        if (e->subjectIsNode)
+            sprintf(s, "Error %d: %s node %s", e->code, msg, e->subject);
+        else
+            sprintf(s, "Error %d: %s %s", e->code, msg, e->subject);
+        wline(sk, s);
+    }
+    if (rd->fatalError > 100)
+    {
+        char msg[RD_MAXLINE] = "";
+        rd_geterrortext(rd->fatalError, msg, sizeof(msg));
+        sprintf(s, "Error %d: %s", rd->fatalError, msg);
+        wline(sk, s);
+    }
+}
+
 int rd_render_text(const RD_ReportData *rd, FILE *f)
 {
     Sink sk;
@@ -735,6 +763,16 @@ int rd_render_text(const RD_ReportData *rd, FILE *f)
 
     renderLogo(rd, &sk);
     if (rd->summaryFlag) renderSummary(rd, &sk);
+
+    /* a project that fails validation stops here: the engine writes the
+       offending-element lines and a terminal error, and never stamps
+       "Analysis begun" (openhyd() fails before writetime())             */
+    if (!rd->analysisRan)
+    {
+        renderErrorLines(rd, &sk);
+        return 0;
+    }
+
     renderTimestamp(&sk, "Analysis begun %s");
 
     /* The hydraulic status report header is written by EN_initH, then the
