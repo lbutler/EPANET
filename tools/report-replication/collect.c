@@ -656,6 +656,14 @@ static void probeControls(EN_Project ph, RD_ReportData *rd, RD_RunState *rs,
 {
     int nControls = 0, i;
 
+    /* KNOWN LIMITATION: demands() runs just before controls() and, for a
+       pump carrying a utilization pattern, rewrites its status/setting
+       (setlinksetting() in src/hydraul.c).  A caller cannot observe that,
+       so the s1/k1 comparison below would use the pre-pattern values.  No
+       network in the test corpus uses pump utilization patterns.  (The
+       reservoir head patterns demands() also applies are harmless here: a
+       reservoir's tankvolume() is head-independent, so a level control on
+       one fires the same way whatever head it is given.)                 */
     EN_getcount(ph, EN_CONTROLCOUNT, &nControls);
     if (nControls <= 0) return;
     /* the engine evaluates controls against link state that earlier
@@ -678,6 +686,12 @@ static void probeControls(EN_Project ph, RD_ReportData *rd, RD_RunState *rs,
         else if (setting == EN_SET_CLOSED) { ctlStatus = RD_CLOSED; ctlSetting = RD_MISSING_SET; }
         else
         {
+            /* GAP: EN_getcontrol reports only the setting, so the
+               control's status must be inferred.  For pumps and pipes a
+               setting of 0 means CLOSED (controldata() in src/input3.c);
+               for a GPV both OPEN and CLOSED store setting = Link.Kc, so
+               the two are indistinguishable and this inference is wrong -
+               see MISSING_API.md #10.                                    */
             ctlSetting = setting;
             if (rd->linkType[link - 1] == EN_PUMP ||
                 rd->linkType[link - 1] == EN_PIPE)

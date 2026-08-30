@@ -116,6 +116,13 @@ can by probing the API after each warned step, mirroring `writehydwarn()`:
 | WARN06 negative pressures         | yes | scan junctions for pressure < 0 and demand > 0 (DDA only) |
 | FMT62 "System ill-conditioned at node X" | **no** | written when the hydraulic solve fails (error 110); the offending node index is not exposed - suggest `EN_getstatistic(EN_ILLCONDITIONEDNODE)` |
 
+On that same failure path `writehyderr()` calls `writehydstat(pr, 0, 0)`,
+which emits the tank/link status block **without** a Balanced/Unbalanced
+line.  A caller cannot detect this: `EN_getstatistic(EN_ITERATIONS)` still
+reports a non-zero trial count, so gating the line on that statistic
+produces a line the engine did not write.  Combined with the unexposed
+FMT62 node, a failed-solve report cannot be reproduced.
+
 *Suggested API:* a per-step warning enumerator
 (`EN_getwarningcount`/`EN_getwarning(i, *code, *elementType, *elementIndex)`)
 or a warning callback, so a caller need not re-derive the engine's checks.
@@ -210,6 +217,18 @@ same memories the engine keeps internally.  What that costs, line by line:
 | FMT54/55 control actions | **no control-fired notification**: the replica re-implements `controls()` - including `tankvolume()` over `EN_VOLCURVE` / `EN_TANKDIAM` / `EN_MINVOLUME` / `EN_MINLEVEL` - and evaluates it against cached state. See the sequencing trap below |
 | FMT63 rule actions | not implemented; no rule-firing notification exists, and rule actions fire at sub-step times. No corpus network emits one, so this is untested |
 | Hydraulic Flow Balance block | reproducible but laborious: per-step accumulation of `EN_DEMANDFLOW` / `EN_EMITTERFLOW` / `EN_LEAKAGEFLOW` / `EN_FULLDEMAND` / tank `EN_DEMAND`, weighted by the *next* step length and divided by the final time - suggest exposing `hyd->FlowBalance` directly |
+
+**`EN_getcontrol` cannot express a control's status.**  It returns the
+control's *setting*, using the sentinels `EN_SET_OPEN`/`EN_SET_CLOSED` only
+when the stored setting is `MISSING`.  For a **GPV** control, `controldata()`
+(`src/input3.c`) stores `setting = Link.Kc` for *both* `OPEN` and `CLOSED`,
+so the sentinel never appears and OPEN is indistinguishable from CLOSED -
+the replica cannot decide whether the control fires, making its FMT54/55
+line unreproducible.  (For pumps and pipes the status is recoverable,
+because a numeric setting of 0 means CLOSED and anything else OPEN.)  No
+corpus network has a controlled GPV, so this is untested but real.
+*Suggested API:* have `EN_getcontrol` return the control's status alongside
+its setting.
 
 **Sequencing trap (undocumented).**  `controls()` runs at the start of
 `EN_runH`, *before* the solve, and the tank heads it sees were updated at
