@@ -319,13 +319,6 @@ typedef enum {
   PDA            // pressure driven analysis
 } DemandModelType;
 
-typedef enum {           // Causes of hydraulic matrix ill-conditioning
-  HYDERR_NONE,           // no ill-conditioning occurred
-  HYDERR_DISCONNECTED,   // node cut off from all tanks & reservoirs
-  HYDERR_VALVE,          // control valve with a conflicting setting
-  HYDERR_OTHER           // cause could not be determined
-} HydErrCauseType;
-
 /*
 ------------------------------------------------------
    Fundamental Data Structures
@@ -807,9 +800,6 @@ typedef struct {
     OpenHflag,             // Hydraulic system opened flag
     Haltflag,              // Flag to halt simulation
     DeficientNodes,        // Number of pressure deficient nodes
-    HydErrCause,           // Cause of matrix ill-conditioning (see HydErrCauseType)
-    HydErrNode,            // Node where matrix ill-conditioning occurred
-    HydErrLink,            // Link involved in matrix ill-conditioning
     DisconnectedNodes,     // Number of junctions cut off from all tanks & reservoirs
     DisconRemark,          // TRUE when junction connectivity must be re-marked
     DisconSig,             // Hash of the junction connectivity marks

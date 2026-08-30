@@ -12,8 +12,7 @@
 */
 
 /*
-   Tests the handling of disconnected junctions (islands) and the
-   diagnosis of hydraulic solver failures (error 110)
+   Tests the handling of junctions with no path to a supply source
 */
 
 #include <boost/test/unit_test.hpp>
@@ -84,7 +83,6 @@ BOOST_AUTO_TEST_CASE(test_island_zero_demand)
     int error = solve(ph, "./test_hyderr_island.inp");
     BOOST_REQUIRE(error == 3);
 
-    BOOST_REQUIRE(statistic(ph, EN_HYDERRCAUSE) == EN_HYDERR_NONE);
     BOOST_REQUIRE(statistic(ph, EN_DISCONNECTEDNODES) == 2);
 
     BOOST_REQUIRE(abs(nodevalue(ph, "J3", EN_HEAD) - 90.0) < 1e-6);
@@ -113,56 +111,6 @@ BOOST_AUTO_TEST_CASE(test_island_with_demand)
 
     // The mainland is served in full
     BOOST_REQUIRE(abs(nodevalue(ph, "J1", EN_DEMAND) - 50.0) < 1e-6);
-
-    closeproject(ph);
-}
-
-BOOST_AUTO_TEST_CASE(test_hyderr_valve)
-{
-    // PRV V2's setting conflicts with the network: badvalve() forces
-    // it open but the retry still fails at its downstream node D2,
-    // which remains connected to the reservoir through open pipes.
-    // Island handling must not interfere: the failure is diagnosed
-    // as a valve conflict, never as a disconnection.
-    EN_Project ph = NULL;
-    int error = solve(ph, "./test_hyderr_valve.inp");
-    BOOST_REQUIRE(error == 110);
-
-    BOOST_REQUIRE(statistic(ph, EN_HYDERRCAUSE) == EN_HYDERR_VALVE);
-
-    int index;
-    char id[EN_MAXID + 1];
-    index = (int)statistic(ph, EN_HYDERRNODE);
-    error = EN_getnodeid(ph, index, id);
-    BOOST_REQUIRE(error == 0);
-    BOOST_REQUIRE(strcmp(id, "D2") == 0);
-    index = (int)statistic(ph, EN_HYDERRLINK);
-    error = EN_getlinkid(ph, index, id);
-    BOOST_REQUIRE(error == 0);
-    BOOST_REQUIRE(strcmp(id, "V2") == 0);
-
-    closeproject(ph);
-}
-
-BOOST_AUTO_TEST_CASE(test_hyderr_other)
-{
-    // An all-open pure-pipe network with an extreme conductance
-    // contrast: the failing node is reachable from both reservoirs
-    // and touches no control valve, so no cause can be assigned.
-    // The open hair pipes are passable, so island handling must
-    // leave this network alone and the run still fails with 110.
-    EN_Project ph = NULL;
-    int error = solve(ph, "./test_hyderr_other.inp");
-    BOOST_REQUIRE(error == 110);
-
-    BOOST_REQUIRE(statistic(ph, EN_HYDERRCAUSE) == EN_HYDERR_OTHER);
-    BOOST_REQUIRE(statistic(ph, EN_HYDERRLINK) == 0);
-
-    int index = (int)statistic(ph, EN_HYDERRNODE);
-    char id[EN_MAXID + 1];
-    error = EN_getnodeid(ph, index, id);
-    BOOST_REQUIRE(error == 0);
-    BOOST_REQUIRE(strcmp(id, "J1") == 0);
 
     closeproject(ph);
 }
@@ -343,26 +291,14 @@ BOOST_AUTO_TEST_CASE(test_parallel_links)
     closeproject(ph);
 }
 
-BOOST_FIXTURE_TEST_CASE(test_hyderr_none, FixtureOpenClose)
+BOOST_FIXTURE_TEST_CASE(test_no_disconnection, FixtureOpenClose)
 {
     double value;
 
     // A successful run on a fully connected network leaves no
-    // diagnosis or disconnection count behind
+    // disconnection count behind
     error = EN_solveH(ph);
     BOOST_REQUIRE(error == 0);
-
-    error = EN_getstatistic(ph, EN_HYDERRCAUSE, &value);
-    BOOST_REQUIRE(error == 0);
-    BOOST_REQUIRE(value == EN_HYDERR_NONE);
-
-    error = EN_getstatistic(ph, EN_HYDERRNODE, &value);
-    BOOST_REQUIRE(error == 0);
-    BOOST_REQUIRE(value == 0);
-
-    error = EN_getstatistic(ph, EN_HYDERRLINK, &value);
-    BOOST_REQUIRE(error == 0);
-    BOOST_REQUIRE(value == 0);
 
     error = EN_getstatistic(ph, EN_DISCONNECTEDNODES, &value);
     BOOST_REQUIRE(error == 0);
@@ -389,7 +325,6 @@ BOOST_AUTO_TEST_CASE(test_isolation_off_by_default)
     error = EN_setoption(ph, EN_ISOLATION, 0);
     BOOST_REQUIRE(error == 0);
     BOOST_REQUIRE(EN_solveH(ph) == 110);
-    BOOST_REQUIRE(statistic(ph, EN_HYDERRCAUSE) == EN_HYDERR_DISCONNECTED);
     BOOST_REQUIRE(statistic(ph, EN_DISCONNECTEDNODES) == 2);
     BOOST_REQUIRE(nodevalue(ph, "J3", EN_ISOLATED) == 0);
 

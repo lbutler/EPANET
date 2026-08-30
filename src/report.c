@@ -45,7 +45,6 @@ static void writeenergy(Project *);
 static int  writeresults(Project *);
 static void listdisconnected(Project *);
 static int  getclosedlink(Project *, int, char *, int *);
-static void findhyderrcause(Project *, int);
 static void writelimits(Project *, int, int);
 static int  checklimits(Report *, double *, int, int);
 static char *fillstr(char *, char, int);
@@ -1244,28 +1243,18 @@ void writehyderr(Project *pr, int errnode)
 
     Snode *Node = net->Node;
 
-    findhyderrcause(pr, errnode);
     if (rpt->Messageflag)
     {
         sprintf(pr->Msg, FMT62, clocktime(rpt->Atime, time->Htime),
                 Node[errnode].ID);
         writeline(pr, pr->Msg);
-        if (hyd->HydErrCause == HYDERR_DISCONNECTED)
-        {
-            if (hyd->HydErrLink > 0)
-                sprintf(pr->Msg, FMT62a, hyd->DisconnectedNodes,
-                        net->Link[hyd->HydErrLink].ID);
-            else
-                sprintf(pr->Msg, FMT62b, hyd->DisconnectedNodes);
-            writeline(pr, pr->Msg);
-        }
-        else if (hyd->HydErrCause == HYDERR_VALVE)
-        {
-            sprintf(pr->Msg, FMT62c, net->Link[hyd->HydErrLink].ID);
-            writeline(pr, pr->Msg);
-        }
     }
     writehydstat(pr, 0, 0);
+
+    // Junctions with no path to a supply source are a common cause of an
+    // ill-conditioned matrix, so list any the run has (isolation keeps the
+    // marks up to date; without it nothing has marked them yet)
+    if (!hyd->Isolation) hyd->DisconnectedNodes = findconnected(pr);
     if (hyd->DisconnectedNodes > 0 && rpt->Messageflag) listdisconnected(pr);
 }
 
@@ -1480,67 +1469,6 @@ int getclosedlink(Project *pr, int i, char *marked, int *stack)
         if (marked[j] == 2) marked[j] = 0;
     }
     return found;
-}
-
-void findhyderrcause(Project *pr, int errnode)
-/*
-**-------------------------------------------------------------------
-**   Input:   errnode = index of node causing ill-conditioning
-**   Output:  None.
-**   Purpose: Determines why the hydraulic equation matrix became
-**            ill-conditioned at a node and saves the finding for
-**            retrieval through EN_getstatistic. Uses the junction
-**            connectivity marks computed by findconnected() when
-**            the failing trial's coefficients were assembled.
-**
-**   Note:    a disconnected junction has its head fixed by
-**            disconcoeffs(), so its rows cannot lose their pivot
-**            and the DISCONNECTED cause should never occur; it is
-**            kept as a safety net for a defect in the marks.
-**-------------------------------------------------------------------
-*/
-{
-    Network *net = &pr->network;
-    Hydraul *hyd = &pr->hydraul;
-
-    int i, k;
-    Slink *link;
-
-    // Default cause when no better diagnosis can be made
-    hyd->HydErrCause = HYDERR_OTHER;
-    hyd->HydErrNode = errnode;
-    hyd->HydErrLink = 0;
-
-    // Without isolation in effect nothing has marked connectivity yet
-    if (!hyd->Isolation) hyd->DisconnectedNodes = findconnected(pr);
-
-    // Failing node has no path to any tank or reservoir - it belongs
-    // to a group of junctions isolated by closed links
-    if (!hyd->Connected[errnode])
-    {
-        hyd->HydErrCause = HYDERR_DISCONNECTED;
-        hyd->HydErrLink = getclosedlink(pr, errnode, hyd->Connected,
-                                        hyd->ConnNodeList);
-    }
-
-    // Otherwise a control valve attached to the failing node
-    // is the likely culprit (badvalve() has already forced any
-    // such valve that was still ACTIVE)
-    else for (i = 1; i <= net->Nvalves; i++)
-    {
-        k = net->Valve[i].Link;
-        link = &net->Link[k];
-        if (link->N1 == errnode || link->N2 == errnode)
-        {
-            if (link->Type == PRV || link->Type == PSV ||
-                link->Type == FCV)
-            {
-                hyd->HydErrCause = HYDERR_VALVE;
-                hyd->HydErrLink = k;
-            }
-            break;
-        }
-    }
 }
 
 void writelimits(Project *pr, int j1, int j2)

@@ -99,15 +99,7 @@ Public Const EN_MASSBALANCE = 4
 Public Const EN_DEFICIENTNODES = 5
 Public Const EN_DEMANDREDUCTION = 6
 Public Const EN_LEAKAGELOSS = 7
-Public Const EN_HYDERRCAUSE = 8
-Public Const EN_HYDERRNODE = 9
-Public Const EN_HYDERRLINK = 10
-Public Const EN_DISCONNECTEDNODES = 11
-
-Public Const EN_HYDERR_NONE = 0   ' Ill-conditioning causes
-Public Const EN_HYDERR_DISCONNECTED = 1
-Public Const EN_HYDERR_VALVE = 2
-Public Const EN_HYDERR_OTHER = 3
+Public Const EN_DISCONNECTEDNODES = 8
 
 Public Const EN_NODE = 0          ' Component types
 Public Const EN_LINK = 1

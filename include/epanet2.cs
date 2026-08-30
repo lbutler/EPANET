@@ -111,15 +111,7 @@ namespace EpanetCSharpLibrary
         public const int EN_DEFICIENTNODES = 5;
         public const int EN_DEMANDREDUCTION = 6;
         public const int EN_LEAKAGELOSS = 7;
-        public const int EN_HYDERRCAUSE = 8;
-        public const int EN_HYDERRNODE = 9;
-        public const int EN_HYDERRLINK = 10;
-        public const int EN_DISCONNECTEDNODES = 11;
-
-        public const int EN_HYDERR_NONE = 0;   //Ill-conditioning causes
-        public const int EN_HYDERR_DISCONNECTED = 1;
-        public const int EN_HYDERR_VALVE = 2;
-        public const int EN_HYDERR_OTHER = 3;
+        public const int EN_DISCONNECTEDNODES = 8;
 
         public const int EN_NODE = 0;          //Component types
         public const int EN_LINK = 1;

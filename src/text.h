@@ -434,9 +434,6 @@
 
 #define FMT61  "%10s: Valve %s caused ill-conditioning"
 #define FMT62  "%10s: System ill-conditioned at node %s"
-#define FMT62a "            Cause: %d junction(s) disconnected from all tanks and reservoirs because of Link %s"
-#define FMT62b "            Cause: %d junction(s) disconnected from all tanks and reservoirs"
-#define FMT62c "            Cause: inconsistent setting for Valve %s"
 #define FMT63  "%10s: %s %s changed by rule %s"
 #define FMT64  "%10s: Balancing the network:\n"
 #define FMT65  "            Trial %2d: relative flow change = %-.6f"

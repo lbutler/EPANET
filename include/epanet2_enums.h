@@ -161,25 +161,8 @@ typedef enum {
   EN_DEFICIENTNODES    = 5,  //!< Number of pressure deficient nodes
   EN_DEMANDREDUCTION   = 6,  //!< % demand reduction at pressure deficient nodes
   EN_LEAKAGELOSS       = 7,  //!< % flow lost to system leakage
-  EN_HYDERRCAUSE       = 8,  //!< Cause of matrix ill-conditioning (see @ref EN_HydErrCause)
-  EN_HYDERRNODE        = 9,  //!< Index of node where matrix ill-conditioning occurred
-  EN_HYDERRLINK        = 10, //!< Index of link involved in matrix ill-conditioning
-  EN_DISCONNECTEDNODES = 11  //!< Number of junctions cut off from all tanks & reservoirs
+  EN_DISCONNECTEDNODES = 8   //!< Number of junctions with no path to a supply source
 } EN_AnalysisStatistic;
-
-/// Causes of hydraulic matrix ill-conditioning
-/**
-The reasons why the matrix of hydraulic equations became ill-conditioned, causing a
-hydraulic analysis to fail with error 110. The cause of the most recent failure, the
-node where it occurred, and the link involved can be retrieved with
-@ref EN_getstatistic using EN_HYDERRCAUSE, EN_HYDERRNODE and EN_HYDERRLINK.
-*/
-typedef enum {
-  EN_HYDERR_NONE         = 0, //!< No ill-conditioning occurred
-  EN_HYDERR_DISCONNECTED = 1, //!< Node cut off from all tanks & reservoirs by closed links
-  EN_HYDERR_VALVE        = 2, //!< Control valve with a setting that conflicts with the network
-  EN_HYDERR_OTHER        = 3  //!< Cause could not be determined
-} EN_HydErrCause;
 
 /// Types of network objects
 /**

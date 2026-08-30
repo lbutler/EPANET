@@ -308,7 +308,6 @@ These are the toolkit's enumerated types whose members are used as function argu
 \typedef EN_InitHydOption
 \typedef EN_ActionCodeType
 \typedef EN_AnalysisStatistic
-\typedef EN_HydErrCause
 \typedef EN_StatusReport
 \typedef EN_RuleObject
 \typedef EN_RuleVariable

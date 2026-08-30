@@ -107,15 +107,7 @@ const
  EN_DEFICIENTNODES = 5;
  EN_DEMANDREDUCTION = 6;
  EN_LEAKAGELOSS     = 7;
- EN_HYDERRCAUSE     = 8;
- EN_HYDERRNODE      = 9;
- EN_HYDERRLINK      = 10;
- EN_DISCONNECTEDNODES = 11;
-
- EN_HYDERR_NONE         = 0;  { Ill-conditioning causes }
- EN_HYDERR_DISCONNECTED = 1;
- EN_HYDERR_VALVE        = 2;
- EN_HYDERR_OTHER        = 3;
+ EN_DISCONNECTEDNODES = 8;
 
  EN_NODE    = 0;        { Component Types }
  EN_LINK    = 1;

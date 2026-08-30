@@ -322,7 +322,7 @@ void   matrixcoeffs(Project *pr)
     }
 
     // Isolation off: every junction stays in service. (Marks left behind
-    // by a failure diagnosis in findhyderrcause() are cleared here.)
+    // by the listing writehyderr() makes are cleared here.)
     else if (hyd->DisconnectedNodes > 0)
     {
         memset(hyd->Connected, 1, (net->Nnodes + 1) * sizeof(char));

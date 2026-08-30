@@ -111,14 +111,10 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
     hyd->DeficientNodes = 0;
     hyd->DemandReduction = 0.0;
 
-    // Initialize ill-conditioning diagnosis & junction connectivity
-    // marking (re-marked at this time step's first trial, then again
-    // only if mid-trial status changes leave junctions cut off at a
-    // point where the solver would otherwise finish or fail - see
-    // matrixcoeffs() in hydcoeffs.c)
-    hyd->HydErrCause = HYDERR_NONE;
-    hyd->HydErrNode = 0;
-    hyd->HydErrLink = 0;
+    // Initialize junction connectivity marking (re-marked at this time
+    // step's first trial, then again only if mid-trial status changes
+    // leave junctions cut off at a point where the solver would
+    // otherwise finish or fail - see matrixcoeffs() in hydcoeffs.c)
     hyd->DisconnectedNodes = 0;
     hyd->DisconRemark = hyd->Isolation;
     // DisconPinned counts the mid-step connectivity re-marks taken; with
