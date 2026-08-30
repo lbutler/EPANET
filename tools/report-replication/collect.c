@@ -167,6 +167,7 @@ static void finalizeEnergy(RD_ReportData *rd, EnergyAcc *acc, double emax,
     }
     rd->demandCharge = emax * demandChargeRate;
     rd->totalEnergyCost = csum + rd->demandCharge;
+    rd->demandChargeRate = demandChargeRate;
 }
 
 /* --------------------------------------------------------------------------

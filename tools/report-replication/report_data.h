@@ -160,8 +160,15 @@ typedef struct RD_ReportData {
 
     /* ---- energy usage ------------------------------------------------ */
     RD_PumpEnergy *pumpEnergy;  /* [nPumps]                                  */
-    double demandCharge;
-    double totalEnergyCost;
+    double demandCharge;        /* CORRECT value: peak system kW x rate      */
+    double totalEnergyCost;     /* CORRECT value: sum of costs + charge      */
+    /* ENGINE QUIRK (see MISSING_API.md "Engine bugs found"): the native
+       report multiplies the demand charge by the rate twice (savenergy()
+       scales Emax by Dcost when saving the binary epilog, writeenergy()
+       multiplies by Dcost again).  The text renderer mirrors that using
+       this rate so the reports stay byte-identical; other renderers
+       should use the correct values above.                                */
+    double demandChargeRate;
 
     /* ---- solver warnings --------------------------------------------- */
     RD_Warning *warnings;

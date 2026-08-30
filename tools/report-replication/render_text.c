@@ -305,10 +305,17 @@ static void renderEnergy(const RD_ReportData *rd, Sink *sk)
     }
 
     wfill(sk, '-', 63);
-    sprintf(s, "%38s Demand Charge: %9.2f", "", rd->demandCharge);
-    wline(sk, s);
-    sprintf(s, "%38s Total Cost:    %9.2f", "", rd->totalEnergyCost);
-    wline(sk, s);
+    /* mirror the engine's double application of the demand-charge rate
+       (savenergy() already scaled Emax by the rate; writeenergy()
+       multiplies by it again) - see MISSING_API.md "Engine bugs found"  */
+    {
+        double reportedCharge = rd->demandCharge * rd->demandChargeRate;
+        double csum = rd->totalEnergyCost - rd->demandCharge;
+        sprintf(s, "%38s Demand Charge: %9.2f", "", reportedCharge);
+        wline(sk, s);
+        sprintf(s, "%38s Total Cost:    %9.2f", "", csum + reportedCharge);
+        wline(sk, s);
+    }
     wline(sk, " ");
 }
 

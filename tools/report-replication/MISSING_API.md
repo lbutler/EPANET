@@ -173,6 +173,18 @@ storage (#8).
   using the one-shot `EN_solveH`/`EN_solveQ` cannot collect that data at
   all.
 
+## Engine bugs found while replicating
+
+* **Demand Charge is applied twice in the report.**  `savenergy()`
+  (`src/output.c`) scales `hyd->Emax` by the demand-charge rate when writing
+  the binary file's energy epilog; `writeenergy()` (`src/report.c`) then
+  prints `Emax * Dcost` - multiplying by the rate a second time.  With a
+  demand charge of 12.5 on Net1 the report shows 15110.49 instead of the
+  correct 1208.84 (the binary output file holds the correct value).
+  Invisible whenever the rate is 0, which is why no test network catches
+  it.  The replica mirrors the doubled value for byte-parity but stores the
+  correct one in its data model.
+
 ## 10. Still to examine: STATUS YES / FULL  (second pass)
 
 The hydraulic status report needs per-event data the API does not expose.
