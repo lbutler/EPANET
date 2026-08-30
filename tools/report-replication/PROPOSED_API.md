@@ -40,6 +40,11 @@ int EN_getactioncount(EN_Project ph, int *out_count);
 int EN_getaction(EN_Project ph, int index, int *out_actionType,
                  int *out_actionIndex, int *out_linkIndex, long *out_time,
                  int *out_newStatus, double *out_newSetting);
+
+// also needed to reason about pressure switches at all: pswitch() compares
+// head against the control grade +/- HTOL, which any INP can set via
+// [OPTIONS] HTOL but no getter can read back
+EN_HTOL = 27   // new EN_Option code
 ```
 Actions accumulate during `EN_runH` (controls) and `EN_nextH` (rules), and
 reset at the start of each.
@@ -48,8 +53,11 @@ reset at the start of each.
 Expose the internal link state that `EN_STATUS` collapses away.
 **Importance** critical · **Complexity** trivial
 *Why:* `EN_STATUS` maps everything above OPEN to "active", so a valve that
-cannot deliver flow is indistinguishable from one working normally; today the
-raw code is reachable only through an undocumented quirk of `EN_PUMP_STATE`.
+cannot deliver flow is indistinguishable from one working normally. The raw
+code does leak out today — `EN_PUMP_STATE` returns it verbatim for any
+non-pump link — but that is undocumented, and four of the eight states have no
+public name at all, so callers end up hard-coding integers read off a private
+header. What is missing is the contract, not the data.
 
 ```c
 typedef enum {
@@ -120,15 +128,41 @@ EN_STEP_PATTERN = 5,   //!< a demand pattern period boundary
 EN_STEP_RULE    = 6    //!< a rule-based control fired
 ```
 
-### 6. Solver iteration callback
-Observe convergence trial by trial instead of only the final result.
-**Importance** medium · **Complexity** moderate
-*Why:* nothing inside a hydraulic solve is observable — a caller cannot tell
-a run that converged immediately from one that nearly failed.
+### 6. Intra-step status switching
+Count and identify links that change state between solver iterations.
+**Importance** high · **Complexity** small
+*Why:* links switch state *inside* a hydraulic step — `valvestatus()` on every
+trial, `linkstatus()` periodically, `pswitch()` on convergence, `badvalve()` on
+ill-conditioning — and the solver deliberately keeps iterating *because* they
+do; but only the settled state survives the step, so a link that cycled
+open → closed → open is indistinguishable from one that never moved.
 
 ```c
+// after EN_runH: how much status churn did that step take?
+int EN_getstatuschangecount(EN_Project ph, int *out_count);
+int EN_getlinkstatuschanges(EN_Project ph, int linkIndex, int *out_count);
+```
+Per-link counts are what identify an unstable model: a handful of links
+accumulating switches every step is the signature of status cycling, which is
+exactly what the `UNBALANCED` extra-trials option exists to absorb.
+
+### 7. Solver iteration callback
+Watch a hydraulic solve trial by trial, including each state switch.
+**Importance** medium · **Complexity** moderate
+*Why:* the counts in #6 say a model is cycling; this says why — nothing inside
+a solve is observable today, so a run that converged immediately and one that
+thrashed for forty trials look the same from outside.
+
+```c
+typedef enum {
+  EN_SOLVER_TRIAL  = 0,  //!< a trial finished; relativeError is set
+  EN_SOLVER_SWITCH = 1   //!< a link changed state mid-solve
+} EN_SolverEvent;
+
 int EN_setsolvercallback(EN_Project ph,
-        void (*callback)(void *userData, int trial, double relativeError),
+        void (*callback)(void *userData, int eventType, int trial,
+                         double relativeError, int linkIndex,
+                         int oldState, int newState),
         void *userData);
 ```
 
@@ -139,7 +173,7 @@ int EN_setsolvercallback(EN_Project ph,
 Raised during a run or when opening a project. Each is currently either
 unnamed, or reported as a single code that says nothing about the element.
 
-### 7. Per-step warnings
+### 8. Per-step warnings
 List every warning condition raised by a hydraulic step, with the element.
 **Importance** high · **Complexity** moderate
 *Why:* `EN_runH` returns one code even when several conditions fire, and
@@ -151,7 +185,7 @@ int EN_getwarning(EN_Project ph, int index, int *out_code,
                   int *out_objectType, int *out_objectIndex);
 ```
 
-### 8. Disconnected nodes
+### 9. Disconnected nodes
 Name the nodes cut off from any source, and the link responsible.
 **Importance** medium · **Complexity** small
 *Why:* rebuilding this means copying the seeding rule, the one-way test on
@@ -164,7 +198,7 @@ int EN_getdisconnectednode(EN_Project ph, int index, int *out_nodeIndex);
 int EN_getdisconnectinglink(EN_Project ph, int *out_linkIndex);
 ```
 
-### 9. Validation errors naming their elements
+### 10. Validation errors naming their elements
 Say which tank, pump, pattern or curve failed validation.
 **Importance** medium · **Complexity** moderate
 *Why:* `EN_openH` returns a single code for the whole network; recovering the
@@ -176,7 +210,7 @@ int EN_getvalidationerror(EN_Project ph, int index, int *out_code,
                           int *out_objectType, int *out_objectIndex);
 ```
 
-### 10. Non-fatal open warnings
+### 11. Non-fatal open warnings
 Surface problems that `EN_open` currently swallows.
 **Importance** medium · **Complexity** trivial
 *Why:* a missing saved-hydraulics file is written into the report, silently
@@ -188,7 +222,7 @@ int EN_getopenwarningcount(EN_Project ph, int *out_count);
 int EN_getopenwarning(EN_Project ph, int index, int *out_code);
 ```
 
-### 11. Input and rule parse diagnostics
+### 12. Input and rule parse diagnostics
 Report which line of the input file failed to parse and why.
 **Importance** low · **Complexity** moderate
 *Why:* `EN_open` returns only "one or more errors in input file" and leaves
@@ -209,7 +243,7 @@ Lower priority: these are summaries produced once the run finishes, not
 runtime behaviour. Listed because each is either impossible to reconstruct
 or requires copying the engine's accumulation exactly.
 
-### 12. Cumulative pump energy
+### 13. Cumulative pump energy
 Return each pump's end-of-run energy statistics and the system peak demand.
 **Importance** low · **Complexity** small
 *Why:* the API exposes only instantaneous kW, so the totals must be
@@ -235,7 +269,7 @@ EN_PEAKENERGY   = 12,  //!< peak total pumping power, kW
 EN_ENERGYCHARGE = 13   //!< demand charge for that peak
 ```
 
-### 13. System flow balance
+### 14. System flow balance
 Return where the water went over the run: inflow, demand, leakage, storage.
 **Importance** low · **Complexity** trivial
 *Why:* the engine already keeps this as a finalized struct; a caller can only
@@ -257,7 +291,7 @@ typedef enum {
 int EN_getflowbalance(EN_Project ph, int property, double *out_value);
 ```
 
-### 14. Water quality mass balance
+### 15. Water quality mass balance
 Return the mass accounting for a quality run, not just its ratio.
 **Importance** low · **Complexity** trivial
 *Why:* the mass terms are sums over the solver's internal pipe-segment lists,
@@ -277,7 +311,7 @@ typedef enum {
 int EN_getmassbalance(EN_Project ph, int property, double *out_value);
 ```
 
-### 15. Per-link reaction rate
+### 16. Per-link reaction rate
 Return each link's average reaction rate during a quality run.
 **Importance** low · **Complexity** trivial
 *Why:* the engine computes and stores it per link, but no property code
