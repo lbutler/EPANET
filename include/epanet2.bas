@@ -100,6 +100,7 @@ Public Const EN_DEFICIENTNODES = 5
 Public Const EN_DEMANDREDUCTION = 6
 Public Const EN_LEAKAGELOSS = 7
 Public Const EN_DISCONNECTEDNODES = 8
+Public Const EN_ILLCONDITIONEDNODE = 9
 
 Public Const EN_NODE = 0          ' Component types
 Public Const EN_LINK = 1

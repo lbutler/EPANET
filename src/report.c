@@ -1230,9 +1230,9 @@ void writehyderr(Project *pr, int errnode)
 **-----------------------------------------------------------
 **   Input:   errnode = index of node causing ill-conditioning
 **   Output:  none
-**   Purpose: determines the cause of ill-conditioning and
-**            outputs status & checks connectivity when
-**            network hydraulic equations cannot be solved.
+**   Purpose: reports the node at which the network hydraulic
+**            equations could not be solved, along with the run's
+**            status and any junctions left without a supply.
 **-----------------------------------------------------------
 */
 {

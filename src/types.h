@@ -800,6 +800,7 @@ typedef struct {
     OpenHflag,             // Hydraulic system opened flag
     Haltflag,              // Flag to halt simulation
     DeficientNodes,        // Number of pressure deficient nodes
+    IllCondNode,           // Node whose equation could not be factored (error 110)
     DisconnectedNodes,     // Number of junctions cut off from all tanks & reservoirs
     DisconRemark,          // TRUE when junction connectivity must be re-marked
     DisconSig,             // Hash of the junction connectivity marks

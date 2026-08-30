@@ -108,6 +108,7 @@ const
  EN_DEMANDREDUCTION = 6;
  EN_LEAKAGELOSS     = 7;
  EN_DISCONNECTEDNODES = 8;
+ EN_ILLCONDITIONEDNODE = 9;
 
  EN_NODE    = 0;        { Component Types }
  EN_LINK    = 1;

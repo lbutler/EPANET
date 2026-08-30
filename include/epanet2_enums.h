@@ -161,7 +161,8 @@ typedef enum {
   EN_DEFICIENTNODES    = 5,  //!< Number of pressure deficient nodes
   EN_DEMANDREDUCTION   = 6,  //!< % demand reduction at pressure deficient nodes
   EN_LEAKAGELOSS       = 7,  //!< % flow lost to system leakage
-  EN_DISCONNECTEDNODES = 8   //!< Number of junctions with no path to a supply source
+  EN_DISCONNECTEDNODES = 8,  //!< Number of junctions with no path to a supply source
+  EN_ILLCONDITIONEDNODE = 9  //!< Index of a node whose equation could not be factored
 } EN_AnalysisStatistic;
 
 /// Types of network objects

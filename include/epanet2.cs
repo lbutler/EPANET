@@ -112,6 +112,7 @@ namespace EpanetCSharpLibrary
         public const int EN_DEMANDREDUCTION = 6;
         public const int EN_LEAKAGELOSS = 7;
         public const int EN_DISCONNECTEDNODES = 8;
+        public const int EN_ILLCONDITIONEDNODE = 9;
 
         public const int EN_NODE = 0;          //Component types
         public const int EN_LINK = 1;

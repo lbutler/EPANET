@@ -55,6 +55,9 @@ int  openhyd(Project *pr)
     int  errcode = 0;
     Slink *link;
     
+    // No analysis has failed yet in this network
+    pr->hydraul.IllCondNode = 0;
+
     // Check for valid project data (see VALIDATE.C)
     errcode = validateproject(pr);
     if (errcode > 0) return errcode;

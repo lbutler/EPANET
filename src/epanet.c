@@ -1103,6 +1103,10 @@ int DLLEXPORT EN_getstatistic(EN_Project p, int type, double *value)
     case EN_DISCONNECTEDNODES:
         *value = p->hydraul.DisconnectedNodes;
         break;
+
+    case EN_ILLCONDITIONEDNODE:
+        *value = p->hydraul.IllCondNode;
+        break;
     case EN_MASSBALANCE:
         *value = p->quality.MassBalance.ratio;
         break;
@@ -2119,6 +2123,11 @@ int DLLEXPORT EN_deletenode(EN_Project p, int index, int actionCode)
         hashtable_update(net->NodeHashTable, net->Node[i].ID, i);
     }
     if (index < p->quality.TraceNode) (p->quality.TraceNode)--;
+
+    // The last analysis described a network this node was part of, so
+    // its findings no longer apply (cleared rather than re-indexed:
+    // the node it names may be the one being deleted)
+    p->hydraul.IllCondNode = 0;
 
     // If deleted node is a tank, remove it from the Tank array
     if (nodeType != EN_JUNCTION)

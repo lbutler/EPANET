@@ -111,10 +111,12 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
     hyd->DeficientNodes = 0;
     hyd->DemandReduction = 0.0;
 
-    // Initialize junction connectivity marking (re-marked at this time
-    // step's first trial, then again only if mid-trial status changes
-    // leave junctions cut off at a point where the solver would
-    // otherwise finish or fail - see matrixcoeffs() in hydcoeffs.c)
+    // Initialize the ill-conditioned node & junction connectivity
+    // marking (re-marked at this time step's first trial, then again
+    // only if mid-trial status changes leave junctions cut off at a
+    // point where the solver would otherwise finish or fail - see
+    // matrixcoeffs() in hydcoeffs.c)
+    hyd->IllCondNode = 0;
     hyd->DisconnectedNodes = 0;
     hyd->DisconRemark = hyd->Isolation;
     // DisconPinned counts the mid-step connectivity re-marks taken; with
@@ -235,7 +237,10 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
     // Iterations ended - report any errors.
     if (errcode > 0)
     {
-        writehyderr(pr, sm->Order[errcode]);    // Ill-conditioned matrix error
+        // linsolve() returned the matrix row that lost its pivot; Order[]
+        // maps it back to the junction whose equation it is
+        hyd->IllCondNode = sm->Order[errcode];
+        writehyderr(pr, hyd->IllCondNode);       // Ill-conditioned matrix error
         errcode = 110;
     }
 

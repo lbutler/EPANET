@@ -303,6 +303,10 @@ BOOST_FIXTURE_TEST_CASE(test_no_disconnection, FixtureOpenClose)
     error = EN_getstatistic(ph, EN_DISCONNECTEDNODES, &value);
     BOOST_REQUIRE(error == 0);
     BOOST_REQUIRE(value == 0);
+
+    error = EN_getstatistic(ph, EN_ILLCONDITIONEDNODE, &value);
+    BOOST_REQUIRE(error == 0);
+    BOOST_REQUIRE(value == 0);
 }
 
 BOOST_AUTO_TEST_CASE(test_isolation_off_by_default)
@@ -326,6 +330,15 @@ BOOST_AUTO_TEST_CASE(test_isolation_off_by_default)
     BOOST_REQUIRE(error == 0);
     BOOST_REQUIRE(EN_solveH(ph) == 110);
     BOOST_REQUIRE(statistic(ph, EN_DISCONNECTEDNODES) == 2);
+
+    // The failing equation's node is retrievable rather than only
+    // printed, so a caller can point at it without parsing the report.
+    // Which member of the offending group the solver stops on depends on
+    // the equation ordering, so only require that it is one of them.
+    int j3, j4, errnode = (int)statistic(ph, EN_ILLCONDITIONEDNODE);
+    BOOST_REQUIRE(EN_getnodeindex(ph, (char *)"J3", &j3) == 0);
+    BOOST_REQUIRE(EN_getnodeindex(ph, (char *)"J4", &j4) == 0);
+    BOOST_REQUIRE(errnode == j3 || errnode == j4);
     BOOST_REQUIRE(nodevalue(ph, "J3", EN_ISOLATED) == 0);
 
     // Turning it on solves the same network with the island out of service
@@ -333,6 +346,7 @@ BOOST_AUTO_TEST_CASE(test_isolation_off_by_default)
     BOOST_REQUIRE(error == 0);
     BOOST_REQUIRE(EN_solveH(ph) == 3);
     BOOST_REQUIRE(nodevalue(ph, "J3", EN_ISOLATED) == 1);
+    BOOST_REQUIRE(statistic(ph, EN_ILLCONDITIONEDNODE) == 0);
 
     // Only the two flag values are accepted
     BOOST_REQUIRE(EN_setoption(ph, EN_ISOLATION, 2) == 213);
