@@ -1,0 +1,64 @@
+[TITLE]
+Disconnected island -> Error 110 (all-default hydraulic options)
+Island = J3,J4 (ZERO demand), joined by 12 parallel OPEN pipes, cut off from
+the reservoir by CLOSED pipes PC1,PC2. At trial 2 the island pipes carry
+near-zero flow so each gets conductance capped at Hexp/RQtol ~ 1.852e7;
+12 in parallel ~ 2.22e8, while the closed pipes couple the island to the
+rest at only 1/CBIG = 1e-8. The exact Schur-complement pivot for the second
+island node is ~2e-8, below one ulp of 2.22e8 (~3e-8), so floating-point
+cancellation in sparse Cholesky drives it non-positive -> linsolve reports
+ill-conditioning -> Error 110. (A single internal open pipe does NOT fail:
+its pivot residual 2e-8 exceeds the ~2e-9 rounding at the 1.852e7 scale.)
+
+[JUNCTIONS]
+;ID    Elev    Demand
+ J1    100     50
+ J2    100     50
+ J3    100     0
+ J4    100     0
+
+[RESERVOIRS]
+;ID    Head
+ R1    200
+
+[PIPES]
+;ID    Node1   Node2   Length  Diam  Rough  Mloss  Status
+ P1    R1      J1      1000    12    100    0      Open
+ P2    J1      J2      1000    12    100    0      Open
+ PC1   J2      J3      1000    12    100    0      Closed
+ PC2   J4      J1      1000    12    100    0      Closed
+ PI1   J3      J4      1000    12    100    0      Open
+ PI2   J3      J4      1000    12    100    0      Open
+ PI3   J3      J4      1000    12    100    0      Open
+ PI4   J3      J4      1000    12    100    0      Open
+ PI5   J3      J4      1000    12    100    0      Open
+ PI6   J3      J4      1000    12    100    0      Open
+ PI7   J3      J4      1000    12    100    0      Open
+ PI8   J3      J4      1000    12    100    0      Open
+ PI9   J3      J4      1000    12    100    0      Open
+ PI10  J3      J4      1000    12    100    0      Open
+ PI11  J3      J4      1000    12    100    0      Open
+ PI12  J3      J4      1000    12    100    0      Open
+
+[STATUS]
+;ID    Status
+ PC1   Closed
+ PC2   Closed
+
+[REPORT]
+ Status    Full
+ Summary   Yes
+ Messages  Yes
+ Nodes     All
+ Links     All
+
+[OPTIONS]
+ Units     GPM
+ Headloss  H-W
+ Trials    40
+ Accuracy  0.001
+
+[TIMES]
+ Duration  0
+
+[END]

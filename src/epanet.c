@@ -1097,8 +1097,20 @@ int DLLEXPORT EN_getstatistic(EN_Project p, int type, double *value)
     case EN_DEMANDREDUCTION:
         *value = p->hydraul.DemandReduction;
         break;
-    case EN_LEAKAGELOSS:    
+    case EN_LEAKAGELOSS:
         *value = p->hydraul.LeakageLoss;
+        break;
+    case EN_HYDERRCAUSE:
+        *value = p->hydraul.HydErrCause;
+        break;
+    case EN_HYDERRNODE:
+        *value = p->hydraul.HydErrNode;
+        break;
+    case EN_HYDERRLINK:
+        *value = p->hydraul.HydErrLink;
+        break;
+    case EN_DISCONNECTEDNODES:
+        *value = p->hydraul.DisconnectedNodes;
         break;
     case EN_MASSBALANCE:
         *value = p->quality.MassBalance.ratio;

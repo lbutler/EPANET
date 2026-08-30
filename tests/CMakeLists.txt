@@ -37,6 +37,7 @@ set(toolkit_test_srcs
      test_pattern.cpp
      test_curve.cpp
      test_control.cpp
+     test_hyderror.cpp
      test_overflow.cpp
      test_pda.cpp
      test_valve.cpp

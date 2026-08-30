@@ -105,6 +105,12 @@ int  hydsolve(Project *pr, int *iter, double *relerr)
     hyd->DeficientNodes = 0;
     hyd->DemandReduction = 0.0;
 
+    // Initialize ill-conditioning diagnosis
+    hyd->HydErrCause = HYDERR_NONE;
+    hyd->HydErrNode = 0;
+    hyd->HydErrLink = 0;
+    hyd->DisconnectedNodes = 0;
+
     // Repeat iterations until convergence or trial limit is exceeded.
     // (ExtraIter used to increase trials in case of status cycling.)
     if (rpt->Statflag == FULL) writerelerr(pr, 0, 0);

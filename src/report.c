@@ -44,8 +44,10 @@ static void writelinktable(Project *, Pfloat *);
 static void writeenergy(Project *);
 static int  writeresults(Project *);
 static int  disconnected(Project *);
+static int  marksources(Project *, int *, char *);
 static void marknodes(Project *, int, int *, char *);
-static void getclosedlink(Project *, int, char *, int *);
+static int  getclosedlink(Project *, int, char *, int *);
+static void findhyderrcause(Project *, int);
 static void writelimits(Project *, int, int);
 static int  checklimits(Report *, double *, int, int);
 static char *fillstr(char *, char, int);
@@ -1219,24 +1221,41 @@ int writehydwarn(Project *pr, int iter, double relerr)
 void writehyderr(Project *pr, int errnode)
 /*
 **-----------------------------------------------------------
-**   Input:   none
+**   Input:   errnode = index of node causing ill-conditioning
 **   Output:  none
-**   Purpose: outputs status & checks connectivity when
+**   Purpose: determines the cause of ill-conditioning and
+**            outputs status & checks connectivity when
 **            network hydraulic equations cannot be solved.
 **-----------------------------------------------------------
 */
 {
     Network *net = &pr->network;
+    Hydraul *hyd = &pr->hydraul;
     Report  *rpt = &pr->report;
     Times   *time = &pr->times;
 
     Snode *Node = net->Node;
 
+    findhyderrcause(pr, errnode);
     if (rpt->Messageflag)
     {
         sprintf(pr->Msg, FMT62, clocktime(rpt->Atime, time->Htime),
                 Node[errnode].ID);
         writeline(pr, pr->Msg);
+        if (hyd->HydErrCause == HYDERR_DISCONNECTED)
+        {
+            if (hyd->HydErrLink > 0)
+                sprintf(pr->Msg, FMT62a, hyd->DisconnectedNodes,
+                        net->Link[hyd->HydErrLink].ID);
+            else
+                sprintf(pr->Msg, FMT62b, hyd->DisconnectedNodes);
+            writeline(pr, pr->Msg);
+        }
+        else if (hyd->HydErrCause == HYDERR_VALVE)
+        {
+            sprintf(pr->Msg, FMT62c, net->Link[hyd->HydErrLink].ID);
+            writeline(pr, pr->Msg);
+        }
     }
     writehydstat(pr, 0, 0);
     disconnected(pr);
@@ -1257,7 +1276,7 @@ int disconnected(Project *pr)
     Report  *rpt = &pr->report;
     Times   *time = &pr->times;
 
-    int i, j;
+    int i, j, k;
     int count, mcount;
     int errcode = 0;
     int *nodelist;
@@ -1278,28 +1297,9 @@ int disconnected(Project *pr)
         return (0);
     }
 
-    // Place tanks on node list and marked list
-    for (i = 1; i <= net->Ntanks; i++)
-    {
-        j = net->Njuncs + i;
-        nodelist[i] = j;
-        marked[j] = 1;
-    }
-
-    // Place junctions with negative demands on the lists
-    mcount = net->Ntanks;
-    for (i = 1; i <= net->Njuncs; i++)
-    {
-        if (hyd->NodeDemand[i] < 0.0)
-        {
-            mcount++;
-            nodelist[mcount] = i;
-            marked[i] = 1;
-        }
-    }
-
     // Mark all nodes that can be connected to tanks
     // and count number of nodes remaining unmarked
+    mcount = marksources(pr, nodelist, marked);
     marknodes(pr, mcount, nodelist, marked);
     j = 0;
     count = 0;
@@ -1329,13 +1329,56 @@ int disconnected(Project *pr)
                     clocktime(rpt->Atime, time->Htime));
             writeline(pr, pr->Msg);
         }
-        getclosedlink(pr, j, marked, nodelist);
+        k = getclosedlink(pr, j, marked, nodelist);
+        if (k > 0)
+        {
+            sprintf(pr->Msg, WARN03c, net->Link[k].ID);
+            writeline(pr, pr->Msg);
+        }
     }
 
     // Free allocated memory
     free(nodelist);
     free(marked);
     return count;
+}
+
+int marksources(Project *pr, int *nodelist, char *marked)
+/*
+**----------------------------------------------------------------
+**   Input:   nodelist[] = array to hold source nodes
+**            marked[]   = TRUE if node is a source
+**   Output:  Returns number of source nodes found
+**   Purpose: Places all source nodes (tanks, reservoirs &
+**            junctions with net inflow) on a node list.
+**----------------------------------------------------------------
+*/
+{
+    Network *net = &pr->network;
+    Hydraul *hyd = &pr->hydraul;
+
+    int i, j, mcount;
+
+    // Place tanks on node list and marked list
+    for (i = 1; i <= net->Ntanks; i++)
+    {
+        j = net->Njuncs + i;
+        nodelist[i] = j;
+        marked[j] = 1;
+    }
+
+    // Place junctions with negative demands on the lists
+    mcount = net->Ntanks;
+    for (i = 1; i <= net->Njuncs; i++)
+    {
+        if (hyd->NodeDemand[i] < 0.0)
+        {
+            mcount++;
+            nodelist[mcount] = i;
+            marked[i] = 1;
+        }
+    }
+    return mcount;
 }
 
 void marknodes(Project *pr, int m, int *nodelist, char *marked)
@@ -1392,13 +1435,14 @@ void marknodes(Project *pr, int m, int *nodelist, char *marked)
     }
 }
 
-void getclosedlink(Project *pr, int i, char *marked, int *stack)
+int getclosedlink(Project *pr, int i, char *marked, int *stack)
 /*
 **----------------------------------------------------------------
 **   Input:   i = junction index
 **            marked[] = marks nodes already examined
 **            stack[] = stack to hold nodes to examine
-**   Output:  None.
+**   Output:  Returns index of a closed link connecting junction i
+**            to the connected portion of the network (0 if none).
 **   Purpose: Determines if a closed link connects to junction i.
 **----------------------------------------------------------------
 */
@@ -1417,7 +1461,7 @@ void getclosedlink(Project *pr, int i, char *marked, int *stack)
     while (top >= 0) {
         i = stack[top--];
         alink = net->Adjlist[i];
-        
+
         // Iterate through each link adjacent to the current node
         while (alink != NULL) {
             k = alink->link;
@@ -1429,11 +1473,9 @@ void getclosedlink(Project *pr, int i, char *marked, int *stack)
                 continue;
             }
 
-            // If a closed link is found, return and display a warning message
+            // If a closed link is found, return its index
             if (marked[j] == 1) {
-                sprintf(pr->Msg, WARN03c, net->Link[k].ID);
-                writeline(pr, pr->Msg);
-                return;
+                return k;
             }
 
             // Mark the node as examined and push it onto the stack
@@ -1442,7 +1484,96 @@ void getclosedlink(Project *pr, int i, char *marked, int *stack)
             alink = alink->next;
         }
     }
+    return 0;
+}
 
+void findhyderrcause(Project *pr, int errnode)
+/*
+**-------------------------------------------------------------------
+**   Input:   errnode = index of node causing ill-conditioning
+**   Output:  None.
+**   Purpose: Determines why the hydraulic equation matrix became
+**            ill-conditioned at a node and saves the finding for
+**            retrieval through EN_getstatistic.
+**-------------------------------------------------------------------
+*/
+{
+    Network *net = &pr->network;
+    Hydraul *hyd = &pr->hydraul;
+
+    int i, j, k, mcount;
+    int *nodelist;
+    char *marked;
+    Slink *link;
+
+    // Default cause when no better diagnosis can be made
+    hyd->HydErrCause = HYDERR_OTHER;
+    hyd->HydErrNode = errnode;
+    hyd->HydErrLink = 0;
+    hyd->DisconnectedNodes = 0;
+
+    // Allocate memory for node list & marked list
+    nodelist = (int *)calloc(net->Nnodes + 1, sizeof(int));
+    marked = (char *)calloc(net->Nnodes + 1, sizeof(char));
+    if (nodelist != NULL && marked != NULL)
+    {
+        // Mark all nodes reachable from a source node through
+        // non-closed links (the head-pinned node of an active
+        // PRV or PSV also acts as a source since its matrix row
+        // cannot lose its pivot)
+        mcount = marksources(pr, nodelist, marked);
+        for (i = 1; i <= net->Nvalves; i++)
+        {
+            k = net->Valve[i].Link;
+            link = &net->Link[k];
+            if (hyd->LinkStatus[k] != ACTIVE) continue;
+            if (link->Type == PRV) j = link->N2;
+            else if (link->Type == PSV) j = link->N1;
+            else continue;
+            if (!marked[j])
+            {
+                mcount++;
+                nodelist[mcount] = j;
+                marked[j] = 1;
+            }
+        }
+        marknodes(pr, mcount, nodelist, marked);
+
+        // Failing node has no path to any source - it belongs to
+        // a group of junctions isolated by closed links
+        if (!marked[errnode])
+        {
+            hyd->HydErrCause = HYDERR_DISCONNECTED;
+            for (i = 1; i <= net->Njuncs; i++)
+            {
+                if (!marked[i]) hyd->DisconnectedNodes++;
+            }
+            hyd->HydErrLink = getclosedlink(pr, errnode, marked, nodelist);
+        }
+
+        // Otherwise a control valve attached to the failing node
+        // is the likely culprit (badvalve() has already forced any
+        // such valve that was still ACTIVE)
+        else for (i = 1; i <= net->Nvalves; i++)
+        {
+            k = net->Valve[i].Link;
+            link = &net->Link[k];
+            if (link->N1 == errnode || link->N2 == errnode)
+            {
+                if (link->Type == PRV || link->Type == PSV ||
+                    link->Type == FCV)
+                {
+                    hyd->HydErrCause = HYDERR_VALVE;
+                    hyd->HydErrLink = k;
+                }
+                break;
+            }
+        }
+    }
+
+    // Free allocated memory
+    free(nodelist);
+    free(marked);
 }
 
 void writelimits(Project *pr, int j1, int j2)

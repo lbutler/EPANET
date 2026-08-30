@@ -39,6 +39,8 @@ This document describes the changes and updates that have been made in version 2
 
  - `EN_SET_CLOSED` and `EN_SET_OPEN` constants were added that can be used with `EN_setcontrol` to fix the status of pipes and valves to completely closed or completely open.
 
+ - When a hydraulic analysis fails with error 110 (ill-conditioned hydraulic equations) the engine now diagnoses the cause of the failure. `EN_HYDERRCAUSE`, `EN_HYDERRNODE`, `EN_HYDERRLINK` and `EN_DISCONNECTEDNODES` can be used with `EN_getstatistic` to retrieve the cause of the failure (a group of junctions disconnected from all tanks and reservoirs by closed links, a control valve with a conflicting setting, or undetermined - see `EN_HydErrCause`), the node where the failure occurred, the link involved, and the number of disconnected junctions. The Status Report's ill-conditioning message now includes the same diagnosis.
+
  - `EN_STATUS_REPORT` can now be used with `EN_getoption` and `EN_setoption` to get or set the type of status report that EPANET will generate (`EN_NO_REPORT`, `EN_NORMAL_REPORT` or `EN_FULL_REPORT`).  
 
  - `EN_PRESS_UNITS` can now be used with `EN_getoption` and `EN_setoption` to get or set a project's pressure units. The choices are EN_PSI, EN_KPA, EN_METERS, EN_BAR, or EN_FEET.
