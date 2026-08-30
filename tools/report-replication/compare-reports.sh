@@ -71,16 +71,37 @@ for inp in "${INPS[@]}"; do
         pass=$((pass+1))
         rm -f "$OUTDIR/$name.diff"
     else
-        # classify: a diff whose native-only lines are all lines the API
-        # provably cannot supply (WARNING lines, water quality mass balance
-        # mass terms - see MISSING_API.md) is a documented gap, not a bug
-        if awk '/^-/ && !/^---/ { line=substr($0,2);
-                 gsub(/^[[:space:]]+|[[:space:]]+$/, "", line);
-                 if (line != "" && line !~ /^WARNING:/ &&
-                     line !~ /^(Initial Mass|Mass Inflow|Mass Outflow|Mass Reacted|Final Mass|Total Segments):/) exit 1 }
-               /^\+/ && !/^\+\+\+/ { line=substr($0,2);
-                 gsub(/^[[:space:]]+|[[:space:]]+$/, "", line);
-                 if (line != "") exit 1 }' "$OUTDIR/$name.diff"; then
+        # Classify. A diff is a documented API gap - not a bug - when every
+        # native-only line is one the toolkit provably cannot supply, and the
+        # replica adds nothing of its own. The unreachable kinds are:
+        #   WARNING: ...                      disconnected-node warnings (#4)
+        #   Initial Mass / Mass Inflow / ...  quality mass balance      (#11)
+        #   <t>: Balancing the network:       FMT64  solver trace       (#12)
+        #   Trial  N: relative flow change    FMT65  solver trace       (#12)
+        #   maximum  flow change/head error   FMT66/67/68               (#12)
+        #   <type> <id> switched from A to B  FMT57  intra-iteration    (#12)
+        #   <type> <id> setting changed to N  FMT56  intra-iteration    (#12)
+        #   <t>: Valve <id> caused ill-cond.  FMT61                     (#12)
+        if awk '
+            /^-/ && !/^---/ {
+                line=substr($0,2)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+                if (line == "") next
+                if (line ~ /^WARNING:/) next
+                if (line ~ /^(Initial Mass|Mass Inflow|Mass Outflow|Mass Reacted|Final Mass|Total Segments):/) next
+                if (line ~ /^[0-9]+:[0-9][0-9]:[0-9][0-9]: Balancing the network:$/) next
+                if (line ~ /^Trial +[0-9]+: relative flow change =/) next
+                if (line ~ /^maximum +(flow change|head error) +=.*for (Link|Node) /) next
+                if (line ~ / switched from .* to /) next
+                if (line ~ / setting changed to /) next
+                if (line ~ /caused ill-conditioning$/) next
+                exit 1
+            }
+            /^\+/ && !/^\+\+\+/ {
+                line=substr($0,2)
+                gsub(/^[[:space:]]+|[[:space:]]+$/, "", line)
+                if (line != "") exit 1
+            }' "$OUTDIR/$name.diff"; then
             gap=$((gap+1)); GAPPED+=("$name")
         else
             fail=$((fail+1)); FAILED+=("$name")

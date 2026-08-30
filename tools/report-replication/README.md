@@ -77,13 +77,27 @@ Against the 3 bundled example networks plus the 56 networks of
 | `--status no` on the 65-network `make-variants.sh` corpus | **65** | 0 | 0 |
 | `--status yes` | **46** | 13 | 0 |
 | `--status yes` on the `make-variants.sh` corpus | **46** | 19 | 0 |
+| `--status full` | 0 | **59** | 0 |
 | as-is (each INP's own setting; 32 request `STATUS FULL`) | 20 | 7 | 32 |
 
 "api-gap only" means every remaining difference is a line the API provably
 cannot supply - at `STATUS YES` that is exclusively the six water quality
-mass-balance lines (MISSING_API.md #11).  The 32 as-is mismatches are the
-`STATUS FULL` networks, whose per-trial solver trace is the next pass
-(MISSING_API.md #12).
+mass-balance lines (MISSING_API.md #11); at `STATUS FULL` it is those plus
+the solver's per-trial trace (#12), which is written between solver
+iterations where the toolkit offers no hook at all.  In every mode the
+replica invents nothing: there is never a line in the replica that the
+engine did not write.
+
+The as-is row predates the FULL classification and is kept because it shows
+what a user gets running each INP exactly as shipped.
+
+`line-coverage.sh <compare-reports outdir>...` answers the complementary
+question - across everything that was run, which *kinds* of line has the
+replica never managed to produce:
+
+```
+tools/report-replication/line-coverage.sh out-full out-yes out-no
+```
 
 Verified byte-identical so far: logo/banner; input summary (all option
 lines, minutes-vs-hours time units, quality variants incl. TRACE headers,

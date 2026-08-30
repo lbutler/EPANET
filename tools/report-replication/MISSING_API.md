@@ -14,10 +14,23 @@ regression corpus (59 networks total).
 |--------------|-----------------------------|
 | `STATUS NO`  | **59 / 59 byte-identical** (also with `NODES ALL`, `LINKS ALL`, `ENERGY YES` forced on, and on the 65-network `make-variants.sh` corpus) |
 | `STATUS YES` | **46 / 59 byte-identical**; the other 13 differ *only* by the six water quality mass-balance lines of gap #11. On the variant corpus (which adds PDA, timer/clocktime controls, pagination, AGE quality and priced energy): 46 identical, 19 mass-balance-only, 0 mismatched |
-| `STATUS FULL`| not implemented - see #12 |
+| `STATUS FULL`| **59 / 59 reach "api-gap only"**: every line the replica cannot produce is one the API provably cannot supply (the solver trace of #12 plus #11), and the replica invents nothing |
 
 Getting there required every workaround documented below: the gaps are real
 even where the replication now succeeds.
+
+**The API's real boundary is data, not text.**  `EN_setreportcallback`
+intercepts `writeline()`, so a caller can capture *every* line the engine
+writes - including the STATUS FULL solver trace and the mass balance it
+cannot otherwise reach - as pre-formatted strings.  What it cannot get is
+the *data* behind those strings: which link, which trial, what value.  A
+consumer that wants the report in another format (HTML, JSON, a table) is
+therefore forced to re-parse EPANET's fixed-width text.  Two further
+catches: installing the callback **diverts** output, so the report file is
+left with only the pre-callback logo (measured: 486 bytes on Net1), and the
+callback receives lines without `writeline()`'s `"\n  "` prefix while some
+formats carry their own embedded newlines.  Every gap below should be read
+as "not available as data".
 
 Legend: **GAP** = value cannot be obtained through the public API.
 **WORKAROUND** = obtainable, but only by duplicating engine internals or
@@ -287,18 +300,40 @@ one gap into a whole-file mismatch.
 *Suggested API:* `EN_getmassbalance(ph, code, *value)` for the five mass
 terms plus a segment count (or extra `EN_getstatistic` codes).
 
-## 12. Still to examine: STATUS FULL  (next pass)
+## 12. STATUS FULL: the solver trace is invisible to the API  (GAP)
 
-`STATUS FULL` adds a per-trial solver trace that the API cannot see at all.
-Measured against the 32 corpus networks whose INP files request it, exactly
-these line kinds are missing:
+`STATUS FULL` is `STATUS YES` plus a per-trial solver trace.  Everything
+`STATUS YES` covers still replicates at FULL, and running the whole corpus
+at `--status full` classifies all 59 networks as *api-gap only* with **no
+replica-invented lines** - so the trace below is precisely, and only, what
+is missing.  Every one of these lines is written from inside a single
+`EN_runH` call, between the solver's iterations, and the toolkit exposes no
+solver callback or iteration hook of any kind (the only callback is
+`EN_setreportcallback`, which yields formatted text - see the note at the
+top of this file).  Measured over the corpus:
 
 | Line | Blocking gap |
 |------|--------------|
 | FMT64 "Balancing the network:" + FMT65 "Trial N: relative flow change = x" | per-iteration convergence values; `EN_getstatistic(EN_RELATIVEERROR)` only reports the final trial - suggest a solver iteration callback |
 | FMT67/68 "maximum flow change = x for Link Y" / "maximum head error = x for Link Y" | `EN_getstatistic(EN_MAXFLOWCHANGE / EN_MAXHEADERROR)` give the values but not the elements - suggest `EN_MAXFLOWCHANGELINK` / `EN_MAXHEADERRORLINK` |
 | FMT56/57 intra-iteration setting/status switches | invisible to the API - same solver callback |
-| FMT61 valve ill-conditioning | no event |
+| FMT61 valve ill-conditioning | no event; not triggered by any corpus network |
 
-Everything else in those reports already matches, so closing the four rows
-above would finish `STATUS FULL`.
+Empirical tally of the missing lines across the corpus at `--status full`
+(from `line-coverage.sh`): 4 440 `Trial N: relative flow change`, 1 804
+`maximum head error ... for Link`, 1 801 `maximum flow change ... for
+Link`, 3 the `for Node` variant, 1 795 `Balancing the network:`, and 70
+`<type> <id> switched from A to B`.  No `setting changed to` (FMT56) or
+`caused ill-conditioning` (FMT61) line is exercised by any corpus network,
+so those two remain untested.
+
+One near-miss worth noting: the *values* in FMT66/67/68 are exposed -
+`EN_getstatistic(EN_MAXFLOWCHANGE / EN_MAXHEADERROR)` returns exactly the
+`hbal->maxflowchange`/`maxheaderror` those lines print (`src/hydsolver.c`
+assigns `hyd->MaxFlowChange`/`MaxHeadError` from the same struct).  Only the
+**element indexes** `maxflowlink` / `maxflownode` / `maxheadlink` are
+withheld, and `reporthydbal()` can fire more than once per step.  Adding
+`EN_MAXFLOWCHANGELINK` / `EN_MAXHEADERRORLINK` statistics would close two of
+the four rows on its own.
+
+Closing the four rows above would finish `STATUS FULL`.
