@@ -1,0 +1,34 @@
+[TITLE]
+Junction J2 fed only through an ACTIVE FCV. Not an island: the valve
+physically delivers its flow setting, so disconnection handling must
+leave this network entirely alone (rule: active FCVs are passable).
+
+[JUNCTIONS]
+;ID    Elev    Demand
+ J1    100     0
+ J2    80      10
+
+[RESERVOIRS]
+;ID    Head
+ R1    200
+
+[PIPES]
+;ID    Node1   Node2   Length  Diam  Rough  Mloss  Status
+ P1    R1      J1      1000    12    130    0      Open
+
+[VALVES]
+;ID    Node1  Node2  Diameter  Type  Setting  MinorLoss
+ V1    J1     J2     12        FCV   10       0
+
+[REPORT]
+ Status    Full
+ Messages  Yes
+
+[OPTIONS]
+ Units     GPM
+ Headloss  H-W
+
+[TIMES]
+ Duration  0
+
+[END]

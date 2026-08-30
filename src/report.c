@@ -1531,86 +1531,55 @@ void findhyderrcause(Project *pr, int errnode)
 **   Output:  None.
 **   Purpose: Determines why the hydraulic equation matrix became
 **            ill-conditioned at a node and saves the finding for
-**            retrieval through EN_getstatistic.
+**            retrieval through EN_getstatistic. Uses the junction
+**            connectivity marks computed by findconnected() when
+**            the failing trial's coefficients were assembled.
+**
+**   Note:    a disconnected junction has its head fixed by
+**            disconcoeffs(), so its rows cannot lose their pivot
+**            and the DISCONNECTED cause should never occur; it is
+**            kept as a safety net for a defect in the marks.
 **-------------------------------------------------------------------
 */
 {
     Network *net = &pr->network;
     Hydraul *hyd = &pr->hydraul;
 
-    int i, j, k, mcount;
-    int *nodelist;
-    char *marked;
+    int i, k;
     Slink *link;
 
     // Default cause when no better diagnosis can be made
     hyd->HydErrCause = HYDERR_OTHER;
     hyd->HydErrNode = errnode;
     hyd->HydErrLink = 0;
-    hyd->DisconnectedNodes = 0;
 
-    // Allocate memory for node list & marked list
-    nodelist = (int *)calloc(net->Nnodes + 1, sizeof(int));
-    marked = (char *)calloc(net->Nnodes + 1, sizeof(char));
-    if (nodelist != NULL && marked != NULL)
+    // Failing node has no path to any tank or reservoir - it belongs
+    // to a group of junctions isolated by closed links
+    if (!hyd->Connected[errnode])
     {
-        // Mark all nodes reachable from a source node through
-        // non-closed links (the head-pinned node of an active
-        // PRV or PSV also acts as a source since its matrix row
-        // cannot lose its pivot)
-        mcount = marksources(pr, nodelist, marked);
-        for (i = 1; i <= net->Nvalves; i++)
-        {
-            k = net->Valve[i].Link;
-            link = &net->Link[k];
-            if (hyd->LinkStatus[k] != ACTIVE) continue;
-            if (link->Type == PRV) j = link->N2;
-            else if (link->Type == PSV) j = link->N1;
-            else continue;
-            if (!marked[j])
-            {
-                mcount++;
-                nodelist[mcount] = j;
-                marked[j] = 1;
-            }
-        }
-        marknodes(pr, mcount, nodelist, marked);
-
-        // Failing node has no path to any source - it belongs to
-        // a group of junctions isolated by closed links
-        if (!marked[errnode])
-        {
-            hyd->HydErrCause = HYDERR_DISCONNECTED;
-            for (i = 1; i <= net->Njuncs; i++)
-            {
-                if (!marked[i]) hyd->DisconnectedNodes++;
-            }
-            hyd->HydErrLink = getclosedlink(pr, errnode, marked, nodelist);
-        }
-
-        // Otherwise a control valve attached to the failing node
-        // is the likely culprit (badvalve() has already forced any
-        // such valve that was still ACTIVE)
-        else for (i = 1; i <= net->Nvalves; i++)
-        {
-            k = net->Valve[i].Link;
-            link = &net->Link[k];
-            if (link->N1 == errnode || link->N2 == errnode)
-            {
-                if (link->Type == PRV || link->Type == PSV ||
-                    link->Type == FCV)
-                {
-                    hyd->HydErrCause = HYDERR_VALVE;
-                    hyd->HydErrLink = k;
-                }
-                break;
-            }
-        }
+        hyd->HydErrCause = HYDERR_DISCONNECTED;
+        hyd->HydErrLink = getclosedlink(pr, errnode, hyd->Connected,
+                                        hyd->ConnNodeList);
     }
 
-    // Free allocated memory
-    free(nodelist);
-    free(marked);
+    // Otherwise a control valve attached to the failing node
+    // is the likely culprit (badvalve() has already forced any
+    // such valve that was still ACTIVE)
+    else for (i = 1; i <= net->Nvalves; i++)
+    {
+        k = net->Valve[i].Link;
+        link = &net->Link[k];
+        if (link->N1 == errnode || link->N2 == errnode)
+        {
+            if (link->Type == PRV || link->Type == PSV ||
+                link->Type == FCV)
+            {
+                hyd->HydErrCause = HYDERR_VALVE;
+                hyd->HydErrLink = k;
+            }
+            break;
+        }
+    }
 }
 
 void writelimits(Project *pr, int j1, int j2)

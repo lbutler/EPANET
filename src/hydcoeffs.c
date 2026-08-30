@@ -43,7 +43,9 @@ const double CBIG   = 1.e8;
 //void   demandheadloss(Project *, int, double, double, double *, double *);
 
 // Local functions
-static int     linkcoupled(Project *pr, int k);
+static int     linkpassable(Project *pr, int k);
+static void    disconflows(Project *pr);
+static double  islandhead(Project *pr, int *nodelist, int m);
 static void    linkcoeffs(Project *pr);
 static void    nodecoeffs(Project *pr);
 static void    valvecoeffs(Project *pr);
@@ -308,21 +310,17 @@ void   matrixcoeffs(Project *pr)
     memset(sm->F, 0, (net->Nnodes + 1) * sizeof(double));
     memset(hyd->Xflow, 0, (net->Nnodes + 1) * sizeof(double));
 
-    // When disconnected junctions are being isolated, re-mark them
-    // (link statuses may have changed) & adjust junction demands:
-    // an isolated junction delivers no demand while a connected one
-    // analyzed as DDA gets its full demand back in case it was
-    // isolated in a previous trial or time period
-    if (hyd->DisconPinned)
+    // Mark the junctions that have an open path to a tank or
+    // reservoir - at the first trial of a time step and, once
+    // hydsolve() finds that mid-trial status changes have cut
+    // junctions off, at every trial - & keep those junctions
+    // out of service
+    if (hyd->DisconRemark || hyd->DisconPinned)
     {
         hyd->DisconnectedNodes = findconnected(pr);
-        for (i = 1; i <= net->Njuncs; i++)
-        {
-            if (!hyd->Connected[i]) hyd->DemandFlow[i] = 0.0;
-            else if (hyd->DemandModel == DDA)
-                hyd->DemandFlow[i] = hyd->FullDemand[i];
-        }
+        hyd->DisconRemark = FALSE;
     }
+    disconflows(pr);
 
     // Compute matrix coeffs. from links, emitters, and nodal demands
     linkcoeffs(pr);
@@ -338,7 +336,7 @@ void   matrixcoeffs(Project *pr)
     valvecoeffs(pr);
 
     // Finally, fix the heads of any disconnected junctions
-    if (hyd->DisconPinned) disconcoeffs(pr);
+    if (hyd->DisconnectedNodes > 0) disconcoeffs(pr);
 }
 
 
@@ -347,18 +345,18 @@ int findconnected(Project *pr)
 **--------------------------------------------------------------
 **  Input:   none
 **  Output:  returns the number of disconnected junctions
-**  Purpose: marks junctions that are connected to a fixed grade
-**           node through the hydraulic equation matrix. A group
-**           of junctions isolated by closed links stays in the
-**           matrix coupled only through the 1/CBIG conductance
-**           placeholder that closed links retain, which makes
-**           the matrix ill-conditioned and lets the group's
-**           demand "leak" through closed links at absurd heads.
+**  Purpose: marks junctions that have a path to a tank or
+**           reservoir through passable links. A junction without
+**           one stays in the equation matrix coupled only through
+**           the 1/CBIG conductance placeholder that impassable
+**           links retain, so its rows either make the matrix
+**           ill-conditioned or let its demand "leak" through
+**           closed links at absurd heads. Such junctions are
+**           taken out of service by disconflows()/disconcoeffs().
 **
-**  Note:    an ACTIVE PRV, PSV or FCV couples its end nodes with
-**           at most 1/CBIG, so it acts as a closed link here,
-**           while the node whose head an ACTIVE PRV or PSV fixes
-**           acts as a fixed grade node (see prvcoeff()/psvcoeff()).
+**  Note:    the head-setting node of an ACTIVE PRV or PSV counts
+**           as a source since prvcoeff()/psvcoeff() fix its head
+**           the same way a fixed grade node's is.
 **--------------------------------------------------------------
 */
 {
@@ -395,8 +393,8 @@ int findconnected(Project *pr)
         }
     }
 
-    // Mark every node connected to those on the list through links
-    // that have an actual conductance in the matrix
+    // Mark every node connected to those on the list through
+    // passable links
     n = 1;
     while (n <= m)
     {
@@ -405,7 +403,7 @@ int findconnected(Project *pr)
         {
             j = alink->node;
             if (hyd->Connected[j]) continue;
-            if (!linkcoupled(pr, alink->link)) continue;
+            if (!linkpassable(pr, alink->link)) continue;
             hyd->Connected[j] = 1;
             nodelist[++m] = j;
         }
@@ -422,29 +420,88 @@ int findconnected(Project *pr)
 }
 
 
-int linkcoupled(Project *pr, int k)
+int linkpassable(Project *pr, int k)
 /*
 **--------------------------------------------------------------
 **  Input:   k = link index
-**  Output:  returns 1 if the link couples its end nodes through
-**           an actual conductance in the hydraulic equation
-**           matrix, 0 if it carries at most the 1/CBIG
-**           placeholder. Closed links, ACTIVE PRVs/PSVs/FCVs
-**           (see prvcoeff()/psvcoeff()/fcvcoeff()) and links
-**           whose head loss gradient has collapsed to the
-**           placeholder cap (e.g. a constant-power pump at
-**           near-zero flow) do not couple their end nodes.
+**  Output:  returns 1 if the link can pass flow, 0 if not
+**  Purpose: applies the same test the coefficient functions use
+**           to assign the 1/CBIG placeholder conductance, so
+**           that island detection predicts exactly which rows
+**           the equation matrix cannot support. A link with
+**           status XHEAD, TEMPCLOSED or CLOSED is impassable
+**           (see pipecoeff()/pumpcoeff()/valvecoeff()); so is a
+**           pump whose coefficients collapsed to the placeholder
+**           for another reason (zero speed, or a constant-power
+**           pump at near-zero flow - see pumpcoeff()). An ACTIVE
+**           PRV or FCV passes flow even though it couples its end
+**           nodes with at most 1/CBIG: a PRV's downstream node is
+**           head-fixed by prvcoeff() and an FCV injects its flow
+**           setting, so sections behind them are supplied and any
+**           trouble there is left to badvalve(). An ACTIVE PSV is
+**           NOT passable: psvcoeff() head-fixes its UPSTREAM node
+**           and couples its downstream side with only 1/CBIG, so
+**           a section fed only through one has no support.
 **--------------------------------------------------------------
 */
 {
     Hydraul *hyd = &pr->hydraul;
-    LinkType t = pr->network.Link[k].Type;
 
     if (hyd->LinkStatus[k] <= CLOSED) return 0;
-    if ((t == PRV || t == PSV || t == FCV) &&
-        hyd->LinkSetting[k] != MISSING)
+    if (pr->network.Link[k].Type == PUMP)
+        return hyd->P[k] > 1.0 / CBIG;
+    if (pr->network.Link[k].Type == PSV)
         return hyd->LinkStatus[k] != ACTIVE;
-    return hyd->P[k] > 1.0 / CBIG;
+    return 1;
+}
+
+
+void disconflows(Project *pr)
+/*
+**--------------------------------------------------------------
+**  Input:   none
+**  Output:  none
+**  Purpose: zeros the demand, emitter, leakage & internal link
+**           flows of junctions taken out of service by
+**           findconnected(), and restores the demand of
+**           junctions that have come back into service (under
+**           DDA, and for the fixed inflows of negative demands
+**           under PDA, since nothing else re-establishes them
+**           within a time step).
+**--------------------------------------------------------------
+*/
+{
+    Network *net = &pr->network;
+    Hydraul *hyd = &pr->hydraul;
+
+    int i, k;
+    Slink *link;
+
+    for (i = 1; i <= net->Njuncs; i++)
+    {
+        if (!hyd->Connected[i])
+        {
+            hyd->DemandFlow[i] = 0.0;
+            hyd->EmitterFlow[i] = 0.0;
+            hyd->LeakageFlow[i] = 0.0;
+        }
+        else if (hyd->DemandModel == DDA || hyd->FullDemand[i] <= 0.0)
+        {
+            hyd->DemandFlow[i] = hyd->FullDemand[i];
+        }
+    }
+
+    // A link with both ends out of service carries no flow (its end
+    // nodes share one fixed head, so once zeroed it stays zero)
+    if (hyd->DisconnectedNodes > 0) for (k = 1; k <= net->Nlinks; k++)
+    {
+        link = &net->Link[k];
+        if (link->N1 <= net->Njuncs && !hyd->Connected[link->N1] &&
+            link->N2 <= net->Njuncs && !hyd->Connected[link->N2])
+        {
+            hyd->LinkFlow[k] = 0.0;
+        }
+    }
 }
 
 
@@ -532,6 +589,39 @@ void  nodecoeffs(Project *pr)
 }
 
 
+double islandhead(Project *pr, int *nodelist, int m)
+/*
+**----------------------------------------------------------------
+**  Input:   nodelist[1..m] = the junctions of one isolated group
+**  Output:  returns the head assigned to the whole group
+**  Purpose: THE ISLAND HEAD CONVENTION, kept in one place so it
+**           can be changed in one place. A group of junctions cut
+**           off from every tank & reservoir shares one common head
+**           (per-node elevations would drive spurious flows through
+**           the group's internal pipes): the elevation of its
+**           LOWEST junction, so the group reads as depressurized -
+**           zero pressure at its low point, non-positive pressure
+**           everywhere - and can never display a plausible
+**           positive pressure. The lowest (not highest) elevation
+**           also keeps the treatment stable: a group pinned at its
+**           highest elevation presents a high head to the closed
+**           PRVs and pumps that isolate it, re-opening them and
+**           cycling the group in & out of service every trial
+**           (observed on the KY12 & KY15 systems).
+**----------------------------------------------------------------
+*/
+{
+    int n;
+    double el = pr->network.Node[nodelist[1]].El;
+
+    for (n = 2; n <= m; n++)
+    {
+        el = MIN(el, pr->network.Node[nodelist[n]].El);
+    }
+    return el;
+}
+
+
 void  disconcoeffs(Project *pr)
 /*
 **----------------------------------------------------------------
@@ -541,9 +631,8 @@ void  disconcoeffs(Project *pr)
 **           by findconnected(), using the same large-diagonal
 **           device as prvcoeff(), so that an isolated group of
 **           junctions leaves the matrix well-conditioned. All
-**           junctions of a group share one head - the lowest
-**           elevation among them - so the group holds zero flow
-**           and can never display a plausible positive pressure.
+**           junctions of a group share the head chosen by
+**           islandhead().
 **----------------------------------------------------------------
 */
 {
@@ -553,10 +642,9 @@ void  disconcoeffs(Project *pr)
 
     int i, j, m, n, row;
     int *nodelist = hyd->ConnNodeList;
-    double elmin;
+    double head;
     Padjlist alink;
 
-    if (hyd->DisconnectedNodes == 0) return;
     for (i = 1; i <= net->Njuncs; i++)
     {
         if (hyd->Connected[i]) continue;
@@ -566,7 +654,6 @@ void  disconcoeffs(Project *pr)
         m = 1;
         nodelist[1] = i;
         hyd->Connected[i] = 2;
-        elmin = net->Node[i].El;
         n = 1;
         while (n <= m)
         {
@@ -575,20 +662,20 @@ void  disconcoeffs(Project *pr)
             {
                 j = alink->node;
                 if (hyd->Connected[j]) continue;
-                if (!linkcoupled(pr, alink->link)) continue;
+                if (!linkpassable(pr, alink->link)) continue;
                 hyd->Connected[j] = 2;
                 nodelist[++m] = j;
-                elmin = MIN(elmin, net->Node[j].El);
             }
             n++;
         }
 
-        // Fix each junction's head at the group's lowest elevation
+        // Fix each junction's head at the group's common head
+        head = islandhead(pr, nodelist, m);
         for (n = 1; n <= m; n++)
         {
             row = sm->Row[nodelist[n]];
             sm->Aii[row] += CBIG;
-            sm->F[row] += (elmin * CBIG);
+            sm->F[row] += (head * CBIG);
         }
     }
 
@@ -676,9 +763,10 @@ void  emittercoeffs(Project *pr)
 
     for (i = 1; i <= net->Njuncs; i++)
     {
-        // Skip junctions without emitters
+        // Skip junctions without emitters or out of service
         node = &net->Node[i];
         if (node->Ke == 0.0) continue;
+        if (!hyd->Connected[i]) continue;
 
         // Find emitter head loss and gradient
         emitterheadloss(pr, i, &hloss, &hgrad);
@@ -769,9 +857,10 @@ void  demandcoeffs(Project *pr)
     // Examine each junction node
     for (i = 1; i <= net->Njuncs; i++)
     {
-        // Skip junctions with non-positive demands
+        // Skip junctions with non-positive demands or out of service
         if (hyd->FullDemand[i] <= 0.0) continue;
-        
+        if (!hyd->Connected[i]) continue;
+
         // Find head loss for demand outflow at node's elevation
         demandheadloss(pr, i, dp, n, &hloss, &hgrad);
                     

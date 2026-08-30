@@ -1,5 +1,5 @@
 [TITLE]
-Island of junctions J3-J4 cut off from the reservoir by CLOSED pipes.
+Island of junctions J3-J4, carrying demand, cut off by CLOSED pipes.
 Without disconnection handling this network makes the hydraulic matrix
 ill-conditioned (Error 110): the island's 16 parallel internal pipes are capped
 by pipecoeff() at a head loss gradient of RQTOL/Hexp = 2^-24 exactly (RQTOL
@@ -15,8 +15,8 @@ its highest junction elevation instead and the run ends with warning 3.
 ;ID    Elev    Demand
  J1    100     50
  J2    100     50
- J3    100     0
- J4    90      0
+ J3    100     5
+ J4    90      5
 
 [RESERVOIRS]
 ;ID    Head

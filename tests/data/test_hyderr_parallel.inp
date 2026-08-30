@@ -1,0 +1,35 @@
+[TITLE]
+Parallel-link check: J1 and J2 are joined by two pipes, one closed.
+The section beyond them is fed only through the open twin and must
+NOT be flagged as disconnected (guards against island detection
+walking an adjacency that drops parallel links).
+
+[JUNCTIONS]
+;ID    Elev    Demand
+ J1    100     0
+ J2    100     0
+ J3    90      10
+
+[RESERVOIRS]
+;ID    Head
+ R1    150
+
+[PIPES]
+;ID    Node1   Node2   Length  Diam  Rough  Mloss  Status
+ P1    R1      J1      1000    12    130    0      Open
+ PA    J1      J2      1000    12    130    0      Open
+ PB    J1      J2      1000    12    130    0      Closed
+ P2    J2      J3      1000    12    130    0      Open
+
+[REPORT]
+ Status    Full
+ Messages  Yes
+
+[OPTIONS]
+ Units     GPM
+ Headloss  H-W
+
+[TIMES]
+ Duration  0
+
+[END]

@@ -810,7 +810,8 @@ typedef struct {
     HydErrNode,            // Node where matrix ill-conditioning occurred
     HydErrLink,            // Link involved in matrix ill-conditioning
     DisconnectedNodes,     // Number of junctions cut off from all tanks & reservoirs
-    DisconPinned,          // TRUE once disconnected junction heads are being fixed
+    DisconRemark,          // TRUE when junction connectivity must be re-marked
+    DisconPinned,          // TRUE once mid-trial disconnections are being treated
     HasLeakage,            // TRUE if project has non-zero leakage parameters
     LeakageChanged;        // TRUE if leakage parameters changed
     

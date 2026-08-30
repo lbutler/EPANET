@@ -338,8 +338,9 @@ void leakagecoeffs(Project *pr)
     
     for (i = 1; i <= net->Njuncs; i++)
     {
-        // Skip junctions that don't leak
+        // Skip junctions that don't leak or are out of service
         node = &net->Node[i];
+        if (!hyd->Connected[i]) continue;
         if (!leakage_headloss(pr, i, &hfa, &gfa, &hva, &gva)) continue;
 
         // Addition to matrix diagonal & r.h.s
