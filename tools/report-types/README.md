@@ -1,103 +1,163 @@
-# EPANET report type model
+# EPANET report parser (epanet-js profile)
 
-`epanet-report.ts` is a complete TypeScript data model for the contents of
-an EPANET `.rpt` report at its fullest setting — STATUS FULL, SUMMARY YES,
-NODES/LINKS ALL, ENERGY YES — plus every warning and error path the engine
-can write.
+A small, dependency-free TypeScript library that turns an EPANET `.rpt`
+report into structured data — plus a byte-exact regenerator that proves
+the capture is lossless.
 
-It exists so a parser (e.g. in epanet-js) can stream a report and fill
-structured data instead of showing text: `ReportStreamEvent` is what a
-line-by-line parser emits, `EpanetReport` is what a reducer accumulates.
-The same structure could re-render the classic report, but the point is to
-present it dynamically.
-
-## Where it comes from
-
-The model is derived from an exhaustive inventory of every code path that
-writes to the report file in OWA EPANET 2.3-dev — all 133 `writeline()`
-call sites, cross-checked against every format macro in `src/text.h` — and
-validated against the engine's actual output on 59 corpus networks plus
-purpose-built failure cases.  See `../report-replication/MISSING_API.md`
-(appendix) for the inventory and `../report-replication/` for the harness
-that produced it.  Each type cites the `FMTnn` / `WARNnn` macro it stores.
-
-## Report anatomy → model
+epanet-js writes the input file, so the report settings are pinned to
+one **fixed profile**:
 
 ```
-Page 1 header + logo banner            → ReportHeader
-[input summary]                        → InputSummary          (SUMMARY YES)
-[validation / parse diagnostics]       → ReportDiagnostic[]
-Analysis begun <ctime>                 → analysisBegun
-[Hydraulic Status: stream]             → HydraulicTimeStep[]   (STATUS YES/FULL)
-[Hydraulic Flow Balance]               → FlowBalance           (STATUS YES/FULL)
-[Water Quality Mass Balance]           → MassBalance           (STATUS YES/FULL + quality)
-Analysis ended <ctime>                 → analysisEnded
-[Energy Usage table]                   → EnergyUsage           (ENERGY YES)
-[node/link tables per period]          → NodeResultsTable[] / LinkResultsTable[]
+[REPORT]   Status FULL / Summary NO / Page 0 / Messages YES /
+           Nodes NONE / Links NONE / Energy NO
+[TIMES]    Statistic NONE
 ```
 
-Note the order: the balance blocks print **before** `Analysis ended`, and
-the energy + results tables print **after** it (they are written by
-`EN_report`).
+Node/link results reach epanet-js through the API and output file, not
+the report.  The report's job is everything the API *cannot* tell you
+(see `../report-replication/MISSING_API.md`): what happened inside the
+hydraulic loop — control and rule actions, link status switching,
+per-trial convergence, warnings — plus the closing balances and any
+input diagnostics.  Under the profile a report is exactly:
+
+```
+Page-1 stamp + logo banner           -> ReportHeader
+[validation / parse diagnostics]     -> ReportDiagnostic[]
+Analysis begun <ctime>               -> analysisBegun
+Hydraulic Status: stream             -> HydraulicTimeStep[] (STATUS FULL)
+Hydraulic Flow Balance               -> FlowBalance
+[Water Quality Mass Balance]         -> MassBalance   (quality runs)
+Analysis ended <ctime>               -> analysisEnded
+[terminal error lines]               -> ReportDiagnostic[]
+```
+
+## Files
+
+| file | what |
+| --- | --- |
+| `epanet-report.ts` | the data model: `EpanetReport`, `StatusEvent`, `ReportStreamEvent`, … (each type cites the `FMTnn`/`WARNnn` macro in `src/text.h` it stores) |
+| `parse.ts` | `ReportParser` (streaming tokenizer), `ReportReducer`, `parseReport()` |
+| `regenerate.ts` | `regenerateReport()` — model back to byte-exact classic text |
+| `roundtrip.mjs` | parse → regenerate → byte-diff over a corpus of native reports |
+| `make-profile-corpus.sh` | rewrites any set of `.inp` files to the profile and runs the engine to produce native reports |
+| `selftest.mjs` | symmetry check for status-line shapes no test network triggers, plus byte-at-a-time streaming equivalence |
+| `fixtures/synthetic.rpt` | the self-test's source-derived fixture (ill-conditioning grammar) |
+
+## Usage
+
+```ts
+import { parseReport } from './parse.js';
+import { regenerateReport } from './regenerate.js';
+
+const { report, unrecognized } = parseReport(text);
+report.statusLog[0].events;   // what the solver did at t=0
+report.flowBalance?.flowRatio;
+report.complete;              // saw "Analysis ended"
+
+// streaming: feed chunks as they arrive (any chunking, mid-line is fine)
+import { ReportParser, ReportReducer } from './parse.js';
+const reducer = new ReportReducer();
+const parser = new ReportParser((ev) => {
+  reducer.handle(ev);          // or drive a live UI from ev directly
+});
+parser.write(chunk);
+parser.end();
+
+// lossless-capture proof / classic rendering
+const text2 = regenerateReport(report);  // === text for profile reports
+```
+
+Build with `npm run build` (plain `tsc`, no dependencies); everything
+compiles under `--strict`.
+
+## Verification
+
+`roundtrip.mjs` demands the regenerated text equal the native report
+**byte for byte — no masking**: wall-clock stamps are stored raw, so
+even the `Analysis begun/ended` lines must survive.  Any field the
+parser drops, mangles, mis-times or mis-orders shows up as a byte
+difference; any line it fails to classify is reported as `unrecognized`.
+
+Current result over the profile corpus — 189 networks: the 56-network
+OWA regression corpus + the three shipped examples + purpose-built
+probes (halted unbalanced runs, PDA demand reductions, rule actions,
+timer/clocktime controls, chem/age/trace quality, overflowing tanks,
+abnormal pumps/valves, disconnections, and 13 networks with validation,
+parse, rule and unlinked-node failures):
+
+```
+round trip: 189 reports, 189 byte-identical, 0 differ, 0 with unrecognized lines
+```
+
+To reproduce:
+
+```
+npm run build
+./make-profile-corpus.sh /tmp/profile-corpus ../../build/bin/runepanet \
+    ../../example-networks <corpus-dirs...>
+node roundtrip.mjs /tmp/profile-corpus
+node selftest.mjs /tmp/profile-corpus/Net3.rpt
+```
+
+Three status-line shapes appear in no engine-runnable network we could
+construct, so `selftest.mjs` pins them from the C source instead
+(regenerate → parse → regenerate must be byte-stable and the model
+deep-equal): FMT61 `Valve <id> caused ill-conditioning`, FMT62
+`System ill-conditioned at node <id>` (including its
+no-trailing-blank warning grammar from `writehyderr()`), and FMT56
+`setting changed to` — which is dead code in 2.3-dev (every
+`writestatchange()` call site is guarded by an actual status change)
+but kept defensively.
 
 ## Parsing notes (hard-won specifics)
 
-- **Line frame.** Every line starts with a newline plus two spaces; blank
-  lines come in two widths (`writeline("")` = 2 spaces,
-  `writeline(" ")` = 3).  Strip the frame before matching.
-- **Pagination is layout, not data.**  With `PAGE n` set, `\f` +
-  `Page N    <title>` headers interrupt any section, and table headers
-  reprint with a ` (continued)` suffix.  Skip them in the parser; the
-  model ignores them.  (The status header's own `(continued)` variant is
-  dead code and can never appear.)
-- **Times.**  Simulation times are `h:mm:ss` with an unpadded hour that
-  can exceed 24, right-aligned in 10 columns.  Wall-clock stamps are raw
-  `ctime()` strings.
-- **Numbers.**  Table cells switch to `%10.2e` scientific notation above
-  1e6 in magnitude; mass balance values are always `%12.5e`.
-- **Timeless status lines.**  WARN03c, the FULL intra-step
-  `switched from` / `setting changed to` lines, and the FULL trial /
-  convergence-detail continuation lines carry no timestamp — attribute
-  them to the current step.
-- **Warnings ignore the STATUS level.**  WARNING lines (and the status
-  dump on an ill-conditioned failure) are gated by `MESSAGES` — on by
-  default — so the status log can be non-empty even at STATUS NO.
-- **The title can hide in a page header.**  With SUMMARY off and
-  `PAGE n` set, the project title appears only in `Page 2+` headers —
-  capture it before dropping them.
-- **Rule action timestamps.**  FMT63 lines are emitted from inside
-  `EN_nextH` and stamped with the *next* period's time, so they appear
-  between one step's block and the next.
-- **Statistic runs.**  With `STATISTIC AVERAGE/…` there is a single
-  node + link table titled `AVERAGE Node Results:` (range prints
-  `DIFFERENTIAL`); single-period runs title tables `Node Results:` with
-  no time.  `resultsStatistic` + `time: null` cover both.
-- **Quality column header.**  The node table's quality column is headed
-  by the chemical's *name* over its *units* — for trace runs that is
-  `% from` over the trace node's ID.
-- **Diagnostics come in pairs.**  Input parse errors are a message line
-  plus an echo of the offending input line; rule errors print their own
-  `Input Error …` pair and are then re-reported by the generic handler.
-- **Known engine bug, stored as printed.**  The energy table's Demand
-  Charge has the rate applied twice (`savenergy()` then `writeenergy()`);
-  the model stores the printed value and documents the bug.
-- **Warnings repeat per step.**  The same warning can appear at every
-  reporting period; each occurrence is its own `StatusEvent`.
+- **Line frame.**  Every content line is `\n` + two spaces
+  (`writeline()` in `src/report.c`); strip exactly those two, never
+  `trim()` — status lines carry meaningful indentation, and echoed
+  input lines must survive verbatim.
+- **Blank lines are derived, not stored.**  They come in three widths,
+  each with a known producer: 0-width from a `\n` embedded in a format
+  string (FMT64 `Balancing the network:`, FMT68 head-error detail,
+  ctime stamps, input2.c's echoed line), 2-space from `writeline("")`
+  (end of logo), 3-space from `writeline(" ")` (status-header break,
+  end of every step block, after a step's warnings).  The regenerator
+  re-derives all of them; the ill-conditioned failure path
+  (`writehyderr()` → `disconnected()`) is the one spot warnings get
+  no trailing blank.
+- **Times.**  Step times are `h:mm:ss`, hour unpadded and unbounded,
+  right-aligned in 10 columns; stored as seconds.  Wall-clock stamps
+  are raw `ctime()` text.
+- **Timeless lines attach to the current step** — trials, convergence
+  details, the intra-step `switched from` lines, and WARN03c.
+- **Warnings carry their own timestamp in the text** and always trail
+  their step (`writehydstat()` runs before `writehydwarn()`); they are
+  gated by MESSAGES, not STATUS.
+- **Rule actions are stamped with the *next* period's time** (emitted
+  from inside `EN_nextH`), so they open that step's block — grouping by
+  printed time reproduces the report exactly.
+- **Diagnostics come in pairs.**  `input2.c` parse errors and
+  `rules.c` rule errors are a message line plus an echo of the
+  offending input line; the input2 echo keeps its `\n` (a 0-width blank
+  follows), the rule echo does not.  The line-too-long variant (214)
+  has no `Error NNN:` prefix.  A rule error is re-reported by the
+  generic handler, so the same clause yields two pairs.  The full line
+  text is stored verbatim in `ReportDiagnostic.text`, so regeneration
+  never depends on the error-message catalogue.
+- **Number formats.**  Convergence values are `%.4f` / `%-.6f`; tank
+  levels and settings `%-.2f`; flow-balance terms `%12.3f`; mass terms
+  `%12.5e` (C prints two exponent digits — JS `toExponential` needs
+  padding); mass ratio `%-.5f`.  C prints `-0.00` for negative zero;
+  JS `toFixed` drops the sign, so the formatter restores it (and
+  `parseFloat('-0.00')` preserving `-0` is what makes the round trip
+  hold).
+- **Trailing newline.**  A completed report ends with the `\n` from the
+  `Analysis ended` ctime; a failed one ends unterminated after its last
+  error line.
 
-## Checking
+## Relation to `../report-replication`
 
-The file compiles clean under `tsc --strict --noEmit` (TypeScript 5.6).
-
-`check-coverage.mjs` classifies every line of a set of `.rpt` files
-against the model's shapes and reports any line with no home:
-
-```
-node check-coverage.mjs <dir-or-file>...
-```
-
-Validated against 405 engine-produced reports (439k non-blank lines,
-including STATUS FULL runs, statistic runs, priced energy, pagination and
-every deliberately-broken network): the only unmatched shapes are echoed
-offending input lines, which the model stores as opaque strings by
-design.  The regexes map one-to-one onto `ReportStreamEvent` arms, so the
-script doubles as the seed of a real streaming parser.
+That harness replicates the report *from the toolkit API* (in C) to
+find API gaps; this library replicates it *from the report text* (in
+TypeScript) so epanet-js can present the same information dynamically
+today, before any of `PROPOSED_API.md` lands.  Both are validated the
+same way: byte-exact reproduction over the same network corpus.

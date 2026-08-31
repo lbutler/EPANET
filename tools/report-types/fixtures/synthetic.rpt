@@ -1,0 +1,27 @@
+  Page 1                                    Mon Aug 31 00:00:00 2026
+
+  ******************************************************************
+  *                           E P A N E T                          *
+  *                   Hydraulic and Water Quality                  *
+  *                   Analysis for Pipe Networks                   *
+  *                          Version 2.3.06                        *
+  ******************************************************************
+  
+  Analysis begun Mon Aug 31 00:00:00 2026
+
+   
+  Hydraulic Status:
+  -----------------------------------------------------------------------
+     0:00:00: Balancing the network:
+
+              Trial  1: relative flow change = 1.000000
+              PRV V1 switched from active to open
+              FCV V2 setting changed to 40.00
+     0:00:00: Valve V9 caused ill-conditioning
+              Trial  2: relative flow change = 0.500000
+                        maximum  flow change = 0.0100 for Node N1
+     0:00:00: System ill-conditioned at node J77
+     0:00:00: Pipe P1 temporarily closed
+   
+  WARNING: Node J77 disconnected at 0:00:00 hrs
+  Error 110: cannot solve network hydraulic equations

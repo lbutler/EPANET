@@ -1,0 +1,10 @@
+{
+  "name": "epanet-report",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Types, streaming parser and byte-exact regenerator for EPANET .rpt reports (fixed epanet-js profile)",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p ."
+  }
+}
